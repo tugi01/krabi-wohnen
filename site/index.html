@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f2b33">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Krabi Wohnen">
+<meta name="robots" content="noindex">
+<title>Krabi Wohnen</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <h1>Krabi Wohnen</h1>
+    <p id="stand" class="muted">Lade Inserate …</p>
+  </div>
+  <button id="filterBtn" class="pill" aria-haspopup="dialog" aria-controls="filters">Filter <span id="filterCount"></span></button>
+</header>
+
+<nav class="seg" role="tablist" aria-label="Ansicht">
+  <button role="tab" id="tabList" aria-selected="true" data-view="list">Liste</button>
+  <button role="tab" id="tabMap" aria-selected="false" data-view="map">Karte</button>
+  <button role="tab" id="tabFav" aria-selected="false" data-view="fav">★ Merkliste</button>
+</nav>
+
+<main>
+  <section id="viewList" class="view">
+    <p id="summary" class="summary"></p>
+    <div id="list" class="cards"></div>
+  </section>
+  <section id="viewMap" class="view" hidden>
+    <div id="map" aria-label="Karte der Inserate"></div>
+    <div class="legend"><span class="dot l"></span>Wohnung <span class="dot s"></span>Strand <span class="dot m"></span>Moschee <span class="dot g"></span>Muay Thai <span class="dot e"></span>Einkauf</div>
+  </section>
+</main>
+
+<div id="scrim" class="scrim" hidden></div>
+<aside id="filters" class="sheet" role="dialog" aria-modal="true" aria-labelledby="fTitle" hidden>
+  <div class="grab"></div>
+  <h2 id="fTitle">Filter</h2>
+  <label class="row toggle"><span><b>Ältere Gebäude zeigen</b><small>älter als 5 Jahre und nicht kernsaniert</small></span><input type="checkbox" id="fOld"><i></i></label>
+  <label class="row toggle"><span><b>Nur mit Pool</b><small>privat oder Gemeinschaftspool</small></span><input type="checkbox" id="fPool"><i></i></label>
+  <label class="row toggle"><span><b>Baujahr unbekannt zeigen</b><small>Inserat nennt kein Baujahr</small></span><input type="checkbox" id="fUnknown"><i></i></label>
+  <label class="row toggle"><span><b>Nur sofort/bald frei</b><small>blendet „frei ab“ später als 2 Monate aus</small></span><input type="checkbox" id="fSoon"><i></i></label>
+  <div class="row range"><label for="fSize"><b>Wohnfläche ab</b> <output id="oSize"></output></label><input type="range" id="fSize" min="0" max="200" step="5"></div>
+  <div class="row range"><label for="fPrice"><b>Miete bis</b> <output id="oPrice"></output></label><input type="range" id="fPrice" min="10000" max="150000" step="1000"></div>
+  <div class="row range"><label for="fBeach"><b>Strand max.</b> <output id="oBeach"></output></label><input type="range" id="fBeach" min="2" max="30" step="1"></div>
+  <div class="row"><label for="fSort"><b>Sortierung</b></label>
+    <select id="fSort">
+      <option value="price">Preis aufsteigend</option>
+      <option value="sqm">Preis pro m²</option>
+      <option value="new">Neueste Inserate</option>
+      <option value="beach">Nähe Strand</option>
+      <option value="mosque">Nähe Moschee</option>
+      <option value="size">Größte zuerst</option>
+    </select>
+  </div>
+  <div class="sheetActions"><button id="fReset" class="ghost">Zurücksetzen</button><button id="fClose" class="primary">Fertig</button></div>
+</aside>
+
+<aside id="detail" class="sheet detail" role="dialog" aria-modal="true" aria-labelledby="dTitle" hidden></aside>
+
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

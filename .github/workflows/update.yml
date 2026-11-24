@@ -1,0 +1,46 @@
+name: Inserate aktualisieren & veröffentlichen
+
+on:
+  schedule:
+    - cron: "0 23 * * *"   # täglich 06:00 Uhr Thailand
+    - cron: "0 11 * * *"   # zusätzlich 18:00 Uhr Thailand
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["site/**", ".github/workflows/**"]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Inserate laden
+        if: github.event_name != 'push'
+        run: python3 scraper/scrape.py
+      - name: Daten speichern
+        if: github.event_name != 'push'
+        run: |
+          git config user.name "krabi-wohnen-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/data/listings.json scraper/cache.json
+          git diff --cached --quiet || git commit -m "Inserate aktualisiert $(date -u +%F\ %H:%M)"
+          git push
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4

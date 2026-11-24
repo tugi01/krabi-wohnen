@@ -1,0 +1,77 @@
+// UI-Prüfung: PW_FROM=<Projekt mit playwright>/package.json node tests/ui-check.mjs  (Server: python3 -m http.server 8765 -d site)
+import { createRequire } from 'module';
+const require = createRequire(process.env.PW_FROM || (process.cwd() + '/package.json'));
+const { chromium, webkit } = require('playwright');
+const BASE = process.env.BASE || 'http://127.0.0.1:8765/';
+const out = process.env.OUT || '/tmp';
+const fails = [];
+const ok = (c, m) => { if (!c) fails.push(m); console.log((c ? '✓ ' : '✗ ') + m); };
+
+for (const [name, engine] of [['chromium', chromium], ['webkit', webkit]]) {
+  const browser = await engine.launch();
+  try {
+    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, hasTouch: true, isMobile: name === 'chromium' });
+    const page = await ctx.newPage();
+    const errors = [];
+    page.on('pageerror', e => errors.push(e.message));
+    page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+    await page.goto(BASE, { waitUntil: 'networkidle' });
+    await page.waitForSelector('.card');
+    const vw = await page.evaluate(() => [innerWidth, document.documentElement.scrollWidth]);
+    ok(vw[0] === 390 && vw[1] <= 390, `${name}: keine horizontale Überbreite (${vw})`);
+    const count = s => page.$$eval('.card', c => c.length);
+    const base = await count();
+    ok(base > 0, `${name}: Standardfilter zeigt ${base} Inserate`);
+    // Standard: keine alten Gebäude sichtbar
+    const oldTags = await page.$$eval('.card .tag.warn', t => t.length);
+    ok(oldTags === 0, `${name}: Standard zeigt keine Gebäude > 5 Jahre (${oldTags})`);
+    await page.waitForTimeout(3000);
+    const loaded = await page.$$eval('.card img', i => i.filter(x => x.getBoundingClientRect().top < innerHeight).map(x => x.complete && x.naturalWidth > 0));
+    ok(loaded.length > 0 && loaded.every(Boolean), `${name}: Fotos der ersten Karten geladen (${loaded})`);
+    await page.screenshot({ path: `${out}/kw-${name}-list.png` });
+    // Filter öffnen, alte einschalten
+    await page.click('#filterBtn');
+    await page.waitForSelector('#filters:not([hidden])'); await page.waitForTimeout(700);
+    await page.screenshot({ path: `${out}/kw-${name}-filter.png` });
+    await page.click('label:has(#fOld) i');
+    const withOld = await count();
+    ok(withOld > base, `${name}: „Ältere zeigen“ erhöht ${base} → ${withOld}`);
+    await page.click('label:has(#fOld) i');
+    ok(await count() === base, `${name}: „Ältere zeigen“ aus → wieder ${base}`);
+    await page.click('label:has(#fPool) i');
+    const pool = await count();
+    const noPoolTag = await page.$$eval('.card', cs => cs.filter(c => !/pool/i.test(c.querySelector('.facts').innerText)).length);
+    ok(pool < base && noPoolTag === 0, `${name}: „Nur mit Pool“ → ${pool} Inserate, alle mit Pool-Tag`);
+    await page.click('label:has(#fPool) i');
+    await page.click('#fClose');
+    // Persistenz nach Reload
+    await page.click('#filterBtn'); await page.click('label:has(#fPool) i'); await page.click('#fClose');
+    await page.reload({ waitUntil: 'networkidle' }); await page.waitForSelector('.card');
+    ok(await page.isChecked('#fPool'), `${name}: Filter bleibt nach Neuladen erhalten`);
+    await page.click('#filterBtn'); await page.click('#fReset'); await page.click('#fClose');
+    // Detail
+    await page.click('.card .body');
+    await page.waitForSelector('#detail:not([hidden])'); await page.waitForTimeout(700);
+    const hasLink = await page.$eval('#detail a.primary', a => a.href.startsWith('http'));
+    ok(hasLink, `${name}: Detail mit Link zum Original`);
+    await page.screenshot({ path: `${out}/kw-${name}-detail.png` });
+    await page.click('#detail .close');
+    // Merken
+    await page.click('.card .fav');
+    await page.click('#tabFav');
+    ok(await count() === 1, `${name}: Merkliste enthält 1 Inserat`);
+    // Karte
+    await page.click('#tabMap');
+    await page.waitForSelector('.pin');
+    await page.waitForTimeout(1500);
+    const tiles = await page.$$eval('.leaflet-tile-loaded', t => t.length);
+    const pins = await page.$$eval('.pin', p => p.length);
+    ok(tiles > 0 && pins > 0, `${name}: Karte mit ${tiles} Kacheln und ${pins} Wohnungs-Pins`);
+    await page.screenshot({ path: `${out}/kw-${name}-map.png` });
+    const imgs = await page.$$eval('.card img', i => i.filter(x => x.complete && x.naturalWidth > 0).length);
+    ok(errors.length === 0, `${name}: keine Konsolenfehler ${errors.join(' | ')}`);
+    await ctx.close();
+  } finally { await browser.close(); }
+}
+console.log(fails.length ? `\n${fails.length} FEHLER` : '\nALLES GRÜN');
+process.exit(fails.length ? 1 : 0);
