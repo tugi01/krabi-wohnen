@@ -108,6 +108,13 @@ for (const [name, engine] of [['chromium', chromium], ['webkit', webkit]]) {
     ok(iw <= 390, `${name}: Infos ohne Überbreite (${iw})`);
     await page.screenshot({ path: `${out}/kw-${name}-info.png`, fullPage: true });
     const imgs = await page.$$eval('.card img', i => i.filter(x => x.complete && x.naturalWidth > 0).length);
+    // Google Maps: Position des Objekts + Routen vom Objekt
+    await page.click('#tabList'); await page.click('.card .body'); await page.waitForSelector('#detail:not([hidden])');
+    const gm = await page.$$eval('#detail a', as => as.map(a => a.href).filter(h => /google\.com\/maps/.test(h)));
+    const lat = await page.evaluate(() => { const id = document.querySelector('#detail [data-fav]').dataset.fav; const l = DATA.listings.find(x=>x.id===id); return l ? [l.lat,l.lng] : null; });
+    ok(lat && gm.some(h => h === `https://www.google.com/maps/search/?api=1&query=${lat[0]},${lat[1]}`), `${name}: Google-Maps-Knopf zeigt Position des Objekts`);
+    ok(gm.filter(h => h.includes(`/dir/?api=1&origin=${lat[0]},${lat[1]}&destination=`)).length >= 3, `${name}: Routen vom Objekt zu Moschee/Strand/… (${gm.length - 1})`);
+    await page.click('#detail .close');
     // Wohnfläche ab/bis
     await page.click('#tabList'); await page.click('#filterBtn'); await page.waitForTimeout(300);
     const cnt = () => page.$eval('#summary', e => +e.textContent.match(/^(\d+)/)[1]);

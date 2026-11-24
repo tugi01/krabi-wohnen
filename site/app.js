@@ -5,7 +5,7 @@ const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 const CITIES = {
   krabi:   { name:'Krabi', long:'Krabi / Ao Nang', key:'krabiwohnen.v1', center:[8.045,98.83], fb:'Ao Nang Krabi',
              note:'Alle Inserate in Mueang Krabi bis 25 km um Ao Nang.' },
-  pattaya: { name:'Pattaya', long:'Pattaya', key:'krabiwohnen.pattaya.v1', center:[12.93,100.89], fb:'Pattaya',
+  pattaya: { name:'Pattaya', long:'Pattaya & Umgebung', key:'krabiwohnen.pattaya.v1', center:[12.93,100.89], fb:'Pattaya',
              note:'Pattaya hat über 16.000 Inserate. Geladen werden nur die passenden: ab 50 m², bis 60.000 ฿ und Baujahr der letzten 10 Jahre.' },
 };
 let CITY = CITIES[localStorage.getItem('krabiwohnen.city')] ? localStorage.getItem('krabiwohnen.city') : 'krabi';
@@ -108,7 +108,7 @@ function card(l){
       <div class="price">${fmt(l.price)} ฿ <small>/ Monat${e?` · ≈ ${fmt(e)} €`:''}</small></div>
       <div class="title">${esc(l.title)}</div>
       <div class="facts">
-        ${l.size?`<span class="tag">${fmt(l.size)} m²</span>`:''}
+        ${l.size?`<span class="tag">${fmt(l.size)} m²</span>`:''}${l.area && !['Pattaya','Krabi'].includes(l.area)?`<span class="tag area">📍 ${esc(l.area.split(' / ')[0])}</span>`:''}
         ${l.beds!=null?`<span class="tag grey">${l.beds} SZ</span>`:''}
         <span class="tag ${a.cls==='ok'?'':a.cls==='old'?'warn':'grey'}">${esc(a.label)}</span>
         ${l.pool?`<span class="tag">${l.pool==='privat'?'Privatpool':'Pool'}</span>`:''}
@@ -174,7 +174,7 @@ function drawMap(rows){
       const [c,e] = POICOL[p.cat] || ['#555','•'];
       const boat = p.cat==='Strand' && p.boat;
       L.marker([p.lat,p.lng], {icon:L.divIcon({className:'', html:`<div class="poi${boat?' boat':''}${p.cat==='7-Eleven'?' seven':''}" style="background:${c}">${e}</div>`, iconSize:[26,26], iconAnchor:[13,13]}), zIndexOffset:-100})
-        .bindPopup(`<b>${esc(p.name)}</b><br>${esc(p.cat)}${boat?' – nur mit dem Longtail-Boot erreichbar':''}${p.note?`<br>${esc(p.note)}`:''}<br><a target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}&travelmode=two-wheeler">Route</a>`)
+        .bindPopup(`<b>${esc(p.name)}</b><br>${esc(p.cat)}${boat?' – nur mit dem Longtail-Boot erreichbar':''}${p.note?`<br>${esc(p.note)}`:''}<br><a target="_blank" rel="noopener" href="${esc(gmPlace(p.lat,p.lng))}">📍 Google Maps</a>`)
         .addTo(poiLayers[p.cat] || (poiLayers[p.cat]=L.layerGroup()));
     }
     const chips = L.control({position:'topright'});
@@ -230,6 +230,9 @@ function renderInfo(){
       <p class="muted">${esc(KLIMA.source)}. Modelldaten zählen eher zu viele Regentage; für den Vergleich untereinander taugen sie.</p></section>`;
 }
 
+// Google Maps: Position als Pin anzeigen (von dort Route starten) bzw. Route vom Objekt zum Ziel (Roller)
+function gmPlace(lat, lng){ return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`; }
+function gmRoute(from, to){ return `https://www.google.com/maps/dir/?api=1&origin=${from.lat},${from.lng}&destination=${to.lat},${to.lng}&travelmode=two-wheeler`; }
 const APP_URL = 'https://tugi01.github.io/krabi-wohnen/';
 function toast(msg){
   let el = $('#toast'); if(!el){ el = document.createElement('div'); el.id='toast'; el.className='toast'; el.setAttribute('role','status'); document.body.appendChild(el); }
@@ -261,21 +264,26 @@ function openDetail(id){
     ['Gebäude', `${a.label}${l.built_src?` (Quelle: ${l.built_src})`:''}`],
     ['Typ', l.type||'–'], ['Möbliert', ({'Fully Furnished':'voll möbliert','Partly Furnished':'teilmöbliert','Unfurnished':'unmöbliert'})[l.furniture]||l.furniture||'–'], ['Pool', l.pool?(l.pool==='privat'?'privater Pool':'Gemeinschaftspool'):'kein Pool angegeben'],
     ['Frei ab', l.available||'nicht angegeben'], ['Haustiere', l.pets||'–'],
-    ['Anbieter', l.seller||'–'], ['Aktualisiert', l.updated||'–'], ['Bei uns seit', l.first_seen||'–'], ['Quelle', (l.source||'–') + (l.also?.length ? ` (auch bei ${l.also.map(a=>a.source).join(', ')})` : '')],
+    ...(l.area ? [['Gegend', l.area]] : []), ['Anbieter', l.seller||'–'], ['Aktualisiert', l.updated||'–'], ['Bei uns seit', l.first_seen||'–'], ['Quelle', (l.source||'–') + (l.also?.length ? ` (auch bei ${l.also.map(a=>a.source).join(', ')})` : '')],
     ...(l.approx && !l.own ? [['Lage', 'nur ungefähr (Ortsteil) – genaue Adresse beim Anbieter erfragen']] : []),
   ];
-  const dist = DISTCATS.filter(k=>d[k]).map(k=>[`${TXTICON(k)==='7-11'?'🏪':TXTICON(k)} ${k}`, `${String(d[k].km).replace('.',',')} km${d[k].min!=null?`, ca. ${d[k].min} min`:''}${d[k].road?'':' (geschätzt)'} – ${d[k].name}`]);
-  const nav = l.lat!=null ? `https://www.google.com/maps/dir/?api=1&destination=${l.lat},${l.lng}&travelmode=two-wheeler` : null;
+  const dist = DISTCATS.filter(k=>d[k]).map(k=>{
+    const poi = l.lat!=null ? (DATA.pois||[]).filter(p=>p.cat===k && p.name===d[k].name)
+      .sort((a,b)=>Math.hypot(a.lat-l.lat,a.lng-l.lng)-Math.hypot(b.lat-l.lat,b.lng-l.lng))[0] : null;
+    return [`${TXTICON(k)==='7-11'?'🏪':TXTICON(k)} ${k}`, `${String(d[k].km).replace('.',',')} km${d[k].min!=null?`, ca. ${d[k].min} min`:''}${d[k].road?'':' (geschätzt)'} – ${d[k].name}`,
+      poi ? gmRoute(l, poi) : null];
+  });
+  const nav = l.lat!=null ? gmPlace(l.lat, l.lng) : null;
   $('#detail').innerHTML = `<div class="grab"></div><button class="close" aria-label="Schließen">✕</button>
     ${gal?`<div class="gallery">${gal}</div>`:''}
     <h2 id="dTitle">${esc(l.title)}</h2>
-    <dl>${[...rows, ...dist].map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>
+    <dl>${[...rows, ...dist].map(([k,v,u])=>`<dt>${esc(k)}</dt><dd>${esc(v)}${u?` <a class="rlink" href="${esc(u)}" target="_blank" rel="noopener" aria-label="Route vom Objekt zu ${esc(k)} in Google Maps">Route ↗</a>`:''}</dd>`).join('')}</dl>
     ${l.description?`<p class="desc">${esc(l.description)}</p>`:''}
     <p class="note">${l.own?'Von dir eingetragen – Entfernungen sind Schätzungen (Luftlinie × 1,3). ':''}Angaben aus dem Inserat, nicht vom Vermieter bestätigt. Vor jeder Zahlung besichtigen und Vertrag prüfen. Entfernungen: Straßen-km und Fahrzeit (Auto-Profil, Roller ähnlich) ab dem Kartenpunkt des Inserats zum nächstgelegenen Ort; Strände nur, wenn ohne Boot erreichbar.</p>
     <div class="actions">
       <a class="primary" href="${esc(l.url)}" target="_blank" rel="noopener">Inserat ↗</a>
       ${(l.also||[]).slice(0,1).map(a=>`<a class="ghost" href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.source)} ↗</a>`).join('')}
-      ${nav?`<a class="ghost" href="${nav}" target="_blank" rel="noopener">Route</a>`:''}
+      ${nav?`<a class="ghost" href="${esc(nav)}" target="_blank" rel="noopener">${l.approx?'Ungefähre Lage':'📍 Maps'}</a>`:''}
       <button class="ghost" data-share="${esc(l.id)}" aria-label="Teilen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M6 11H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-1"/></svg></button>
       <button class="ghost" data-fav="${esc(l.id)}">${isFav(l.id)?'★':'☆'}</button>
     </div>
