@@ -43,6 +43,11 @@ for (const [name, engine] of [['chromium', chromium], ['webkit', webkit]]) {
     const noPoolTag = await page.$$eval('.card', cs => cs.filter(c => !/pool/i.test(c.querySelector('.facts').innerText)).length);
     ok(pool < base && noPoolTag === 0, `${name}: „Nur mit Pool“ → ${pool} Inserate, alle mit Pool-Tag`);
     await page.click('label:has(#fPool) i');
+    await page.selectOption('#fAge', '10');
+    const age10 = await count();
+    ok(age10 > base, `${name}: Altersgrenze 10 Jahre zeigt mehr (${base} → ${age10})`);
+    await page.selectOption('#fAge', '5');
+    ok(await count() === base, `${name}: Altersgrenze zurück auf 5 Jahre → ${base}`);
     await page.click('#fClose');
     // Persistenz nach Reload
     await page.click('#filterBtn'); await page.click('label:has(#fPool) i'); await page.click('#fClose');
@@ -67,7 +72,18 @@ for (const [name, engine] of [['chromium', chromium], ['webkit', webkit]]) {
     const tiles = await page.$$eval('.leaflet-tile-loaded', t => t.length);
     const pins = await page.$$eval('.pin', p => p.length);
     ok(tiles > 0 && pins > 0, `${name}: Karte mit ${tiles} Kacheln und ${pins} Wohnungs-Pins`);
+    const mosques = await page.$$eval('.poi', p => p.filter(x => x.textContent.includes('🕌')).length);
+    ok(mosques >= 10, `${name}: Karte zeigt ${mosques} Moscheen`);
+    await page.click('.chip[data-layer="Krankenhaus"]');
+    const hosp = await page.$$eval('.poi', p => p.filter(x => x.textContent.includes('🏥')).length);
+    ok(hosp >= 3, `${name}: Ebene Krankenhaus eingeblendet (${hosp})`);
     await page.screenshot({ path: `${out}/kw-${name}-map.png` });
+    await page.click('#tabInfo');
+    await page.waitForSelector('.bars .bar'); await page.waitForTimeout(900);
+    ok(await page.$$eval('.bars .bar', b => b.length) === 12, `${name}: Infos mit 12 Monatsbalken`);
+    const iw = await page.evaluate(() => document.documentElement.scrollWidth);
+    ok(iw <= 390, `${name}: Infos ohne Überbreite (${iw})`);
+    await page.screenshot({ path: `${out}/kw-${name}-info.png`, fullPage: true });
     const imgs = await page.$$eval('.card img', i => i.filter(x => x.complete && x.naturalWidth > 0).length);
     ok(errors.length === 0, `${name}: keine Konsolenfehler ${errors.join(' | ')}`);
     await ctx.close();

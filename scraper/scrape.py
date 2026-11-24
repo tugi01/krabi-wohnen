@@ -34,18 +34,8 @@ MAX_PAGES = 30
 MAX_RADIUS_KM = 25
 
 AO_NANG = (8.0310923, 98.8218831)
-POIS = [
-    {"id": "beach-aonang", "cat": "Strand", "name": "Ao Nang Beach", "lat": 8.0310923, "lng": 98.8218831},
-    {"id": "beach-noppharat", "cat": "Strand", "name": "Noppharat Thara Beach", "lat": 8.0432922, "lng": 98.8087792},
-    {"id": "beach-klongmuang", "cat": "Strand", "name": "Klong Muang Beach", "lat": 8.0496559, "lng": 98.7574128},
-    {"id": "mosque-aonang", "cat": "Moschee", "name": "Masjid Aonang Al-Munuawarah", "lat": 8.035478, "lng": 98.8310177},
-    {"id": "mosque-klonghaeng", "cat": "Moschee", "name": "Masjid Ban Khlong Haeng", "lat": 8.0498438, "lng": 98.8156873},
-    {"id": "mosque-chongpli", "cat": "Moschee", "name": "Masjid Nurunyannah (Chong Pli)", "lat": 8.0744795, "lng": 98.8359274},
-    {"id": "gym-emerald", "cat": "Muay Thai", "name": "Emerald Muay Thai Gym", "lat": 8.0323259, "lng": 98.8386019},
-    {"id": "shop-makro", "cat": "Einkauf", "name": "Makro Ao Nang", "lat": 8.0425204, "lng": 98.8406331},
-    {"id": "shop-lotus", "cat": "Einkauf", "name": "Lotus’s go fresh Ao Nang", "lat": 8.0405562, "lng": 98.8351783},
-    {"id": "shop-vogue", "cat": "Einkauf", "name": "Vogue Shopping Center (Krabi-Stadt)", "lat": 8.0643716, "lng": 98.9156773},
-]
+# Orte (Strand, Moschee, Muay Thai, Einkauf, Krankenhaus) aus OpenStreetMap – gepflegt in scraper/pois.json
+POIS = json.load(open(os.path.join(ROOT, "scraper", "pois.json"), encoding="utf-8"))
 MONTHS = {m: i + 1 for i, m in enumerate(
     ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"])}
 
@@ -299,41 +289,50 @@ def scrape_aonangapartments():
 
 
 def osrm_distances(listings):
-    """Straßen-km von jedem Inserat zum nächsten Strand/Moschee/Gym/Einkauf (OSRM table)."""
+    """Straßen-km von jedem Inserat zum nächsten Ort je Kategorie (OSRM table, Luftlinie×1,3 als Ersatz).
+
+    Strände nur, wenn sie mit dem Roller erreichbar sind (boat=False)."""
     pts = [l for l in listings if l.get("lat") and l.get("lng")]
-    groups = {}
-    for i, p in enumerate(POIS):
-        groups.setdefault(p["cat"], []).append(i)
-    for chunk in range(0, len(pts), 80):
-        part = pts[chunk:chunk + 80]
-        coords = ";".join(f"{p['lng']},{p['lat']}" for p in POIS) + ";" + ";".join(
-            f"{l['lng']},{l['lat']}" for l in part)
-        n = len(POIS)
-        src = ";".join(str(n + i) for i in range(len(part)))
-        dst = ";".join(str(i) for i in range(n))
-        url = f"https://router.project-osrm.org/table/v1/driving/{coords}?sources={src}&destinations={dst}&annotations=distance"
-        try:
-            data = json.loads(fetch(url))
-        except Exception as e:  # noqa: BLE001
-            log("OSRM nicht erreichbar – nur Luftlinie", e)
-            data = None
-        for i, l in enumerate(part):
-            dist = {}
-            for cat, idxs in groups.items():
+    cats = {}
+    for p in POIS:
+        if p["cat"] == "Strand" and p.get("boat"):
+            continue
+        cats.setdefault(p["cat"], []).append(p)
+    for l in pts:
+        l["dist"] = {}
+    for cat, dests in cats.items():
+        for chunk in range(0, len(pts), 40):
+            part = pts[chunk:chunk + 40]
+            coords = ";".join(f"{p['lng']},{p['lat']}" for p in dests) + ";" + ";".join(
+                f"{l['lng']},{l['lat']}" for l in part)
+            n = len(dests)
+            src = ";".join(str(n + i) for i in range(len(part)))
+            dst = ";".join(str(i) for i in range(n))
+            url = f"https://router.project-osrm.org/table/v1/driving/{coords}?sources={src}&destinations={dst}&annotations=distance,duration"
+            try:
+                data = json.loads(fetch(url))
+                if data.get("code") != "Ok":
+                    raise RuntimeError(data.get("code"))
+            except Exception as e:  # noqa: BLE001
+                log("OSRM nicht erreichbar – Luftlinie", cat, e)
+                data = None
+            for i, l in enumerate(part):
                 best = None
-                for k in idxs:
-                    km = None
-                    if data and data.get("distances"):
+                for k, p in enumerate(dests):
+                    km = mins = None
+                    if data:
                         v = data["distances"][i][k]
+                        t = data["durations"][i][k]
                         km = v / 1000 if v is not None else None
+                        mins = round(t / 60) if t is not None else None
                     road = km is not None
                     if km is None:
-                        km = haversine((l["lat"], l["lng"]), (POIS[k]["lat"], POIS[k]["lng"])) * 1.3
-                    if best is None or km < best[0]:
-                        best = (km, POIS[k]["name"], road)
-                dist[cat] = {"km": round(best[0], 1), "name": best[1], "road": best[2]}
-            l["dist"] = dist
-        time.sleep(1)
+                        km = haversine((l["lat"], l["lng"]), (p["lat"], p["lng"])) * 1.3
+                    if best is None or km < best["km"]:
+                        best = {"km": km, "min": mins, "name": p["name"], "road": road}
+                best["km"] = round(best["km"], 1)
+                l["dist"][cat] = best
+            time.sleep(1)
 
 
 def thb_per_eur() -> dict:

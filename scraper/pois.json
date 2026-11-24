@@ -1,0 +1,533 @@
+[
+ {
+  "cat": "Einkauf",
+  "name": "Lotus's",
+  "lat": 8.1092332,
+  "lng": 98.9388517,
+  "id": "ein-0"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Mother Marché",
+  "lat": 8.0626091,
+  "lng": 98.915815,
+  "id": "ein-1"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Masjid",
+  "lat": 8.0612314,
+  "lng": 98.748926,
+  "id": "mos-2"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Tops",
+  "lat": 8.0420174,
+  "lng": 98.841172,
+  "id": "ein-3"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Ban Laem Pho Mosque",
+  "lat": 8.0256522,
+  "lng": 98.8812097,
+  "id": "mos-4"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Mother Marche",
+  "lat": 8.0331912,
+  "lng": 98.8276846,
+  "id": "ein-5"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Moschee (Name fehlt in OSM)",
+  "lat": 8.0355929,
+  "lng": 98.8931882,
+  "id": "mos-6"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Moschee (Name fehlt in OSM)",
+  "lat": 8.0260956,
+  "lng": 98.8847936,
+  "id": "mos-7"
+ },
+ {
+  "cat": "Krankenhaus",
+  "name": "Krabi Nakharin International Hospital",
+  "lat": 8.0807978,
+  "lng": 98.9058189,
+  "id": "kra-8"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Mercado grande aonang",
+  "lat": 8.0502025,
+  "lng": 98.8157721,
+  "id": "ein-9"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Weekend Market",
+  "lat": 8.0350967,
+  "lng": 98.8310835,
+  "note": "Markt",
+  "id": "ein-10"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Moschee (Name fehlt in OSM)",
+  "lat": 8.1087052,
+  "lng": 98.8781178,
+  "id": "mos-11"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Matsayit Ban Khao Klom",
+  "lat": 8.109333,
+  "lng": 98.802222,
+  "id": "mos-12"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Matsayit Ban Na Tin",
+  "lat": 8.058944,
+  "lng": 98.808583,
+  "id": "mos-13"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Mother Marché",
+  "lat": 8.0860086,
+  "lng": 98.905947,
+  "id": "ein-14"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Huge Outdoor Food Market",
+  "lat": 8.0551263,
+  "lng": 98.817272,
+  "id": "ein-15"
+ },
+ {
+  "cat": "Krankenhaus",
+  "name": "Jariyatham Ruampat Krabi Hospital",
+  "lat": 8.1010441,
+  "lng": 98.9081284,
+  "id": "kra-16"
+ },
+ {
+  "cat": "Krankenhaus",
+  "name": "Krabi Hospital",
+  "lat": 8.0758642,
+  "lng": 98.9152065,
+  "id": "kra-17"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Lotus's go fresh",
+  "lat": 8.1005931,
+  "lng": 98.9086141,
+  "id": "ein-18"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "BIGBEN",
+  "lat": 8.1013822,
+  "lng": 98.9111238,
+  "id": "ein-19"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Mother Marché",
+  "lat": 8.0783801,
+  "lng": 98.8543832,
+  "id": "ein-20"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Matsayit Nu Run Yan Na",
+  "lat": 8.0744795,
+  "lng": 98.8359274,
+  "id": "mos-21"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Sanit",
+  "lat": 8.0398777,
+  "lng": 98.8197289,
+  "id": "ein-22"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Matsayit Ban Nong Thale",
+  "lat": 8.0927165,
+  "lng": 98.8110397,
+  "id": "mos-23"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Moschee (Name fehlt in OSM)",
+  "lat": 8.1077729,
+  "lng": 98.9303645,
+  "id": "mos-24"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Blüe Moüntain Market",
+  "lat": 8.0317385,
+  "lng": 98.8280477,
+  "note": "Markt",
+  "id": "ein-25"
+ },
+ {
+  "cat": "Strand",
+  "name": "Klong Muang Beach",
+  "lat": 8.0493918,
+  "lng": 98.7558013,
+  "boat": false,
+  "id": "str-26"
+ },
+ {
+  "cat": "Strand",
+  "name": "Koh Kwang Beach",
+  "lat": 8.0621849,
+  "lng": 98.7461747,
+  "boat": true,
+  "id": "str-27"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Masjid Aonang Al-Munuawarah",
+  "lat": 8.0354708,
+  "lng": 98.8310178,
+  "id": "mos-28"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Maharaj Market",
+  "lat": 8.0665363,
+  "lng": 98.9131644,
+  "note": "Markt",
+  "id": "ein-29"
+ },
+ {
+  "cat": "Strand",
+  "name": "Tup Kaek Beach",
+  "lat": 8.0923374,
+  "lng": 98.7463963,
+  "boat": false,
+  "id": "str-30"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Big C",
+  "lat": 8.1090443,
+  "lng": 98.9271541,
+  "note": "Einkaufszentrum",
+  "id": "ein-31"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "City Market",
+  "lat": 8.0653912,
+  "lng": 98.9162853,
+  "note": "Markt",
+  "id": "ein-32"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Matsayit Ban Khlong Muang",
+  "lat": 8.052395,
+  "lng": 98.7617901,
+  "id": "mos-33"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Vogue Shopping Center",
+  "lat": 8.0644305,
+  "lng": 98.9156825,
+  "note": "Einkaufszentrum",
+  "id": "ein-34"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "The Outlet",
+  "lat": 8.1094036,
+  "lng": 98.933093,
+  "note": "Einkaufszentrum",
+  "id": "ein-35"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Lotus's go fresh",
+  "lat": 8.0758758,
+  "lng": 98.9087168,
+  "id": "ein-36"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Mother Marché",
+  "lat": 8.0317823,
+  "lng": 98.8626462,
+  "id": "ein-37"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Al-Aman Mosque",
+  "lat": 8.0498437,
+  "lng": 98.8156872,
+  "id": "mos-38"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Matsayit Ban Laem Som",
+  "lat": 8.094121,
+  "lng": 98.8050334,
+  "id": "mos-39"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Matsayit Sai Khao",
+  "lat": 8.0688683,
+  "lng": 98.7920215,
+  "id": "mos-40"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Black Crab Night Market",
+  "lat": 8.0670459,
+  "lng": 98.9163261,
+  "note": "Markt",
+  "id": "ein-41"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Krabi Walking Street",
+  "lat": 8.0639738,
+  "lng": 98.9161779,
+  "note": "Markt",
+  "id": "ein-42"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Ban Talat Kao Fresh Market",
+  "lat": 8.099688,
+  "lng": 98.9093098,
+  "note": "Markt",
+  "id": "ein-43"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Super Cheap",
+  "lat": 8.0813859,
+  "lng": 98.8711699,
+  "id": "ein-44"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Ao-Nang Landmark Night Market",
+  "lat": 8.0429285,
+  "lng": 98.8123131,
+  "note": "Markt",
+  "id": "ein-45"
+ },
+ {
+  "cat": "Krankenhaus",
+  "name": "wattanapat hospital ao nang (private)",
+  "lat": 8.0566041,
+  "lng": 98.8174936,
+  "id": "kra-46"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Super Cheap",
+  "lat": 8.0595547,
+  "lng": 98.8214042,
+  "id": "ein-47"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Super Cheap",
+  "lat": 8.0950118,
+  "lng": 98.9111287,
+  "id": "ein-48"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Mother Marche",
+  "lat": 8.0506665,
+  "lng": 98.8130276,
+  "id": "ein-49"
+ },
+ {
+  "cat": "Strand",
+  "name": "Yao Beach",
+  "lat": 7.9610353,
+  "lng": 98.9574664,
+  "boat": false,
+  "id": "str-50"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Mus Alli Mosque",
+  "lat": 7.9903958,
+  "lng": 98.9446868,
+  "id": "mos-51"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Khlong Moung Shopping Center",
+  "lat": 8.0529326,
+  "lng": 98.758055,
+  "note": "Einkaufszentrum",
+  "id": "ein-52"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Monday & Friday Market",
+  "lat": 8.0519559,
+  "lng": 98.7665904,
+  "note": "Markt",
+  "id": "ein-53"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Sunday and Tuesday Market",
+  "lat": 8.0531074,
+  "lng": 98.7638767,
+  "note": "Markt",
+  "id": "ein-54"
+ },
+ {
+  "cat": "Strand",
+  "name": "Silanto beach",
+  "lat": 8.1013449,
+  "lng": 98.7469177,
+  "boat": false,
+  "id": "str-55"
+ },
+ {
+  "cat": "Strand",
+  "name": "Noppharat Thara Beach",
+  "lat": 8.0432979,
+  "lng": 98.8052936,
+  "boat": false,
+  "id": "str-56"
+ },
+ {
+  "cat": "Strand",
+  "name": "Ao Rai Le",
+  "lat": 8.0115373,
+  "lng": 98.8369237,
+  "boat": true,
+  "id": "str-57"
+ },
+ {
+  "cat": "Strand",
+  "name": "Raile Tawan Ok Beach",
+  "lat": 8.0088649,
+  "lng": 98.8411651,
+  "boat": true,
+  "id": "str-58"
+ },
+ {
+  "cat": "Strand",
+  "name": "Phai Plong Beach",
+  "lat": 8.0235922,
+  "lng": 98.8285506,
+  "boat": true,
+  "id": "str-59"
+ },
+ {
+  "cat": "Strand",
+  "name": "Ao Nang Beach",
+  "lat": 8.0310437,
+  "lng": 98.8217813,
+  "boat": false,
+  "id": "str-60"
+ },
+ {
+  "cat": "Strand",
+  "name": "Ao Phra Nang",
+  "lat": 8.0059823,
+  "lng": 98.8383589,
+  "boat": true,
+  "id": "str-61"
+ },
+ {
+  "cat": "Strand",
+  "name": "Eagle Beach",
+  "lat": 8.0159895,
+  "lng": 98.8298597,
+  "boat": true,
+  "id": "str-62"
+ },
+ {
+  "cat": "Strand",
+  "name": "Ton Sai Beach",
+  "lat": 8.0168996,
+  "lng": 98.8330556,
+  "boat": true,
+  "id": "str-63"
+ },
+ {
+  "cat": "Strand",
+  "name": "Laem Pong Beach",
+  "lat": 8.0744178,
+  "lng": 98.7428575,
+  "boat": true,
+  "id": "str-64"
+ },
+ {
+  "cat": "Strand",
+  "name": "Relax Beach",
+  "lat": 8.040355,
+  "lng": 98.763446,
+  "boat": true,
+  "id": "str-65"
+ },
+ {
+  "cat": "Strand",
+  "name": "Little Rai Ley East Beach",
+  "lat": 8.013157,
+  "lng": 98.8484513,
+  "boat": true,
+  "id": "str-66"
+ },
+ {
+  "cat": "Muay Thai",
+  "name": "Emerald Muay Thai",
+  "lat": 8.0323259,
+  "lng": 98.8386019,
+  "note": "Laut World Muay Thai Magazine einer der 3 besten Gyms in Krabi.",
+  "id": "mua-67"
+ },
+ {
+  "cat": "Muay Thai",
+  "name": "Knockout Muaythai Boxing Gym",
+  "lat": 8.0389172,
+  "lng": 98.83327,
+  "note": "An der Straße 4203.",
+  "id": "mua-68"
+ },
+ {
+  "cat": "Muay Thai",
+  "name": "Ao Nang Muay Thai Boxing Stadium & Gym",
+  "lat": 8.0461609,
+  "lng": 98.8133118,
+  "note": "Stadion mit Gym in Klong Haeng, dort finden Kämpfe statt.",
+  "id": "mua-69"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Makro Ao Nang",
+  "lat": 8.0425204,
+  "lng": 98.8406331,
+  "note": "Großmarkt",
+  "id": "ein-70"
+ }
+]

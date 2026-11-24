@@ -28,7 +28,8 @@
 <nav class="seg" role="tablist" aria-label="Ansicht">
   <button role="tab" id="tabList" aria-selected="true" data-view="list">Liste</button>
   <button role="tab" id="tabMap" aria-selected="false" data-view="map">Karte</button>
-  <button role="tab" id="tabFav" aria-selected="false" data-view="fav">★ Merkliste</button>
+  <button role="tab" id="tabFav" aria-selected="false" data-view="fav">★ Merken</button>
+  <button role="tab" id="tabInfo" aria-selected="false" data-view="info">Infos</button>
 </nav>
 
 <main>
@@ -38,15 +39,18 @@
   </section>
   <section id="viewMap" class="view" hidden>
     <div id="map" aria-label="Karte der Inserate"></div>
-    <div class="legend"><span class="dot l"></span>Wohnung <span class="dot s"></span>Strand <span class="dot m"></span>Moschee <span class="dot g"></span>Muay Thai <span class="dot e"></span>Einkauf</div>
+    <div class="legend"><span class="dot l"></span>Wohnung (Preis) · Oben rechts Orte ein- und ausblenden · blasse Strände nur per Boot</div>
   </section>
+  <section id="viewInfo" class="view" hidden><div id="info"></div></section>
 </main>
 
 <div id="scrim" class="scrim" hidden></div>
 <aside id="filters" class="sheet" role="dialog" aria-modal="true" aria-labelledby="fTitle" hidden>
   <div class="grab"></div>
   <h2 id="fTitle">Filter</h2>
-  <label class="row toggle"><span><b>Ältere Gebäude zeigen</b><small>älter als 5 Jahre und nicht kernsaniert</small></span><input type="checkbox" id="fOld"><i></i></label>
+  <label class="row toggle"><span><b>Ältere Gebäude zeigen</b><small id="oldSub">älter als die Altersgrenze und nicht kernsaniert</small></span><input type="checkbox" id="fOld"><i></i></label>
+  <div class="row"><label for="fAge"><b>Altersgrenze</b><small>gilt als „neu“, wenn jünger oder kernsaniert</small></label>
+    <select id="fAge"><option value="3">3 Jahre</option><option value="5">5 Jahre</option><option value="7">7 Jahre</option><option value="10">10 Jahre</option><option value="15">15 Jahre</option></select></div>
   <label class="row toggle"><span><b>Nur mit Pool</b><small>privat oder Gemeinschaftspool</small></span><input type="checkbox" id="fPool"><i></i></label>
   <label class="row toggle"><span><b>Baujahr unbekannt zeigen</b><small>Inserat nennt kein Baujahr</small></span><input type="checkbox" id="fUnknown"><i></i></label>
   <label class="row toggle"><span><b>Nur sofort/bald frei</b><small>blendet „frei ab“ später als 2 Monate aus</small></span><input type="checkbox" id="fSoon"><i></i></label>
@@ -60,6 +64,7 @@
       <option value="new">Neueste Inserate</option>
       <option value="beach">Nähe Strand</option>
       <option value="mosque">Nähe Moschee</option>
+      <option value="gym">Nähe Muay Thai</option>
       <option value="size">Größte zuerst</option>
     </select>
   </div>
