@@ -4,9 +4,9 @@ const $ = s => document.querySelector(s);
 const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const KEY = 'krabiwohnen.v1';
 const DEFAULTS = { old:false, pool:false, unknown:false, soon:false, maxAge:5, size:50, price:60000, beach:30, sort:'price' };
-const LAYERS = { Strand:true, Moschee:true, 'Muay Thai':true, Einkauf:false, Krankenhaus:false };
-const POICOL = { Strand:['#1b8cb2','🏖'], Moschee:['#2f7d4b','🕌'], 'Muay Thai':['#7d54a4','🥊'], Einkauf:['#ad841a','🛒'], Krankenhaus:['#c0392b','🏥'] };
-const DISTCATS = ['Strand','Moschee','Muay Thai','Einkauf','Krankenhaus'];
+const LAYERS = { Strand:true, Moschee:true, 'Muay Thai':true, '7-Eleven':true, Einkauf:false, Krankenhaus:false };
+const POICOL = { Strand:['#1b8cb2','🏖'], Moschee:['#2f7d4b','🕌'], 'Muay Thai':['#7d54a4','🥊'], '7-Eleven':['#ee7a00','🏪'], Einkauf:['#ad841a','🛒'], Krankenhaus:['#c0392b','🏥'] };
+const DISTCATS = ['Strand','Moschee','Muay Thai','7-Eleven','Einkauf','Krankenhaus'];
 let state = load();
 let DATA = null, KLIMA = null, view = 'list', map = null, layer = null, poiLayers = {};
 
@@ -70,6 +70,7 @@ function filtered(onlyFav=false){
     new:(a,b)=>String(b.first_seen).localeCompare(String(a.first_seen)) || (a.price-b.price),
     beach:(a,b)=>(a.dist?.Strand?.km??99)-(b.dist?.Strand?.km??99),
     mosque:(a,b)=>(a.dist?.Moschee?.km??99)-(b.dist?.Moschee?.km??99),
+    seven:(a,b)=>(a.dist?.['7-Eleven']?.km??99)-(b.dist?.['7-Eleven']?.km??99),
     gym:(a,b)=>(a.dist?.['Muay Thai']?.km??99)-(b.dist?.['Muay Thai']?.km??99),
     size:(a,b)=>(b.size||0)-(a.size||0),
   }[state.filters.sort] || ((a,b)=>a.price-b.price);
@@ -85,7 +86,7 @@ function card(l){
       <button class="cnav prev" data-nav="-1" aria-label="Vorheriges Foto">‹</button><button class="cnav next" data-nav="1" aria-label="Nächstes Foto">›</button>`:''}</div>` : `<div class="noimg">🏠</div>`;
   const e = eur(l.price);
   const d = l.dist || {};
-  const distTxt = ['Strand','Moschee','Muay Thai','Einkauf'].filter(k=>d[k]).map(k=>`${POICOL[k][1]} ${String(d[k].km).replace('.',',')} km${d[k].min!=null?` · ${d[k].min} min`:''}`).join('   ');
+  const distTxt = ['Strand','Moschee','Muay Thai','7-Eleven'].filter(k=>d[k]).map(k=>`${POICOL[k][1]} ${String(d[k].km).replace('.',',')} km${d[k].min!=null?` · ${d[k].min} min`:''}`).join('   ');
   return `<article class="card" data-id="${esc(l.id)}" tabindex="0" aria-label="${esc(l.title)}">
     ${img}
     <div class="badges">${isNew(l)?'<span class="badge new">NEU</span>':''}${l.price_before && l.price_before>l.price?'<span class="badge drop">Preis ↓</span>':''}</div>
@@ -145,6 +146,8 @@ function drawMap(rows){
     chips.onAdd = () => { const d = L.DomUtil.create('div','layerchips'); L.DomEvent.disableClickPropagation(d); return d; };
     chips.addTo(map);
     layer = L.layerGroup().addTo(map);
+    const zcls = () => map.getContainer().classList.toggle('far', map.getZoom() < 13);
+    map.on('zoomend', zcls); zcls();
   }
   syncLayers();
   layer.clearLayers();
@@ -183,7 +186,7 @@ function renderInfo(){
     <section class="panel"><h2>Fahrzeit ab Ao Nang</h2><table><tr><th>Ziel</th><th>km</th><th>min</th></tr>${drive}</table>
       <p class="muted">${esc(KLIMA.drive_source)}. Mit dem Roller ähnlich.</p></section>
     <section class="panel"><h2>Was rund um Ao Nang auf der Karte ist</h2>
-      <p>${nPois('Moschee')} Moscheen · ${nPois('Muay Thai')} Muay-Thai-Gyms · ${nPois('Einkauf')} Supermärkte, Märkte und Einkaufszentren · ${nPois('Krankenhaus')} Krankenhäuser · ${nPois('Strand')} Strände ohne Boot erreichbar</p>
+      <p>${nPois('Moschee')} Moscheen · ${nPois('Muay Thai')} Muay-Thai-Gyms · ${nPois('7-Eleven')} 7-Eleven · ${nPois('Einkauf')} Supermärkte, Märkte und Einkaufszentren · ${nPois('Krankenhaus')} Krankenhäuser · ${nPois('Strand')} Strände ohne Boot erreichbar</p>
       <p class="muted">Orte aus OpenStreetMap. Gebetszeiten und Trainingszeiten vor Ort erfragen.</p></section>
     <section class="panel"><h2>Wetter-Vergleich der geprüften Orte</h2>
       <div class="tablewrap"><table><tr><th>Ort</th><th>Regen&shy;tage</th><th>mm</th><th>Ø max °C</th></tr>${rows}</table></div>

@@ -1,5 +1,5 @@
 // Krabi Wohnen – Service Worker: App-Hülle offline, Daten immer zuerst aus dem Netz.
-const CACHE = 'krabiwohnen-v3';
+const CACHE = 'krabiwohnen-v4';
 const SHELL = ['./', 'index.html', 'style.css', 'app.js', 'manifest.webmanifest',
   'vendor/leaflet/leaflet.js', 'vendor/leaflet/leaflet.css', 'icons/icon-192.png', 'icons/icon-180.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL))); self.skipWaiting(); });

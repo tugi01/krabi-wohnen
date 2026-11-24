@@ -35,7 +35,46 @@ MAX_RADIUS_KM = 25
 
 AO_NANG = (8.0310923, 98.8218831)
 # Orte (Strand, Moschee, Muay Thai, Einkauf, Krankenhaus) aus OpenStreetMap – gepflegt in scraper/pois.json
-POIS = json.load(open(os.path.join(ROOT, "scraper", "pois.json"), encoding="utf-8"))
+POIS_FILE = os.path.join(ROOT, "scraper", "pois.json")
+POIS = json.load(open(POIS_FILE, encoding="utf-8"))
+SEVEN_Q = ('[out:json][timeout:90];(nwr["brand"~"7-Eleven|7-11",i](7.94,98.70,8.16,98.98);'
+           'nwr["name"~"7-Eleven|7-11|7 Eleven|เซเว่น",i](7.94,98.70,8.16,98.98);'
+           'nwr["brand:wikidata"="Q259340"](7.94,98.70,8.16,98.98););out center tags;')
+
+
+def refresh_seven_eleven():
+    """7-Eleven-Filialen aus OpenStreetMap neu laden (neue Filialen kommen dazu). Bei Fehler bleibt die alte Liste."""
+    global POIS
+    import urllib.parse
+    try:
+        body = urllib.parse.urlencode({"data": SEVEN_Q}).encode()
+        req = urllib.request.Request("https://overpass-api.de/api/interpreter", data=body, headers={"User-Agent": "krabi-wohnen/1.0"})
+        with urllib.request.urlopen(req, timeout=120) as r:
+            els = json.loads(r.read().decode())["elements"]
+    except Exception as e:  # noqa: BLE001
+        log("7-Eleven-Abfrage fehlgeschlagen – alte Liste bleibt", e)
+        return
+    pts = []
+    for e in els:
+        lat = e.get("lat") or (e.get("center") or {}).get("lat")
+        lon = e.get("lon") or (e.get("center") or {}).get("lon")
+        if lat is None or any(haversine((lat, lon), (p["lat"], p["lng"])) < 0.04 for p in pts):
+            continue
+        t = e.get("tags", {})
+        oh = t.get("opening_hours") or ""
+        street = t.get("addr:street") or ""
+        pts.append({"cat": "7-Eleven", "name": "7-Eleven" + (f" – {street}" if street else ""),
+                    "lat": round(lat, 7), "lng": round(lon, 7),
+                    "note": "24 Stunden geöffnet" if ("24/7" in oh or "00:00+" in oh) else "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+                    "id": f"711-{e['type'][0]}{e['id']}"})
+    old = [p for p in POIS if p["cat"] == "7-Eleven"]
+    if len(pts) < max(20, int(len(old) * 0.8)):
+        log(f"7-Eleven: nur {len(pts)} gefunden (vorher {len(old)}) – alte Liste bleibt")
+        return
+    POIS = [p for p in POIS if p["cat"] != "7-Eleven"] + pts
+    with open(POIS_FILE, "w", encoding="utf-8") as f:
+        json.dump(POIS, f, ensure_ascii=False, indent=1)
+    log(f"7-Eleven: {len(pts)} Filialen (vorher {len(old)})")
 MONTHS = {m: i + 1 for i, m in enumerate(
     ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"])}
 
@@ -353,6 +392,7 @@ def main():
     if os.path.exists(OUT):
         for l in json.load(open(OUT)).get("listings", []):
             prev[l["id"]] = l
+    refresh_seven_eleven()
     dp, total = scrape_dotproperty(cache, now)
     if len(dp) < 20:
         raise SystemExit(f"Nur {len(dp)} Inserate gefunden – Abbruch, alte Daten bleiben bestehen.")
