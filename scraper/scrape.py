@@ -232,6 +232,10 @@ def scrape_dotproperty(cache: dict, now: datetime):
         if stale:
             try:
                 det = parse_detail(fetch(r["url"]))
+            except urllib.error.HTTPError as e:
+                log("Inserat entfernt (HTTP", e.code, ")", r["url"])
+                cache.pop(r["url"], None)
+                continue
             except Exception as e:  # noqa: BLE001
                 log("Detail-Fehler", r["url"], e)
                 if not c:
