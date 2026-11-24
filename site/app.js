@@ -5,7 +5,7 @@ const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 const KEY = 'krabiwohnen.v1';
 const DEFAULTS = { old:false, pool:false, unknown:false, soon:false, maxAge:5, size:50, price:60000, beach:30, sort:'price' };
 const LAYERS = { Strand:true, Moschee:true, 'Muay Thai':true, '7-Eleven':true, Einkauf:false, Krankenhaus:false };
-const POICOL = { Strand:['#1b8cb2','🏖'], Moschee:['#2f7d4b','🕌'], 'Muay Thai':['#7d54a4','🥊'], '7-Eleven':['#ee7a00','🏪'], Einkauf:['#ad841a','🛒'], Krankenhaus:['#c0392b','🏥'] };
+const POICOL = { Strand:['#1b8cb2','🏖'], Moschee:['#2f7d4b','🕌'], 'Muay Thai':['#7d54a4','🥊'], '7-Eleven':['#ee7a00','7‑11'], Einkauf:['#ad841a','🛒'], Krankenhaus:['#c0392b','🏥'] };
 const DISTCATS = ['Strand','Moschee','Muay Thai','7-Eleven','Einkauf','Krankenhaus'];
 let state = load();
 let DATA = null, KLIMA = null, view = 'list', map = null, layer = null, poiLayers = {};
@@ -138,7 +138,7 @@ function drawMap(rows){
     for(const p of DATA.pois){
       const [c,e] = POICOL[p.cat] || ['#555','•'];
       const boat = p.cat==='Strand' && p.boat;
-      L.marker([p.lat,p.lng], {icon:L.divIcon({className:'', html:`<div class="poi${boat?' boat':''}" style="background:${c}">${e}</div>`, iconSize:[26,26], iconAnchor:[13,13]}), zIndexOffset:-100})
+      L.marker([p.lat,p.lng], {icon:L.divIcon({className:'', html:`<div class="poi${boat?' boat':''}${p.cat==='7-Eleven'?' seven':''}" style="background:${c}">${e}</div>`, iconSize:[26,26], iconAnchor:[13,13]}), zIndexOffset:-100})
         .bindPopup(`<b>${esc(p.name)}</b><br>${esc(p.cat)}${boat?' – nur mit dem Longtail-Boot erreichbar':''}${p.note?`<br>${esc(p.note)}`:''}<br><a target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}&travelmode=two-wheeler">Route</a>`)
         .addTo(poiLayers[p.cat] || (poiLayers[p.cat]=L.layerGroup()));
     }
@@ -332,5 +332,9 @@ async function init(){
   bindFilters();
   render();
 }
-if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+if('serviceWorker' in navigator){
+  const hadCtrl = !!navigator.serviceWorker.controller; let reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if(hadCtrl && !reloaded){ reloaded = true; location.reload(); } });
+  navigator.serviceWorker.register('sw.js', {updateViaCache:'none'}).then(r => r.update()).catch(()=>{});
+}
 init();
