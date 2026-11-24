@@ -1,4 +1,4 @@
-/* Krabi Wohnen – PWA. Daten: data/<stadt>/listings.json (zweimal täglich per GitHub Action aktualisiert). */
+/* Thailand Wohnen – PWA. Daten: data/<stadt>/listings.json (zweimal täglich per GitHub Action aktualisiert). */
 'use strict';
 const $ = s => document.querySelector(s);
 const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -248,7 +248,7 @@ function shareListing(id){
   const near = ['Strand','Moschee','Muay Thai'].filter(k=>d[k]).map(k=>`${k} ${String(d[k].km).replace('.',',')} km`).join(', ');
   shareData({ title: l.title, text: `🏠 ${l.title}\n${bits}${near?`\n${near}`:''}`, url: l.url });
 }
-function shareApp(){ shareData({ title:'Krabi Wohnen', text:'🏝 Krabi Wohnen – Mietinserate in Krabi und Pattaya, täglich aktualisiert', url: APP_URL }); }
+function shareApp(){ shareData({ title:'Thailand Wohnen', text:'🏝 Thailand Wohnen – Mietwohnungen in Krabi und Pattaya, zweimal täglich aktualisiert', url: APP_URL }); }
 
 function openDetail(id){
   const l = allListings().find(x=>x.id===id); if(!l) return;
@@ -374,7 +374,7 @@ function bindUi(){
 
 function syncCityUi(){
   document.querySelectorAll('[data-city]').forEach(b => { const on = b.dataset.city===CITY; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
-  document.title = `${CITIES[CITY].name} – Krabi Wohnen`;
+  document.title = `${CITIES[CITY].name} – Thailand Wohnen`;
 }
 async function loadCity(city){
   CITY = city; localStorage.setItem('krabiwohnen.city', city);

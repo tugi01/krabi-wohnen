@@ -1,7 +1,7 @@
 {
-  "name": "Krabi Wohnen",
-  "short_name": "Krabi Wohnen",
-  "description": "Mietinserate in Ao Nang & Krabi – täglich aktualisiert",
+  "name": "Thailand Wohnen",
+  "short_name": "Thailand Wohnen",
+  "description": "Mietwohnungen in Thailand (Krabi, Pattaya) – zweimal täglich aktualisiert",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

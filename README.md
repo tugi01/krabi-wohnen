@@ -1,4 +1,4 @@
-# Krabi Wohnen
+# Thailand Wohnen
 
 Persönliche Web-App (PWA) mit Mietinseraten in Ao Nang / Mueang Krabi.
 
