@@ -22,7 +22,8 @@
     <h1>Krabi Wohnen</h1>
     <p id="stand" class="muted">Lade Inserate …</p>
   </div>
-  <button id="filterBtn" class="pill" aria-haspopup="dialog" aria-controls="filters">Filter <span id="filterCount"></span></button>
+  <div class="topbtns"><button id="shareApp" class="pill icon" aria-label="App teilen" title="App teilen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M6 11H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-1"/></svg></button>
+  <button id="filterBtn" class="pill" aria-haspopup="dialog" aria-controls="filters">Filter <span id="filterCount"></span></button></div>
 </header>
 
 <nav class="seg" role="tablist" aria-label="Ansicht">
@@ -34,6 +35,15 @@
 
 <main>
   <section id="viewList" class="view">
+    <div id="sortbar" class="sortbar" role="group" aria-label="Sortieren">
+      <button data-sort="price">Preis ↑ günstig zuerst</button>
+      <button data-sort="sqm">฿ pro m²</button>
+      <button data-sort="new">Neueste</button>
+      <button data-sort="size">Größte</button>
+      <button data-sort="beach">Nähe Strand</button>
+      <button data-sort="mosque">Nähe Moschee</button>
+      <button data-sort="gym">Nähe Muay Thai</button>
+    </div>
     <p id="summary" class="summary"></p>
     <div id="list" class="cards"></div>
   </section>
@@ -60,6 +70,7 @@
   <div class="row"><label for="fSort"><b>Sortierung</b></label>
     <select id="fSort">
       <option value="price">Preis aufsteigend</option>
+      <option value="priceDesc">Preis absteigend</option>
       <option value="sqm">Preis pro m²</option>
       <option value="new">Neueste Inserate</option>
       <option value="beach">Nähe Strand</option>

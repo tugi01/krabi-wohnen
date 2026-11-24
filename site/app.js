@@ -65,6 +65,7 @@ function filtered(onlyFav=false){
   }
   const by = {
     price:(a,b)=>(a.price||1e9)-(b.price||1e9),
+    priceDesc:(a,b)=>(b.price||0)-(a.price||0),
     sqm:(a,b)=>((a.price||1e9)/(a.size||1))-((b.price||1e9)/(b.size||1)),
     new:(a,b)=>String(b.first_seen).localeCompare(String(a.first_seen)) || (a.price-b.price),
     beach:(a,b)=>(a.dist?.Strand?.km??99)-(b.dist?.Strand?.km??99),
@@ -78,7 +79,10 @@ function filtered(onlyFav=false){
 
 function card(l){
   const a = ageInfo(l, new Date(DATA.generated));
-  const img = l.images?.[0] ? `<img loading="lazy" src="${esc(imgSrc(l.images[0],640))}" alt="">` : `<div class="noimg">🏠</div>`;
+  const pics = (l.images||[]).slice(0,6);
+  const img = pics.length ? `<div class="media"><div class="cgal" data-gal>${pics.map((u,i)=>`<img loading="lazy" src="${esc(imgSrc(u,640))}" alt="Foto ${i+1} von ${pics.length}" draggable="false">`).join('')}</div>
+      ${pics.length>1?`<div class="cdots" aria-hidden="true">${pics.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div><span class="ccount">1/${pics.length}</span>
+      <button class="cnav prev" data-nav="-1" aria-label="Vorheriges Foto">‹</button><button class="cnav next" data-nav="1" aria-label="Nächstes Foto">›</button>`:''}</div>` : `<div class="noimg">🏠</div>`;
   const e = eur(l.price);
   const d = l.dist || {};
   const distTxt = ['Strand','Moschee','Muay Thai','Einkauf'].filter(k=>d[k]).map(k=>`${POICOL[k][1]} ${String(d[k].km).replace('.',',')} km${d[k].min!=null?` · ${d[k].min} min`:''}`).join('   ');
@@ -116,6 +120,7 @@ function render(){
     `${rows.length} von ${DATA.count} Inseraten` + (parts.length ? ` · ausgeblendet: ${parts.join(', ')}` : '');
   $('#list').innerHTML = rows.length ? rows.map(card).join('') :
     `<p class="empty">${onlyFav?'Noch nichts gemerkt – tippe ☆ auf einem Inserat.':'Keine Inserate passen zu den Filtern.'}</p>`;
+  bindGalleries();
   const active = Object.keys(DEFAULTS).filter(k => k!=='sort' && state.filters[k]!==DEFAULTS[k]).length;
   $('#filterCount').textContent = active || '';
   if(view==='map') drawMap(rows);
@@ -185,6 +190,26 @@ function renderInfo(){
       <p class="muted">${esc(KLIMA.source)}. Modelldaten zählen eher zu viele Regentage; für den Vergleich untereinander taugen sie.</p></section>`;
 }
 
+const APP_URL = 'https://tugi01.github.io/krabi-wohnen/';
+function toast(msg){
+  let el = $('#toast'); if(!el){ el = document.createElement('div'); el.id='toast'; el.className='toast'; el.setAttribute('role','status'); document.body.appendChild(el); }
+  el.textContent = msg; el.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(()=>el.classList.remove('show'), 2200);
+}
+async function shareData(data){
+  if(navigator.share){ try { await navigator.share(data); return; } catch(err){ if(err && err.name==='AbortError') return; } }
+  const txt = `${data.text}\n${data.url}`;
+  try { await navigator.clipboard.writeText(txt); toast('Link kopiert – jetzt einfügen und senden'); }
+  catch { prompt('Link kopieren:', data.url); }
+}
+function shareListing(id){
+  const l = DATA.listings.find(x=>x.id===id); if(!l) return;
+  const e = eur(l.price), a = ageInfo(l, new Date(DATA.generated)), d = l.dist || {};
+  const bits = [`${fmt(l.price)} ฿/Monat${e?` (≈ ${fmt(e)} €)`:''}`, l.size?`${fmt(l.size)} m²`:null, l.beds!=null?`${l.beds} SZ`:null, a.label, l.pool?(l.pool==='privat'?'Privatpool':'Pool'):null].filter(Boolean).join(' · ');
+  const near = ['Strand','Moschee','Muay Thai'].filter(k=>d[k]).map(k=>`${k} ${String(d[k].km).replace('.',',')} km`).join(', ');
+  shareData({ title: l.title, text: `🏠 ${l.title}\n${bits}${near?`\n${near}`:''}`, url: l.url });
+}
+function shareApp(){ shareData({ title:'Krabi Wohnen', text:'🏝 Krabi Wohnen – Mietinserate in Ao Nang, täglich aktualisiert', url: APP_URL }); }
+
 function openDetail(id){
   const l = DATA.listings.find(x=>x.id===id); if(!l) return;
   const a = ageInfo(l, new Date(DATA.generated)), e = eur(l.price), d = l.dist || {};
@@ -209,7 +234,8 @@ function openDetail(id){
     <div class="actions">
       <a class="primary" href="${esc(l.url)}" target="_blank" rel="noopener">Inserat ↗</a>
       ${nav?`<a class="ghost" href="${nav}" target="_blank" rel="noopener">Route</a>`:''}
-      <button class="ghost" data-fav="${esc(l.id)}">${isFav(l.id)?'★ Gemerkt':'☆ Merken'}</button>
+      <button class="ghost" data-share="${esc(l.id)}" aria-label="Teilen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M6 11H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-1"/></svg></button>
+      <button class="ghost" data-fav="${esc(l.id)}">${isFav(l.id)?'★':'☆'}</button>
     </div>`;
   openSheet('#detail');
 }
@@ -226,6 +252,9 @@ function bindFilters(){
     $('#fSize').value=f.size; $('#fPrice').value=f.price; $('#fBeach').value=f.beach; $('#fSort').value=f.sort;
     $('#oSize').textContent = f.size ? `${f.size} m²` : 'alle';
     $('#oPrice').textContent = f.price>=150000 ? 'egal' : `${fmt(+f.price)} ฿${eur(f.price)?` (≈ ${fmt(eur(f.price))} €)`:''}`;
+    document.querySelectorAll('#sortbar [data-sort]').forEach(b => { const on = b.dataset.sort===f.sort || (b.dataset.sort==='price' && f.sort==='priceDesc');
+      b.classList.toggle('on', on); b.setAttribute('aria-pressed', on);
+      if(b.dataset.sort==='price') b.textContent = f.sort==='priceDesc' ? 'Preis ↓ teuer zuerst' : 'Preis ↑ günstig zuerst'; });
     $('#oBeach').textContent = f.beach>=30 ? 'egal' : `${f.beach} km`;
   };
   const upd = (k, v) => { f[k]=v; save(); set(); render(); };
@@ -238,12 +267,27 @@ function bindFilters(){
   $('#fPrice').oninput = e => upd('price', +e.target.value);
   $('#fBeach').oninput = e => upd('beach', +e.target.value);
   $('#fSort').onchange = e => upd('sort', e.target.value);
+  $('#sortbar').onclick = e => { const b = e.target.closest('[data-sort]'); if(!b) return;
+    let v = b.dataset.sort; if(v==='price') v = f.sort==='price' ? 'priceDesc' : 'price';
+    upd('sort', v); };
   $('#fReset').onclick = () => { Object.assign(f, DEFAULTS); save(); set(); render(); };
   $('#fClose').onclick = closeSheets;
   $('#filterBtn').onclick = () => openSheet('#filters');
   $('#scrim').onclick = closeSheets;
   document.addEventListener('keydown', e => { if(e.key==='Escape') closeSheets(); });
   set();
+}
+
+function bindGalleries(){
+  document.querySelectorAll('[data-gal]').forEach(g => {
+    if(g.dataset.bound) return; g.dataset.bound = 1;
+    const card = g.closest('.card'), dots = card.querySelectorAll('.cdots i'), cnt = card.querySelector('.ccount');
+    let raf = 0;
+    g.addEventListener('scroll', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => {
+      const i = Math.round(g.scrollLeft / g.clientWidth);
+      dots.forEach((d,k)=>d.classList.toggle('on', k===i)); if(cnt) cnt.textContent = `${i+1}/${dots.length}`;
+    }); }, {passive:true});
+  });
 }
 
 function bindUi(){
@@ -254,6 +298,11 @@ function bindUi(){
     render();
   });
   document.addEventListener('click', e => {
+    const nb = e.target.closest('[data-nav]');
+    if(nb){ e.stopPropagation(); const g = nb.closest('.media').querySelector('[data-gal]'); g.scrollBy({left: g.clientWidth * +nb.dataset.nav, behavior:'smooth'}); return; }
+    const sb = e.target.closest('[data-share]');
+    if(sb){ e.stopPropagation(); shareListing(sb.dataset.share); return; }
+    if(e.target.closest('#shareApp')){ shareApp(); return; }
     const lb = e.target.closest('[data-layer]');
     if(lb){ const c = lb.dataset.layer; state.layers[c] = !state.layers[c]; save(); syncLayers(); return; }
     const fb = e.target.closest('[data-fav]');

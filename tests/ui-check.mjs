@@ -26,7 +26,7 @@ for (const [name, engine] of [['chromium', chromium], ['webkit', webkit]]) {
     const oldTags = await page.$$eval('.card .tag.warn', t => t.length);
     ok(oldTags === 0, `${name}: Standard zeigt keine Gebäude > 5 Jahre (${oldTags})`);
     await page.waitForTimeout(3000);
-    const loaded = await page.$$eval('.card img', i => i.filter(x => x.getBoundingClientRect().top < innerHeight).map(x => x.complete && x.naturalWidth > 0));
+    const loaded = await page.$$eval('.card [data-gal] img:first-child, .card .noimg', i => i.filter(x => x.getBoundingClientRect().top < innerHeight).map(x => x.tagName !== 'IMG' || (x.complete && x.naturalWidth > 0)));
     ok(loaded.length > 0 && loaded.every(Boolean), `${name}: Fotos der ersten Karten geladen (${loaded})`);
     await page.screenshot({ path: `${out}/kw-${name}-list.png` });
     // Filter öffnen, alte einschalten
@@ -54,11 +54,30 @@ for (const [name, engine] of [['chromium', chromium], ['webkit', webkit]]) {
     await page.reload({ waitUntil: 'networkidle' }); await page.waitForSelector('.card');
     ok(await page.isChecked('#fPool'), `${name}: Filter bleibt nach Neuladen erhalten`);
     await page.click('#filterBtn'); await page.click('#fReset'); await page.click('#fClose');
+    // Wischbare Fotos in der Liste
+    const g0 = await page.$('.card [data-gal]');
+    const nImg = await g0.$$eval('img', i => i.length);
+    await g0.evaluate(g => g.scrollTo({left: g.clientWidth, behavior:'instant'}));
+    await page.waitForTimeout(400);
+    const cnt0 = await page.$eval('.card .ccount', e => e.textContent);
+    ok(nImg > 1 && cnt0.startsWith('2/'), `${name}: Fotos in der Liste wischbar (${nImg} Fotos, Anzeige ${cnt0})`);
+    // Sortierung Preis (Leiste über der Liste)
+    const prices = () => page.$$eval('.card .price', p => p.map(x => +x.textContent.split('฿')[0].replace(/\D/g,'')));
+    await page.click('#sortbar [data-sort="price"]');
+    let pr = await prices();
+    ok(pr.length > 1 && pr.every((v,i)=>!i||pr[i-1]>=v), `${name}: Preis ↓ teuer zuerst (${pr.slice(0,3)})`);
+    await page.click('#sortbar [data-sort="price"]');
+    pr = await prices();
+    ok(pr.every((v,i)=>!i||pr[i-1]<=v), `${name}: Preis ↑ günstig zuerst (${pr.slice(0,3)})`);
     // Detail
     await page.click('.card .body');
     await page.waitForSelector('#detail:not([hidden])'); await page.waitForTimeout(700);
     const hasLink = await page.$eval('#detail a.primary', a => a.href.startsWith('http'));
     ok(hasLink, `${name}: Detail mit Link zum Original`);
+    await page.evaluate(() => { window.__shared = null; navigator.share = d => { window.__shared = d; return Promise.resolve(); }; });
+    await page.click('#detail [data-share]');
+    const sh = await page.evaluate(() => window.__shared);
+    ok(sh && sh.url.startsWith('http') && /฿/.test(sh.text), `${name}: Teilen übergibt Link + Preis`);
     await page.screenshot({ path: `${out}/kw-${name}-detail.png` });
     await page.click('#detail .close');
     // Merken
