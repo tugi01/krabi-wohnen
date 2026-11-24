@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Sammelt Mietinserate in Mueang Krabi (Ao Nang & Umgebung) und schreibt site/data/listings.json.
+"""Sammelt Mietinserate für mehrere Städte (Krabi, Pattaya) und schreibt site/data/<stadt>/listings.json.
 
 Quellen:
   * DotProperty (enthält die FazWaz-Inserate inkl. GPS, Größe, Ausstattung, Baujahr)
   * aonangapartments.com (Vermieter-Direktseite Ao Nang Valley)
 
-Nur Python-Standardbibliothek. Lauf: python3 scraper/scrape.py
-Detailseiten werden zwischengespeichert (scraper/cache.json) und nur neu geladen,
+Nur Python-Standardbibliothek. Lauf: python3 scraper/scrape.py [stadt ...]
+Detailseiten werden zwischengespeichert (scraper/cache-<stadt>.json) und nur neu geladen,
 wenn sich Preis/Titel ändern oder der Eintrag älter als REFRESH_DAYS ist.
 """
 from __future__ import annotations
@@ -23,39 +23,131 @@ import urllib.request
 from datetime import datetime, timezone, timedelta
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(ROOT, "site", "data", "listings.json")
-CACHE = os.path.join(ROOT, "scraper", "cache.json")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")
-LIST_URL = "https://www.dotproperty.co.th/en/properties-for-rent/krabi/mueang-krabi?page={}"
 REFRESH_DAYS = 7
-MAX_PAGES = 30
-# Nur Inserate innerhalb dieses Radius um Ao Nang Beach (Luftlinie, km)
-MAX_RADIUS_KM = 25
+MAX_PAGES = 60
+YEAR = datetime.now(timezone.utc).year
 
-AO_NANG = (8.0310923, 98.8218831)
-# Orte (Strand, Moschee, Muay Thai, Einkauf, Krankenhaus) aus OpenStreetMap – gepflegt in scraper/pois.json
-POIS_FILE = os.path.join(ROOT, "scraper", "pois.json")
-POIS = json.load(open(POIS_FILE, encoding="utf-8"))
-SEVEN_Q = ('[out:json][timeout:90];(nwr["brand"~"7-Eleven|7-11",i](7.94,98.70,8.16,98.98);'
-           'nwr["name"~"7-Eleven|7-11|7 Eleven|เซเว่น",i](7.94,98.70,8.16,98.98);'
-           'nwr["brand:wikidata"="Q259340"](7.94,98.70,8.16,98.98););out center tags;')
+# Städte. "params" filtert schon beim Portal (Pattaya hat sonst > 16.000 Inserate).
+CITIES = {
+    "krabi": {
+        "name": "Krabi / Ao Nang",
+        "list": "https://www.dotproperty.co.th/en/properties-for-rent/krabi/mueang-krabi",
+        "params": "",
+        "center": (8.0310923, 98.8218831), "radius_km": 25,
+        "bbox": (7.94, 98.70, 8.16, 98.98),
+        "boat": lambda lat, lon: False,
+        "landlords": True,
+    },
+    "pattaya": {
+        "name": "Pattaya",
+        "list": "https://www.dotproperty.co.th/en/properties-for-rent/chonburi/pattaya",
+        "params": f"minLivingArea=50&maxPrice=60000&minYearBuilt={YEAR - 10}",
+        "center": (12.9327, 100.8800), "radius_km": 20,
+        "bbox": (12.78, 100.76, 13.03, 101.00),
+        "boat": lambda lat, lon: lon < 100.80,   # Koh Larn – nur per Fähre
+        "landlords": False,
+    },
+}
+CITY = None      # aktuelle Stadt (Schlüssel)
+POIS = []
+POIS_FILE = ""
 
 
-MARKET_Q = ('[out:json][timeout:90];(nwr["amenity"="marketplace"](7.94,98.70,8.16,98.98);'
-            'nwr["amenity"="food_court"](7.94,98.70,8.16,98.98);'
-            'nwr["name"~"night market|walking street|food market|weekend market",i](7.94,98.70,8.16,98.98););out center tags;')
+def overpass(q: str):
+    import urllib.parse
+    last = None
+    for url in ("https://overpass-api.de/api/interpreter", "https://overpass.private.coffee/api/interpreter",
+                "https://maps.mail.ru/osm/tools/overpass/api/interpreter"):
+        try:
+            body = urllib.parse.urlencode({"data": q}).encode()
+            req = urllib.request.Request(url, data=body, headers={"User-Agent": "krabi-wohnen/1.0"})
+            with urllib.request.urlopen(req, timeout=150) as r:
+                return json.loads(r.read().decode())["elements"]
+        except Exception as e:  # noqa: BLE001
+            last = e
+            time.sleep(3)
+    raise RuntimeError(f"Overpass: {last}")
+
+
+def _ll(e):
+    return e.get("lat") or (e.get("center") or {}).get("lat"), e.get("lon") or (e.get("center") or {}).get("lon")
+
+
+def build_pois(city: str):
+    """Erstbefüllung der Orte einer Stadt aus OpenStreetMap."""
+    c = CITIES[city]
+    bb = "(%s,%s,%s,%s)" % c["bbox"]
+    queries = {
+        "Strand": f'nwr["natural"="beach"]{bb};',
+        "Moschee": f'nwr["amenity"="place_of_worship"]["religion"="muslim"]{bb};',
+        "Muay Thai": (f'nwr["sport"~"muay_thai|boxing|kickboxing|thai_boxing"]{bb};'
+                      f'nwr["name"~"muay ?thai|boxing|fairtex|sityodtong|kombat|มวย",i]["amenity"!="place_of_worship"]{bb};'),
+        "Einkauf": f'nwr["shop"~"^(supermarket|mall|department_store|wholesale)$"]{bb};',
+        "Krankenhaus": f'nwr["amenity"="hospital"]{bb};',
+    }
+    part_file = os.path.join(ROOT, "scraper", f"pois-{city}.partial.json")
+    out = json.load(open(part_file, encoding="utf-8")) if os.path.exists(part_file) else []
+    for cat, q in queries.items():
+        if any(p["cat"] == cat for p in out):
+            continue   # schon geladen (Fortsetzung nach Fehler)
+        els = overpass(f"[out:json][timeout:120];({q});out center tags;")
+        for e in els:
+            lat, lon = _ll(e)
+            t = e.get("tags", {})
+            name = t.get("name:en") or t.get("name") or ""
+            if lat is None or (cat != "Strand" and not name and cat != "Moschee"):
+                continue
+            if cat == "Muay Thai" and re.search(r"hotel|resort|shop|store|restaurant|bar$", name, re.I):
+                continue
+            if any(p["cat"] == cat and haversine((lat, lon), (p["lat"], p["lng"])) < 0.06 for p in out):
+                continue
+            p = {"cat": cat, "name": name or {"Strand": "Strand (ohne Namen)", "Moschee": "Moschee (ohne Namen in OSM)"}[cat],
+                 "lat": round(lat, 7), "lng": round(lon, 7), "id": f"{cat[:3].lower()}-{e['type'][0]}{e['id']}"}
+            if cat == "Strand":
+                p["boat"] = bool(c["boat"](lat, lon))
+                if p["boat"]:
+                    p["note"] = "Nur per Boot/Fähre erreichbar"
+            if cat == "Moschee":
+                p["note"] = "Gebetszeiten vor Ort erfragen"
+            if cat == "Muay Thai":
+                p["note"] = "Trainingszeiten und Preise vor Ort erfragen"
+            out.append(p)
+        log(f"{city}: {cat} {sum(1 for p in out if p['cat'] == cat)}")
+        with open(part_file, "w", encoding="utf-8") as f:
+            json.dump(out, f, ensure_ascii=False)
+        time.sleep(2)
+    if os.path.exists(part_file):
+        os.remove(part_file)
+    return out
+
+
+def set_city(city: str):
+    global CITY, POIS, POIS_FILE
+    CITY = city
+    POIS_FILE = os.path.join(ROOT, "scraper", f"pois-{city}.json")
+    if os.path.exists(POIS_FILE):
+        POIS = json.load(open(POIS_FILE, encoding="utf-8"))
+    else:
+        POIS = build_pois(city)
+        save_pois()
+
+
+def save_pois():
+    with open(POIS_FILE, "w", encoding="utf-8") as f:
+        json.dump(POIS, f, ensure_ascii=False, indent=1)
 
 
 def refresh_markets():
     """Neue Nacht-/Essensmärkte aus OpenStreetMap ergänzen (bestehende Einträge mit deutschen Notizen bleiben)."""
     global POIS
-    import urllib.parse
+    bb = "(%s,%s,%s,%s)" % CITIES[CITY]["bbox"]
+    q = ('[out:json][timeout:90];(nwr["amenity"="marketplace"]' + bb + ';nwr["amenity"="food_court"]' + bb + ';'
+         'nwr["name"~"night market|walking street|food market|weekend market|floating market",i]' + bb + ';);out center tags;')
     try:
-        body = urllib.parse.urlencode({"data": MARKET_Q}).encode()
-        req = urllib.request.Request("https://overpass-api.de/api/interpreter", data=body, headers={"User-Agent": "krabi-wohnen/1.0"})
-        with urllib.request.urlopen(req, timeout=120) as r:
-            els = json.loads(r.read().decode())["elements"]
+        els = overpass(q)
     except Exception as e:  # noqa: BLE001
         log("Markt-Abfrage fehlgeschlagen", e)
         return
@@ -63,40 +155,40 @@ def refresh_markets():
     added = 0
     for e in els:
         t = e.get("tags", {})
-        lat = e.get("lat") or (e.get("center") or {}).get("lat")
-        lon = e.get("lon") or (e.get("center") or {}).get("lon")
+        lat, lon = _ll(e)
         name = t.get("name:en") or t.get("name") or ""
-        if lat is None or "minimart" in name.lower() or (lat < 8.02 and 98.83 < lon < 98.85):
+        if lat is None or "minimart" in name.lower() or CITIES[CITY]["boat"](lat, lon):
+            continue
+        if CITY == "krabi" and lat < 8.02 and 98.83 < lon < 98.85:   # Railay – nur per Boot
             continue
         if any(haversine((lat, lon), (p["lat"], p["lng"])) < 0.08 for p in have):
             continue
         kind = "Essensmarkt" if t.get("amenity") == "food_court" else "Markt"
+        note = ("Öffnungszeiten laut OSM: " + t["opening_hours"]) if t.get("opening_hours") else "Öffnungszeiten vor Ort erfragen"
+        if re.search(r"night|walking", name, re.I):
+            note = "Nachtmarkt · " + note
         p = {"cat": "Markt", "name": name or f"{kind} (ohne Namen in OSM)", "lat": round(lat, 7), "lng": round(lon, 7),
-             "note": ("Öffnungszeiten laut OSM: " + t["opening_hours"]) if t.get("opening_hours") else "Öffnungszeiten vor Ort erfragen",
-             "id": f"mkt-{e['type'][0]}{e['id']}"}
+             "note": note, "id": f"mkt-{e['type'][0]}{e['id']}"}
         POIS.append(p); have.append(p); added += 1
     if added:
-        with open(POIS_FILE, "w", encoding="utf-8") as f:
-            json.dump(POIS, f, ensure_ascii=False, indent=1)
-    log(f"Märkte: {added} neu")
+        save_pois()
+    log(f"{CITY}: Märkte {added} neu")
 
 
 def refresh_seven_eleven():
     """7-Eleven-Filialen aus OpenStreetMap neu laden (neue Filialen kommen dazu). Bei Fehler bleibt die alte Liste."""
     global POIS
-    import urllib.parse
+    bb = "(%s,%s,%s,%s)" % CITIES[CITY]["bbox"]
+    q = ('[out:json][timeout:90];(nwr["brand"~"7-Eleven|7-11",i]' + bb + ';nwr["name"~"7-Eleven|7-11|7 Eleven|เซเว่น",i]' + bb + ';'
+         'nwr["brand:wikidata"="Q259340"]' + bb + ';);out center tags;')
     try:
-        body = urllib.parse.urlencode({"data": SEVEN_Q}).encode()
-        req = urllib.request.Request("https://overpass-api.de/api/interpreter", data=body, headers={"User-Agent": "krabi-wohnen/1.0"})
-        with urllib.request.urlopen(req, timeout=120) as r:
-            els = json.loads(r.read().decode())["elements"]
+        els = overpass(q)
     except Exception as e:  # noqa: BLE001
         log("7-Eleven-Abfrage fehlgeschlagen – alte Liste bleibt", e)
         return
     pts = []
     for e in els:
-        lat = e.get("lat") or (e.get("center") or {}).get("lat")
-        lon = e.get("lon") or (e.get("center") or {}).get("lon")
+        lat, lon = _ll(e)
         if lat is None or any(haversine((lat, lon), (p["lat"], p["lng"])) < 0.04 for p in pts):
             continue
         t = e.get("tags", {})
@@ -111,9 +203,10 @@ def refresh_seven_eleven():
         log(f"7-Eleven: nur {len(pts)} gefunden (vorher {len(old)}) – alte Liste bleibt")
         return
     POIS = [p for p in POIS if p["cat"] != "7-Eleven"] + pts
-    with open(POIS_FILE, "w", encoding="utf-8") as f:
-        json.dump(POIS, f, ensure_ascii=False, indent=1)
-    log(f"7-Eleven: {len(pts)} Filialen (vorher {len(old)})")
+    save_pois()
+    log(f"{CITY}: 7-Eleven {len(pts)} Filialen (vorher {len(old)})")
+
+
 MONTHS = {m: i + 1 for i, m in enumerate(
     ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"])}
 
@@ -271,11 +364,17 @@ def parse_detail(page: str) -> dict:
     return d
 
 
-def scrape_dotproperty(cache: dict, now: datetime):
+def c_ok(c):
+    return bool(c and c.get("detail"))
+
+
+def scrape_dotproperty(cache: dict, now: datetime, budget):
     items, seen = [], set()
     total = None
+    c = CITIES[CITY]
     for p in range(1, MAX_PAGES + 1):
-        page = fetch(LIST_URL.format(p))
+        q = "&".join(x for x in (c["params"], f"page={p}" if p > 1 else "") if x)
+        page = fetch(c["list"] + ("?" + q if q else ""))
         if total is None:
             for j in ld_blocks(page):
                 if j.get("@type") == "ItemList":
@@ -292,12 +391,17 @@ def scrape_dotproperty(cache: dict, now: datetime):
         time.sleep(1.0)
     out = []
     for r in items:
-        if r["lat"] and r["lng"] and haversine(AO_NANG, (r["lat"], r["lng"])) > MAX_RADIUS_KM:
+        if r["lat"] and r["lng"] and haversine(c["center"], (r["lat"], r["lng"])) > c["radius_km"]:
             continue
-        c = cache.get(r["url"])
-        stale = (not c or c.get("price_list") != r["price"] or c.get("title_list") != r["title"]
-                 or (now - datetime.fromisoformat(c["fetched"])).days >= REFRESH_DAYS)
+        cached = cache.get(r["url"])
+        stale = (not cached or cached.get("price_list") != r["price"] or cached.get("title_list") != r["title"]
+                 or (now - datetime.fromisoformat(cached["fetched"])).days >= REFRESH_DAYS)
+        if stale and budget[0] <= 0:
+            if not c_ok(cc := cache.get(r["url"])):
+                continue   # Rest kommt beim nächsten Lauf (Zeitlimit)
+            stale = False
         if stale:
+            budget[0] -= 1
             try:
                 det = parse_detail(fetch(r["url"]))
             except urllib.error.HTTPError as e:
@@ -306,14 +410,13 @@ def scrape_dotproperty(cache: dict, now: datetime):
                 continue
             except Exception as e:  # noqa: BLE001
                 log("Detail-Fehler", r["url"], e)
-                if not c:
+                if not cached:
                     continue
-                det = c["detail"]
             else:
-                c = {"detail": det, "fetched": now.isoformat(), "price_list": r["price"], "title_list": r["title"]}
-                cache[r["url"]] = c
-                time.sleep(0.8)
-        det = dict(c["detail"])
+                cached = {"detail": det, "fetched": now.isoformat(), "price_list": r["price"], "title_list": r["title"]}
+                cache[r["url"]] = cached
+                time.sleep(0.6)
+        det = dict(cached["detail"])
         rec = {**r, **{k: v for k, v in det.items() if v not in (None, [], "")}}
         rec["price"] = r["price"] or det.get("price")
         rec["source"] = "DotProperty / FazWaz"
@@ -367,9 +470,11 @@ def scrape_aonangapartments():
 
 
 def osrm_distances(listings):
-    """Straßen-km von jedem Inserat zum nächsten Ort je Kategorie (OSRM table, Luftlinie×1,3 als Ersatz).
+    """Straßen-km/-Minuten von jedem Inserat zum nächsten Ort je Kategorie.
 
-    Strände nur, wenn sie mit dem Roller erreichbar sind (boat=False)."""
+    Pro Inserat werden nur die 4 nächsten Orte (Luftlinie) per OSRM-Tabelle verglichen, damit
+    Abfragen auch bei vielen Orten (z. B. 300 x 7-Eleven) klein bleiben. Ersatz: Luftlinie x 1,3.
+    Strände nur, wenn ohne Boot erreichbar."""
     pts = [l for l in listings if l.get("lat") and l.get("lng")]
     cats = {}
     for p in POIS:
@@ -378,31 +483,41 @@ def osrm_distances(listings):
         cats.setdefault(p["cat"], []).append(p)
     for l in pts:
         l["dist"] = {}
+    fails = 0
     for cat, dests in cats.items():
-        for chunk in range(0, len(pts), 40):
-            part = pts[chunk:chunk + 40]
-            coords = ";".join(f"{p['lng']},{p['lat']}" for p in dests) + ";" + ";".join(
-                f"{l['lng']},{l['lat']}" for l in part)
-            n = len(dests)
-            src = ";".join(str(n + i) for i in range(len(part)))
-            dst = ";".join(str(i) for i in range(n))
-            url = f"https://router.project-osrm.org/table/v1/driving/{coords}?sources={src}&destinations={dst}&annotations=distance,duration"
-            try:
-                data = json.loads(fetch(url))
-                if data.get("code") != "Ok":
-                    raise RuntimeError(data.get("code"))
-            except Exception as e:  # noqa: BLE001
-                log("OSRM nicht erreichbar – Luftlinie", cat, e)
-                data = None
+        for chunk in range(0, len(pts), 15):
+            part = pts[chunk:chunk + 15]
+            cand = []
+            for l in part:
+                near = sorted(dests, key=lambda p: haversine((l["lat"], l["lng"]), (p["lat"], p["lng"])))[:4]
+                for p in near:
+                    if p not in cand:
+                        cand.append(p)
+            data = None
+            if fails < 5:
+                coords = ";".join(f"{p['lng']},{p['lat']}" for p in cand) + ";" + ";".join(f"{l['lng']},{l['lat']}" for l in part)
+                n = len(cand)
+                src = ";".join(str(n + i) for i in range(len(part)))
+                dst = ";".join(str(i) for i in range(n))
+                url = f"https://router.project-osrm.org/table/v1/driving/{coords}?sources={src}&destinations={dst}&annotations=distance,duration"
+                try:
+                    data = json.loads(fetch(url, tries=2))
+                    if data.get("code") != "Ok":
+                        raise RuntimeError(data.get("code"))
+                except Exception as e:  # noqa: BLE001
+                    log("OSRM nicht erreichbar – Luftlinie", cat, str(e)[:120])
+                    data = None
+                    fails += 1     # nach 5 Fehlern nur noch Luftlinie statt langer Wartezeiten
+                time.sleep(0.5)
             for i, l in enumerate(part):
                 best = None
-                for k, p in enumerate(dests):
+                for k, p in enumerate(cand):
                     km = mins = None
                     if data:
                         v = data["distances"][i][k]
-                        t = data["durations"][i][k]
+                        tt = data["durations"][i][k]
                         km = v / 1000 if v is not None else None
-                        mins = round(t / 60) if t is not None else None
+                        mins = round(tt / 60) if tt is not None else None
                     road = km is not None
                     if km is None:
                         km = haversine((l["lat"], l["lng"]), (p["lat"], p["lng"])) * 1.3
@@ -410,7 +525,6 @@ def osrm_distances(listings):
                         best = {"km": km, "min": mins, "name": p["name"], "road": road}
                 best["km"] = round(best["km"], 1)
                 l["dist"][cat] = best
-            time.sleep(1)
 
 
 def thb_per_eur() -> dict:
@@ -424,20 +538,32 @@ def thb_per_eur() -> dict:
         return {"rate": 37.24, "date": None, "source": "Fallback (EZB 23.11.2026)"}
 
 
-def main():
-    now = datetime.now(timezone.utc)
-    cache = json.load(open(CACHE)) if os.path.exists(CACHE) else {}
+def run_city(city: str, now: datetime, fx: dict, budget):
+    set_city(city)
+    out_dir = os.path.join(ROOT, "site", "data", city)
+    out = os.path.join(out_dir, "listings.json")
+    cache_file = os.path.join(ROOT, "scraper", f"cache-{city}.json")
+    cache = json.load(open(cache_file)) if os.path.exists(cache_file) else {}
     prev = {}
-    if os.path.exists(OUT):
-        for l in json.load(open(OUT)).get("listings", []):
+    if os.path.exists(out):
+        for l in json.load(open(out)).get("listings", []):
             prev[l["id"]] = l
     refresh_seven_eleven()
     refresh_markets()
-    dp, total = scrape_dotproperty(cache, now)
+    dp, total = scrape_dotproperty(cache, now, budget)
     if len(dp) < 20:
-        raise SystemExit(f"Nur {len(dp)} Inserate gefunden – Abbruch, alte Daten bleiben bestehen.")
-    listings = dp + scrape_aonangapartments()
-    # Duplikate (gleiches Objekt bei mehreren Quellen) – nach Listing-ID
+        log(f"{city}: nur {len(dp)} Inserate gefunden – alte Daten bleiben bestehen.")
+        return
+    import sources  # noqa: PLC0415
+    me = sys.modules[__name__]
+    extra = []
+    for fn in (sources.bahtsold, sources.meezub):
+        try:
+            extra += fn(me, cache, now, budget)
+        except Exception as e:  # noqa: BLE001
+            log(f"{city}: Quelle {fn.__name__} fehlgeschlagen", e)
+    listings = sources.dedupe(dp + (scrape_aonangapartments() if CITIES[city]["landlords"] else []) + extra)
+    log(f"{city}: DotProperty {len(dp)}, weitere Quellen {len(extra)}, nach Zusammenfassen {len(listings)}")
     uniq = {}
     for l in listings:
         uniq.setdefault(l["id"], l)
@@ -451,26 +577,43 @@ def main():
             l["price_before"] = old["price_before"]
     osrm_distances(listings)
     removed = sorted(set(prev) - {l["id"] for l in listings})
-    # Cache aufräumen: nur aktuelle URLs behalten
-    live = {l["url"] for l in listings}
-    cache = {k: v for k, v in cache.items() if k in live}
+    live = {l["url"] for l in listings} | {a["url"] for l in listings for a in l.get("also", [])}
+    cache = {k: v for k, v in cache.items()
+             if k in live or (now - datetime.fromisoformat(v["fetched"])).days < 14}
+    c = CITIES[city]
     data = {
+        "city": city, "city_name": c["name"],
         "generated": now.isoformat(timespec="minutes"),
-        "portal_total": total,
+        "portal_total": total, "portal_filter": c["params"],
+        "sources": {src: sum(1 for l in listings if l.get("source", "").startswith(src)) for src in ("DotProperty", "BahtSold", "Meezub", "aonangapartments")},
         "count": len(listings),
         "removed_since_last": len(removed),
-        "fx": thb_per_eur(),
+        "new_since_last": sum(1 for l in listings if l["id"] not in prev) if prev else 0,
+        "fx": fx,
         "pois": POIS,
         "listings": sorted(listings, key=lambda l: (l.get("price") or 10**9)),
     }
-    os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    tmp = OUT + ".tmp"
+    os.makedirs(out_dir, exist_ok=True)
+    tmp = out + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
-    os.replace(tmp, OUT)
-    with open(CACHE, "w", encoding="utf-8") as f:
+    os.replace(tmp, out)
+    with open(cache_file, "w", encoding="utf-8") as f:
         json.dump(cache, f, ensure_ascii=False)
-    log(f"Fertig: {len(listings)} Inserate, {len(removed)} entfernt, {sum(1 for l in listings if l['first_seen']==now.date().isoformat() and prev)} neu")
+    log(f"{city}: {len(listings)} Inserate, {len(removed)} entfernt, {data['new_since_last']} neu")
+
+
+def main():
+    now = datetime.now(timezone.utc)
+    fx = thb_per_eur()
+    cities = sys.argv[1:] or list(CITIES)
+    # höchstens so viele Detailseiten pro Lauf (Zeitlimit der Action); Rest folgt im nächsten Lauf
+    budget = [int(os.environ.get("DETAIL_BUDGET", "1500"))]
+    for city in cities:
+        try:
+            run_city(city, now, fx, budget)
+        except Exception as e:  # noqa: BLE001
+            log(f"{city}: Fehler – alte Daten bleiben", e)
 
 
 if __name__ == "__main__":

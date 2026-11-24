@@ -1,0 +1,4001 @@
+[
+ {
+  "cat": "Strand",
+  "name": "Strand (ohne Namen)",
+  "lat": 12.881488,
+  "lng": 100.881488,
+  "id": "str-n12991091930",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Ta Yai Beach",
+  "lat": 12.9361652,
+  "lng": 100.7880747,
+  "id": "str-w106843819",
+  "boat": true,
+  "note": "Nur per Boot/Fähre erreichbar"
+ },
+ {
+  "cat": "Strand",
+  "name": "Sangvan Beach",
+  "lat": 12.9265937,
+  "lng": 100.7731312,
+  "id": "str-w106843829",
+  "boat": true,
+  "note": "Nur per Boot/Fähre erreichbar"
+ },
+ {
+  "cat": "Strand",
+  "name": "Tawaen Beach",
+  "lat": 12.9253998,
+  "lng": 100.778093,
+  "id": "str-w106843845",
+  "boat": true,
+  "note": "Nur per Boot/Fähre erreichbar"
+ },
+ {
+  "cat": "Strand",
+  "name": "Samae Beach",
+  "lat": 12.9119334,
+  "lng": 100.7695897,
+  "id": "str-w106843853",
+  "boat": true,
+  "note": "Nur per Boot/Fähre erreichbar"
+ },
+ {
+  "cat": "Strand",
+  "name": "Ta Rai Beach",
+  "lat": 12.9098235,
+  "lng": 100.7825588,
+  "id": "str-w106843865",
+  "boat": true,
+  "note": "Nur per Boot/Fähre erreichbar"
+ },
+ {
+  "cat": "Strand",
+  "name": "Tam Beach",
+  "lat": 12.9054497,
+  "lng": 100.7718896,
+  "id": "str-w106843909",
+  "boat": true,
+  "note": "Nur per Boot/Fähre erreichbar"
+ },
+ {
+  "cat": "Strand",
+  "name": "Tonglang Beach",
+  "lat": 12.9295394,
+  "lng": 100.7829837,
+  "id": "str-w106843976",
+  "boat": true,
+  "note": "Nur per Boot/Fähre erreichbar"
+ },
+ {
+  "cat": "Strand",
+  "name": "Thian (Tien) Beach",
+  "lat": 12.9190508,
+  "lng": 100.7697411,
+  "id": "str-w106843983",
+  "boat": true,
+  "note": "Nur per Boot/Fähre erreichbar"
+ },
+ {
+  "cat": "Strand",
+  "name": "Nuan Beach",
+  "lat": 12.9004978,
+  "lng": 100.7769189,
+  "id": "str-w106843994",
+  "boat": true,
+  "note": "Nur per Boot/Fähre erreichbar"
+ },
+ {
+  "cat": "Strand",
+  "name": "Pattaya Beach",
+  "lat": 12.9389163,
+  "lng": 100.8795264,
+  "id": "str-w149698464",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Strand (ohne Namen)",
+  "lat": 12.9251584,
+  "lng": 100.8689202,
+  "id": "str-w149698809",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Strand (ohne Namen)",
+  "lat": 12.9440097,
+  "lng": 100.7919685,
+  "id": "str-w150947837",
+  "boat": true,
+  "note": "Nur per Boot/Fähre erreichbar"
+ },
+ {
+  "cat": "Strand",
+  "name": "Cosy Beach",
+  "lat": 12.9212623,
+  "lng": 100.8581793,
+  "id": "str-w169474825",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Ban Amphur Beach",
+  "lat": 12.8090076,
+  "lng": 100.9128587,
+  "id": "str-w170898120",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Dongtan Beach",
+  "lat": 12.9018067,
+  "lng": 100.8631759,
+  "id": "str-w173154608",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Wong Amat Beach",
+  "lat": 12.9625394,
+  "lng": 100.8837952,
+  "id": "str-w183413169",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Yinyom Beach",
+  "lat": 12.9076764,
+  "lng": 100.8576617,
+  "id": "str-w183416012",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Krating Beach",
+  "lat": 12.989909,
+  "lng": 100.9203038,
+  "id": "str-w185164313",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Asia Beach",
+  "lat": 12.9153339,
+  "lng": 100.8568141,
+  "id": "str-w185168907",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "North Na Jomtien Beach",
+  "lat": 12.8473193,
+  "lng": 100.9019517,
+  "id": "str-w185459752",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Ban Bpoop Beach",
+  "lat": 12.8015967,
+  "lng": 100.9108454,
+  "id": "str-w185938735",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Sunset  Beach",
+  "lat": 12.7924701,
+  "lng": 100.9085267,
+  "id": "str-w185938736",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Strand (ohne Namen)",
+  "lat": 12.7874374,
+  "lng": 100.9066993,
+  "id": "str-w186631961",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Palm Beach",
+  "lat": 12.9712475,
+  "lng": 100.8846492,
+  "id": "str-w192658629",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Crescent Moon Beach",
+  "lat": 12.9711495,
+  "lng": 100.8864721,
+  "id": "str-w192658630",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Wong Prachan Beach",
+  "lat": 12.9737678,
+  "lng": 100.8918794,
+  "id": "str-w192660051",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Strand (ohne Namen)",
+  "lat": 12.97183,
+  "lng": 100.8955806,
+  "id": "str-w192660346",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Strand (ohne Namen)",
+  "lat": 13.0245776,
+  "lng": 100.8212848,
+  "id": "str-w242293582",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Strand (ohne Namen)",
+  "lat": 12.8158317,
+  "lng": 100.9121566,
+  "id": "str-w306643067",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Strand (ohne Namen)",
+  "lat": 12.8181715,
+  "lng": 100.9119917,
+  "id": "str-w306643083",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Strand (ohne Namen)",
+  "lat": 12.8172516,
+  "lng": 100.9120899,
+  "id": "str-w306643088",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Strand (ohne Namen)",
+  "lat": 12.8239178,
+  "lng": 100.9103368,
+  "id": "str-w306643092",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Strand (ohne Namen)",
+  "lat": 12.8194966,
+  "lng": 100.9117485,
+  "id": "str-w306643095",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Rainbow Beach",
+  "lat": 12.9009377,
+  "lng": 100.8642889,
+  "id": "str-w322834281",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Strand (ohne Namen)",
+  "lat": 12.9260728,
+  "lng": 100.8610044,
+  "id": "str-w343742217",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Strand (ohne Namen)",
+  "lat": 12.9251759,
+  "lng": 100.8601537,
+  "id": "str-w343750034",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Naklua Beach",
+  "lat": 12.9536637,
+  "lng": 100.8827201,
+  "id": "str-w413851662",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Strand (ohne Namen)",
+  "lat": 12.9744151,
+  "lng": 100.8939816,
+  "id": "str-w765578332",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Strand (ohne Namen)",
+  "lat": 12.9180231,
+  "lng": 100.8561701,
+  "id": "str-w1138418557",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Sanctuary Beach",
+  "lat": 12.9726566,
+  "lng": 100.8882395,
+  "id": "str-w1210802611",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Bamboo Beach",
+  "lat": 12.9695436,
+  "lng": 100.883053,
+  "id": "str-w1217461393",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Laem Thong Beach",
+  "lat": 12.8980803,
+  "lng": 100.7738861,
+  "id": "str-w1241933138",
+  "boat": true,
+  "note": "Nur per Boot/Fähre erreichbar"
+ },
+ {
+  "cat": "Strand",
+  "name": "Jomtien Beach",
+  "lat": 12.8768835,
+  "lng": 100.8826011,
+  "id": "str-w1297672173",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Strand (ohne Namen)",
+  "lat": 12.8499723,
+  "lng": 100.9003165,
+  "id": "str-w1297672174",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Kruat Beach",
+  "lat": 12.9007639,
+  "lng": 100.7726004,
+  "id": "str-w1343006778",
+  "boat": true,
+  "note": "Nur per Boot/Fähre erreichbar"
+ },
+ {
+  "cat": "Strand",
+  "name": "Strand (ohne Namen)",
+  "lat": 12.8878973,
+  "lng": 100.8868511,
+  "id": "str-w1353645171",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Strand (ohne Namen)",
+  "lat": 13.0303824,
+  "lng": 100.9226593,
+  "id": "str-w1374817646",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "Strand (ohne Namen)",
+  "lat": 12.8359501,
+  "lng": 100.9435756,
+  "id": "str-r4094447",
+  "boat": false
+ },
+ {
+  "cat": "Strand",
+  "name": "South Na Jomtien Beach",
+  "lat": 12.8364328,
+  "lng": 100.9063319,
+  "id": "str-r14116925",
+  "boat": false
+ },
+ {
+  "cat": "Moschee",
+  "name": "Hidayatussaligeen Mosque",
+  "lat": 12.9608711,
+  "lng": 100.9078923,
+  "id": "mos-n976304041",
+  "note": "Gebetszeiten vor Ort erfragen"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Moschee (ohne Namen in OSM)",
+  "lat": 12.9444783,
+  "lng": 100.9253488,
+  "id": "mos-n4482934153",
+  "note": "Gebetszeiten vor Ort erfragen"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Masjid Darul-Ibadah Pattaya City Thailand",
+  "lat": 12.9340408,
+  "lng": 100.9004352,
+  "id": "mos-w311061266",
+  "note": "Gebetszeiten vor Ort erfragen"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Masjid Toatillah",
+  "lat": 12.9203116,
+  "lng": 100.8884099,
+  "id": "mos-w341145925",
+  "note": "Gebetszeiten vor Ort erfragen"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Masjid Nurul Yaqeen",
+  "lat": 12.9315637,
+  "lng": 100.9128721,
+  "id": "mos-w1462566506",
+  "note": "Gebetszeiten vor Ort erfragen"
+ },
+ {
+  "cat": "Muay Thai",
+  "name": "Boxing Roo",
+  "lat": 12.9273405,
+  "lng": 100.8870286,
+  "id": "mua-n559927843",
+  "note": "Trainingszeiten und Preise vor Ort erfragen"
+ },
+ {
+  "cat": "Muay Thai",
+  "name": "Boxing Equipment",
+  "lat": 12.9159907,
+  "lng": 100.8862467,
+  "id": "mua-n3270047135",
+  "note": "Trainingszeiten und Preise vor Ort erfragen"
+ },
+ {
+  "cat": "Muay Thai",
+  "name": "Fairtex",
+  "lat": 12.9515534,
+  "lng": 100.8898816,
+  "id": "mua-n3450816427",
+  "note": "Trainingszeiten und Preise vor Ort erfragen"
+ },
+ {
+  "cat": "Muay Thai",
+  "name": "Florida Boxing Equipments",
+  "lat": 12.9272742,
+  "lng": 100.8771112,
+  "id": "mua-n3909224482",
+  "note": "Trainingszeiten und Preise vor Ort erfragen"
+ },
+ {
+  "cat": "Muay Thai",
+  "name": "Sityodtong Muay Thai Gym",
+  "lat": 12.9455562,
+  "lng": 100.9292775,
+  "id": "mua-n4402299891",
+  "note": "Trainingszeiten und Preise vor Ort erfragen"
+ },
+ {
+  "cat": "Muay Thai",
+  "name": "Kombat Group Huai Yai (Thailand) Co.Ltd.",
+  "lat": 12.8737389,
+  "lng": 100.9434383,
+  "id": "mua-n9178732302",
+  "note": "Trainingszeiten und Preise vor Ort erfragen"
+ },
+ {
+  "cat": "Muay Thai",
+  "name": "Mabsong-Kaimuay Road",
+  "lat": 12.9445884,
+  "lng": 100.9290689,
+  "id": "mua-w145227500",
+  "note": "Trainingszeiten und Preise vor Ort erfragen"
+ },
+ {
+  "cat": "Muay Thai",
+  "name": "Max Muay Thai Stadium Pattaya",
+  "lat": 12.9288592,
+  "lng": 100.899203,
+  "id": "mua-w318349781",
+  "note": "Trainingszeiten und Preise vor Ort erfragen"
+ },
+ {
+  "cat": "Muay Thai",
+  "name": "Pattaya Boxing World",
+  "lat": 12.955073,
+  "lng": 100.9087544,
+  "id": "mua-w323013052",
+  "note": "Trainingszeiten und Preise vor Ort erfragen"
+ },
+ {
+  "cat": "Muay Thai",
+  "name": "Muay Thai Boxing Stadium",
+  "lat": 12.9097085,
+  "lng": 100.8916552,
+  "id": "mua-w336936128",
+  "note": "Trainingszeiten und Preise vor Ort erfragen"
+ },
+ {
+  "cat": "Muay Thai",
+  "name": "93 Muay Thai Gym",
+  "lat": 12.9305298,
+  "lng": 100.8901599,
+  "id": "mua-w1206787941",
+  "note": "Trainingszeiten und Preise vor Ort erfragen"
+ },
+ {
+  "cat": "Muay Thai",
+  "name": "Apichai Academy, Muay Thai & Fitness",
+  "lat": 12.9053962,
+  "lng": 100.8901879,
+  "id": "mua-w1233319845",
+  "note": "Trainingszeiten und Preise vor Ort erfragen"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Lotus's",
+  "lat": 12.8198776,
+  "lng": 100.9167709,
+  "id": "ein-n995551160"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Villa Market",
+  "lat": 12.9296874,
+  "lng": 100.8817023,
+  "id": "ein-n1553398550"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Lotus's Minimart",
+  "lat": 12.8898145,
+  "lng": 100.8868835,
+  "id": "ein-n2641802478"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Tops Daily (Kho Phra Tamnak)",
+  "lat": 12.9015769,
+  "lng": 100.8699583,
+  "id": "ein-n2739066104"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Serene Plaza",
+  "lat": 12.9278392,
+  "lng": 100.8754969,
+  "id": "ein-n3447253883"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "MaxValu",
+  "lat": 12.9346314,
+  "lng": 100.8977746,
+  "id": "ein-n4097197843"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Tops",
+  "lat": 12.9226831,
+  "lng": 100.9112157,
+  "id": "ein-n4105655690"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Tops",
+  "lat": 12.9237153,
+  "lng": 100.8786135,
+  "id": "ein-n4268628398"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Family Mart",
+  "lat": 12.9695837,
+  "lng": 100.8910981,
+  "id": "ein-n5527457721"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Mini So",
+  "lat": 12.9250347,
+  "lng": 100.86995,
+  "id": "ein-n6330204685"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Tops",
+  "lat": 12.9142754,
+  "lng": 100.894569,
+  "id": "ein-n6753992085"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Mini Big C",
+  "lat": 12.8138544,
+  "lng": 100.9164888,
+  "id": "ein-n6865278111"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Big C",
+  "lat": 12.9079642,
+  "lng": 100.9240613,
+  "id": "ein-n7483601782"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Big C",
+  "lat": 12.9353539,
+  "lng": 100.8948854,
+  "id": "ein-n11181065939"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Tops",
+  "lat": 12.8970439,
+  "lng": 100.8716222,
+  "id": "ein-n11598283677"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Kings Birds Nest Outlet Mall. Closed?",
+  "lat": 12.7927738,
+  "lng": 100.9488459,
+  "id": "ein-n11898403705"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Tops",
+  "lat": 12.8999175,
+  "lng": 100.899524,
+  "id": "ein-n12670002689"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Mike Shopping Mall",
+  "lat": 12.9318991,
+  "lng": 100.8808124,
+  "id": "ein-w27444939"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Central Marina Outlet",
+  "lat": 12.9456788,
+  "lng": 100.890005,
+  "id": "ein-w27464545"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Royal Garden Plaza",
+  "lat": 12.9293037,
+  "lng": 100.8781515,
+  "id": "ein-w27486202"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Tesco Lotus South Pattaya",
+  "lat": 12.9063638,
+  "lng": 100.8946216,
+  "id": "ein-w142172785"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Lotus's",
+  "lat": 12.9512487,
+  "lng": 100.8938505,
+  "id": "ein-w142333438"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Big C",
+  "lat": 12.9157481,
+  "lng": 100.8940415,
+  "id": "ein-w142569150"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Central Pattaya",
+  "lat": 12.9346215,
+  "lng": 100.8835015,
+  "id": "ein-w151000011"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Foodmart",
+  "lat": 12.9049654,
+  "lng": 100.8697684,
+  "id": "ein-w153095118"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Makro",
+  "lat": 12.8977571,
+  "lng": 100.8946834,
+  "id": "ein-w200085657"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "GO Wholesale",
+  "lat": 12.9148206,
+  "lng": 100.8934614,
+  "id": "ein-w205436101"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Big C",
+  "lat": 12.94565,
+  "lng": 100.8912251,
+  "id": "ein-w228433893"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Friendship Supermarket",
+  "lat": 12.9234837,
+  "lng": 100.8798,
+  "id": "ein-w253420258"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Focus Pattaya Shopping Arcade",
+  "lat": 12.9480666,
+  "lng": 100.8891374,
+  "id": "ein-w259504185"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Foodland",
+  "lat": 12.9337327,
+  "lng": 100.8971433,
+  "id": "ein-w311061298"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "The Village Shopping Centre",
+  "lat": 12.8822518,
+  "lng": 100.8974199,
+  "id": "ein-w322288204"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Tops",
+  "lat": 12.9150172,
+  "lng": 100.8624932,
+  "id": "ein-w322604509"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Fairrit Shopping Center",
+  "lat": 12.9234482,
+  "lng": 100.8820546,
+  "id": "ein-w339535933"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "King Power Pattaya Duty Free",
+  "lat": 12.9303482,
+  "lng": 100.8990219,
+  "id": "ein-w377250879"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Lotus's",
+  "lat": 12.8834179,
+  "lng": 100.9067425,
+  "id": "ein-w380957958"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Makro",
+  "lat": 12.948315,
+  "lng": 100.9024906,
+  "id": "ein-w404928433"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Premium Outlet Pattaya",
+  "lat": 12.9081464,
+  "lng": 100.8947067,
+  "id": "ein-w412478346"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Toscano Leather and Fur",
+  "lat": 12.9498568,
+  "lng": 100.8936329,
+  "id": "ein-w454075307"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Terminal 21 Pattaya",
+  "lat": 12.9498403,
+  "lng": 100.8896924,
+  "id": "ein-w651015521"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "The Bay",
+  "lat": 12.9435277,
+  "lng": 100.8852217,
+  "id": "ein-w723838127"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Jaybon Grocery Store",
+  "lat": 12.9199788,
+  "lng": 100.9179413,
+  "id": "ein-w1356062587"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Best Supermarket",
+  "lat": 12.9565855,
+  "lng": 100.8906723,
+  "id": "ein-w1368740151"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Lotus's go fresh",
+  "lat": 12.9092456,
+  "lng": 100.9017962,
+  "id": "ein-w1388285877"
+ },
+ {
+  "cat": "Einkauf",
+  "name": "Tops",
+  "lat": 12.9177417,
+  "lng": 100.8668839,
+  "id": "ein-w1474629392"
+ },
+ {
+  "cat": "Krankenhaus",
+  "name": "Bangkok Hospital Pattaya",
+  "lat": 12.9538015,
+  "lng": 100.905503,
+  "id": "kra-w226823896"
+ },
+ {
+  "cat": "Krankenhaus",
+  "name": "Pattaya BhattamaKun Hospital",
+  "lat": 12.9663293,
+  "lng": 100.90639,
+  "id": "kra-w240370871"
+ },
+ {
+  "cat": "Krankenhaus",
+  "name": "Yahnasang Vararam Hospital",
+  "lat": 12.7925503,
+  "lng": 100.9565699,
+  "id": "kra-w1055772111"
+ },
+ {
+  "cat": "Krankenhaus",
+  "name": "Pattaya City Hospital",
+  "lat": 12.9274167,
+  "lng": 100.8846791,
+  "id": "kra-w1211753054"
+ },
+ {
+  "cat": "Krankenhaus",
+  "name": "Pattaya International Hospital",
+  "lat": 12.9440648,
+  "lng": 100.8876564,
+  "id": "kra-w1212165124"
+ },
+ {
+  "cat": "Krankenhaus",
+  "name": "Pattaya Memorial Hospital",
+  "lat": 12.9356015,
+  "lng": 100.8865577,
+  "id": "kra-w1212167013"
+ },
+ {
+  "cat": "Krankenhaus",
+  "name": "Jomtien Hospital",
+  "lat": 12.9125511,
+  "lng": 100.8977095,
+  "id": "kra-w1561991929"
+ },
+ {
+  "cat": "Krankenhaus",
+  "name": "EASE Orthopedic Hospital",
+  "lat": 12.9391221,
+  "lng": 100.8988624,
+  "id": "kra-w1567833436"
+ },
+ {
+  "cat": "Markt",
+  "name": "M Food Center",
+  "lat": 12.9466403,
+  "lng": 100.8891279,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-n301561862"
+ },
+ {
+  "cat": "Markt",
+  "name": "Walking Street Food Court",
+  "lat": 12.9273152,
+  "lng": 100.8745643,
+  "note": "Nachtmarkt · Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-n1600804787"
+ },
+ {
+  "cat": "Markt",
+  "name": "fresh market",
+  "lat": 12.9439845,
+  "lng": 100.9391707,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-n2119072203"
+ },
+ {
+  "cat": "Markt",
+  "name": "Food Park",
+  "lat": 12.9350759,
+  "lng": 100.8936307,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-n2837373622"
+ },
+ {
+  "cat": "Markt",
+  "name": "Market",
+  "lat": 12.9135,
+  "lng": 100.86473,
+  "note": "Öffnungszeiten laut OSM: Mo-Su 13:00-19:00",
+  "id": "mkt-n2881831225"
+ },
+ {
+  "cat": "Markt",
+  "name": "Markt (ohne Namen in OSM)",
+  "lat": 12.8023498,
+  "lng": 100.9402102,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-n3122586568"
+ },
+ {
+  "cat": "Markt",
+  "name": "Markt (ohne Namen in OSM)",
+  "lat": 12.8588394,
+  "lng": 100.9158487,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-n3970792709"
+ },
+ {
+  "cat": "Markt",
+  "name": "Markt (ohne Namen in OSM)",
+  "lat": 12.8640225,
+  "lng": 100.947173,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-n3984025191"
+ },
+ {
+  "cat": "Markt",
+  "name": "Markt (ohne Namen in OSM)",
+  "lat": 12.8923651,
+  "lng": 100.9281773,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-n4036163583"
+ },
+ {
+  "cat": "Markt",
+  "name": "Markt (ohne Namen in OSM)",
+  "lat": 12.9205771,
+  "lng": 100.8786645,
+  "note": "Öffnungszeiten laut OSM: Mo-Su 09:00-20:00",
+  "id": "mkt-n4510265274"
+ },
+ {
+  "cat": "Markt",
+  "name": "Pier 21",
+  "lat": 12.9497974,
+  "lng": 100.8907146,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-n9739900840"
+ },
+ {
+  "cat": "Markt",
+  "name": "Essensmarkt (ohne Namen in OSM)",
+  "lat": 12.9086477,
+  "lng": 100.8887622,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-n11231013987"
+ },
+ {
+  "cat": "Markt",
+  "name": "Ban Chak Ngaeo Antique Chinese Market",
+  "lat": 12.8333706,
+  "lng": 100.9652482,
+  "note": "Öffnungszeiten laut OSM: Sa 17:00-23:00",
+  "id": "mkt-n11361612270"
+ },
+ {
+  "cat": "Markt",
+  "name": "Markt (ohne Namen in OSM)",
+  "lat": 12.8843493,
+  "lng": 100.9144415,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-n11879536286"
+ },
+ {
+  "cat": "Markt",
+  "name": "Checkpont",
+  "lat": 12.9100323,
+  "lng": 100.8588674,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-n12096706171"
+ },
+ {
+  "cat": "Markt",
+  "name": "Primo Market",
+  "lat": 12.8950657,
+  "lng": 100.9068091,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-n12304060331"
+ },
+ {
+  "cat": "Markt",
+  "name": "HIDELAND Luxury Pool Villa Pattaya Walking Street",
+  "lat": 12.9124638,
+  "lng": 100.8756193,
+  "note": "Nachtmarkt · Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-n13099491852"
+ },
+ {
+  "cat": "Markt",
+  "name": "STARLAND Luxury Pool Villa Pattaya Walking Street",
+  "lat": 12.9117989,
+  "lng": 100.8751392,
+  "note": "Nachtmarkt · Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-n13099491859"
+ },
+ {
+  "cat": "Markt",
+  "name": "Amon City Market",
+  "lat": 12.9710397,
+  "lng": 100.9067148,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-n13404196760"
+ },
+ {
+  "cat": "Markt",
+  "name": "Chak Ngaeo Saturday Market",
+  "lat": 12.8331407,
+  "lng": 100.9643393,
+  "note": "Öffnungszeiten laut OSM: Sa 16:00-20:00",
+  "id": "mkt-n14159395971"
+ },
+ {
+  "cat": "Markt",
+  "name": "Hong Tu La Night Market",
+  "lat": 12.9473815,
+  "lng": 100.8883632,
+  "note": "Nachtmarkt · Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w27487186"
+ },
+ {
+  "cat": "Markt",
+  "name": "Markt (ohne Namen in OSM)",
+  "lat": 12.9147892,
+  "lng": 100.8803748,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w143952397"
+ },
+ {
+  "cat": "Markt",
+  "name": "Windy Plaza",
+  "lat": 12.9314007,
+  "lng": 100.8794324,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w153537963"
+ },
+ {
+  "cat": "Markt",
+  "name": "Pattaya Night Bazaar",
+  "lat": 12.9323059,
+  "lng": 100.8844965,
+  "note": "Nachtmarkt · Öffnungszeiten laut OSM: Mo-Su 11:00-23:00",
+  "id": "mkt-w165977248"
+ },
+ {
+  "cat": "Markt",
+  "name": "Bua Khao Market",
+  "lat": 12.9246217,
+  "lng": 100.8798532,
+  "note": "Öffnungszeiten laut OSM: Th-Fr 10:00-16:00",
+  "id": "mkt-w170594051"
+ },
+ {
+  "cat": "Markt",
+  "name": "Duck Square",
+  "lat": 12.9168188,
+  "lng": 100.892668,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w200085658"
+ },
+ {
+  "cat": "Markt",
+  "name": "Grand Hall Market",
+  "lat": 12.9245839,
+  "lng": 100.8788958,
+  "note": "Öffnungszeiten laut OSM: Mo-Su 09:00-17:00",
+  "id": "mkt-w275677822"
+ },
+ {
+  "cat": "Markt",
+  "name": "Thepprasit Night Market",
+  "lat": 12.9083941,
+  "lng": 100.8930075,
+  "note": "Nachtmarkt · Öffnungszeiten laut OSM: Fr-Su 17:00-23:00",
+  "id": "mkt-w305417056"
+ },
+ {
+  "cat": "Markt",
+  "name": "Rom Pho Market",
+  "lat": 12.898508,
+  "lng": 100.872929,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w307546382"
+ },
+ {
+  "cat": "Markt",
+  "name": "Jomtien Night Market",
+  "lat": 12.8917424,
+  "lng": 100.8745967,
+  "note": "Nachtmarkt · Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w307546385"
+ },
+ {
+  "cat": "Markt",
+  "name": "Wat Chai Mongkhon Market",
+  "lat": 12.9243703,
+  "lng": 100.8764425,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w311526196"
+ },
+ {
+  "cat": "Markt",
+  "name": "Markt (ohne Namen in OSM)",
+  "lat": 12.8390663,
+  "lng": 100.9090341,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w311769651"
+ },
+ {
+  "cat": "Markt",
+  "name": "Wadtham Market",
+  "lat": 12.9162475,
+  "lng": 100.897778,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w319067083"
+ },
+ {
+  "cat": "Markt",
+  "name": "Markt (ohne Namen in OSM)",
+  "lat": 12.9190204,
+  "lng": 100.8832996,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w319371429"
+ },
+ {
+  "cat": "Markt",
+  "name": "Night market",
+  "lat": 12.9650074,
+  "lng": 100.891173,
+  "note": "Nachtmarkt · Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w321636751"
+ },
+ {
+  "cat": "Markt",
+  "name": "Fruit Market",
+  "lat": 12.9312031,
+  "lng": 100.8817932,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w322203165"
+ },
+ {
+  "cat": "Markt",
+  "name": "Market",
+  "lat": 13.0188819,
+  "lng": 100.9432133,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w322432100"
+ },
+ {
+  "cat": "Markt",
+  "name": "Markt (ohne Namen in OSM)",
+  "lat": 12.8896238,
+  "lng": 100.8837784,
+  "note": "Öffnungszeiten laut OSM: 17:00-22:00",
+  "id": "mkt-w336954442"
+ },
+ {
+  "cat": "Markt",
+  "name": "Markt (ohne Namen in OSM)",
+  "lat": 12.8407194,
+  "lng": 100.9126759,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w336979642"
+ },
+ {
+  "cat": "Markt",
+  "name": "Ratanakorn Market",
+  "lat": 12.9039657,
+  "lng": 100.8769644,
+  "note": "Öffnungszeiten laut OSM: Mo-Su 05:00-18:00",
+  "id": "mkt-w338786753"
+ },
+ {
+  "cat": "Markt",
+  "name": "Lan Pho Market",
+  "lat": 12.9734398,
+  "lng": 100.9064243,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w363719863"
+ },
+ {
+  "cat": "Markt",
+  "name": "Naklua Fresh Market",
+  "lat": 12.9694931,
+  "lng": 100.9070648,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w415467999"
+ },
+ {
+  "cat": "Markt",
+  "name": "Market",
+  "lat": 13.0189073,
+  "lng": 100.9326667,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w441124927"
+ },
+ {
+  "cat": "Markt",
+  "name": "Mae Wilai Market",
+  "lat": 12.9364768,
+  "lng": 100.8878017,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w452616481"
+ },
+ {
+  "cat": "Markt",
+  "name": "Khlong Thom Market Pattaya",
+  "lat": 12.9564961,
+  "lng": 100.9084387,
+  "note": "Öffnungszeiten laut OSM: Sa-Su",
+  "id": "mkt-w460984637"
+ },
+ {
+  "cat": "Markt",
+  "name": "Essensmarkt (ohne Namen in OSM)",
+  "lat": 12.9013652,
+  "lng": 100.8861744,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w463162782"
+ },
+ {
+  "cat": "Markt",
+  "name": "ตลาดโรงเพชร",
+  "lat": 12.9085749,
+  "lng": 100.9045949,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w465344046"
+ },
+ {
+  "cat": "Markt",
+  "name": "Markt (ohne Namen in OSM)",
+  "lat": 12.8164909,
+  "lng": 100.9174441,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w465349386"
+ },
+ {
+  "cat": "Markt",
+  "name": "Markt (ohne Namen in OSM)",
+  "lat": 12.882757,
+  "lng": 100.9023931,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w465570907"
+ },
+ {
+  "cat": "Markt",
+  "name": "Markt (ohne Namen in OSM)",
+  "lat": 12.8815667,
+  "lng": 100.9033288,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w465570910"
+ },
+ {
+  "cat": "Markt",
+  "name": "Market Photisarn",
+  "lat": 12.9554148,
+  "lng": 100.8986751,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w473001373"
+ },
+ {
+  "cat": "Markt",
+  "name": "Essensmarkt (ohne Namen in OSM)",
+  "lat": 12.9522984,
+  "lng": 100.8862947,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w623549167"
+ },
+ {
+  "cat": "Markt",
+  "name": "Tree Town Foodcourt",
+  "lat": 12.930904,
+  "lng": 100.8858164,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w779136577"
+ },
+ {
+  "cat": "Markt",
+  "name": "The Big Market Jomtien",
+  "lat": 12.8737431,
+  "lng": 100.8901997,
+  "note": "Öffnungszeiten laut OSM: Mo-Su 17:00-23:00",
+  "id": "mkt-w1012471862"
+ },
+ {
+  "cat": "Markt",
+  "name": "Rattanakornwanasin Market",
+  "lat": 12.9399058,
+  "lng": 100.9212432,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1148463842"
+ },
+ {
+  "cat": "Markt",
+  "name": "Runway Street Food",
+  "lat": 12.9426413,
+  "lng": 100.8874245,
+  "note": "Öffnungszeiten laut OSM: Mo-Su 16:00-23:00",
+  "id": "mkt-w1164635111"
+ },
+ {
+  "cat": "Markt",
+  "name": "Essensmarkt (ohne Namen in OSM)",
+  "lat": 12.9291272,
+  "lng": 100.8942274,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1167335894"
+ },
+ {
+  "cat": "Markt",
+  "name": "Ginplern Food Market",
+  "lat": 12.928533,
+  "lng": 100.8928276,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1195191076"
+ },
+ {
+  "cat": "Markt",
+  "name": "Khaotalo Plaza",
+  "lat": 12.9070299,
+  "lng": 100.9112363,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1198860039"
+ },
+ {
+  "cat": "Markt",
+  "name": "Night Market",
+  "lat": 12.8212391,
+  "lng": 100.9146808,
+  "note": "Nachtmarkt · Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1199983658"
+ },
+ {
+  "cat": "Markt",
+  "name": "Essensmarkt (ohne Namen in OSM)",
+  "lat": 12.9275248,
+  "lng": 100.8888922,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1200822306"
+ },
+ {
+  "cat": "Markt",
+  "name": "Markt (ohne Namen in OSM)",
+  "lat": 12.9651642,
+  "lng": 100.8865364,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1200967778"
+ },
+ {
+  "cat": "Markt",
+  "name": "Essensmarkt (ohne Namen in OSM)",
+  "lat": 12.9328984,
+  "lng": 100.8867744,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1201734796"
+ },
+ {
+  "cat": "Markt",
+  "name": "New Plaza",
+  "lat": 12.9344114,
+  "lng": 100.8875106,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1201734797"
+ },
+ {
+  "cat": "Markt",
+  "name": "Sawadee Market",
+  "lat": 12.9377205,
+  "lng": 100.898544,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1202712500"
+ },
+ {
+  "cat": "Markt",
+  "name": "Smile Land Street Food",
+  "lat": 12.9424724,
+  "lng": 100.8909129,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1204841086"
+ },
+ {
+  "cat": "Markt",
+  "name": "Yai Mak Market",
+  "lat": 12.884085,
+  "lng": 100.8812096,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1205439246"
+ },
+ {
+  "cat": "Markt",
+  "name": "Villa Market",
+  "lat": 12.9356226,
+  "lng": 100.9045326,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1206323236"
+ },
+ {
+  "cat": "Markt",
+  "name": "Essensmarkt (ohne Namen in OSM)",
+  "lat": 12.9065924,
+  "lng": 100.8971325,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1206772209"
+ },
+ {
+  "cat": "Markt",
+  "name": "Essensmarkt (ohne Namen in OSM)",
+  "lat": 12.9439035,
+  "lng": 100.9030542,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1206775364"
+ },
+ {
+  "cat": "Markt",
+  "name": "Essensmarkt (ohne Namen in OSM)",
+  "lat": 12.9121398,
+  "lng": 100.8956357,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1217727437"
+ },
+ {
+  "cat": "Markt",
+  "name": "Rai Vanasin Night Market",
+  "lat": 12.9400086,
+  "lng": 100.9198844,
+  "note": "Nachtmarkt · Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1219461595"
+ },
+ {
+  "cat": "Markt",
+  "name": "Essensmarkt (ohne Namen in OSM)",
+  "lat": 12.9503897,
+  "lng": 100.8996177,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1227943394"
+ },
+ {
+  "cat": "Markt",
+  "name": "House of Benedict Pattaya",
+  "lat": 12.8606472,
+  "lng": 100.9049859,
+  "note": "Öffnungszeiten laut OSM: Mo-Su 10:00-19:00",
+  "id": "mkt-w1246961366"
+ },
+ {
+  "cat": "Markt",
+  "name": "Pratamnak Night Market",
+  "lat": 12.9125462,
+  "lng": 100.8634404,
+  "note": "Nachtmarkt · Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1306083318"
+ },
+ {
+  "cat": "Markt",
+  "name": "Won Market",
+  "lat": 12.9341424,
+  "lng": 100.8856506,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1343524529"
+ },
+ {
+  "cat": "Markt",
+  "name": "ตลาดหมู่ย้านอรรถพร",
+  "lat": 12.9830135,
+  "lng": 100.9352999,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1408575675"
+ },
+ {
+  "cat": "Markt",
+  "name": "Chang Beach Party",
+  "lat": 12.9411573,
+  "lng": 100.8848506,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1431672457"
+ },
+ {
+  "cat": "Markt",
+  "name": "Pattaya Park Night Plaza",
+  "lat": 12.9095708,
+  "lng": 100.8637456,
+  "note": "Nachtmarkt · Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-r6621233"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Moschee (ohne Namen in OSM)",
+  "lat": 12.9307811,
+  "lng": 100.9128321,
+  "note": "Gebetszeiten vor Ort erfragen",
+  "id": "mos-w1462566507"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9274103,
+  "lng": 100.8834852,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n415291963"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9240415,
+  "lng": 100.8800745,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n415291981"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9309346,
+  "lng": 100.8862504,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n416345675"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9329141,
+  "lng": 100.8977696,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n417324520"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9363754,
+  "lng": 100.8967689,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n417347660"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9362819,
+  "lng": 100.88724,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n420531844"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9191133,
+  "lng": 100.8855304,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n422873077"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.907865,
+  "lng": 100.8829853,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n422901802"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – เทพประสิทธิ์",
+  "lat": 12.9047652,
+  "lng": 100.8714559,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n422901823"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9009535,
+  "lng": 100.8700352,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n422901831"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9002608,
+  "lng": 100.8690669,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n422901836"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8987793,
+  "lng": 100.8668848,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n422901840"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8968306,
+  "lng": 100.8688653,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n423747034"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8964297,
+  "lng": 100.869326,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n423747037"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8961059,
+  "lng": 100.8696624,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n423747040"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8955238,
+  "lng": 100.8701962,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n423747043"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8903013,
+  "lng": 100.8748123,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n423747055"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8853203,
+  "lng": 100.8788996,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n423747074"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8841421,
+  "lng": 100.8798982,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n423747080"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8800251,
+  "lng": 100.8832598,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n423747101"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8712458,
+  "lng": 100.8894906,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n423778065"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8767517,
+  "lng": 100.8856427,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n423778083"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9532662,
+  "lng": 100.8893124,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n554183526"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9541495,
+  "lng": 100.8895892,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n554187215"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9559794,
+  "lng": 100.8899227,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n554187233"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9601971,
+  "lng": 100.8942353,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n554200132"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9657418,
+  "lng": 100.8980291,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n554200164"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8140772,
+  "lng": 100.916506,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n1000289721"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9360948,
+  "lng": 100.8885417,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1060238422"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9508538,
+  "lng": 100.9897204,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1503743263"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – เฉลิมพระเกียรติ",
+  "lat": 12.9382489,
+  "lng": 100.893329,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n1549984325"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9468483,
+  "lng": 100.8964846,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1550005662"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9547122,
+  "lng": 100.9071051,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1550011242"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9309141,
+  "lng": 100.8787612,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n1557021538"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – ถนนพัทยาสายหนึ่ง",
+  "lat": 12.9286809,
+  "lng": 100.8763155,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1557021576"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9269184,
+  "lng": 100.8749006,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n1557038870"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – เฉลิมพระเกียรติ",
+  "lat": 12.9324331,
+  "lng": 100.8906332,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n1560371072"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9095779,
+  "lng": 100.9170579,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1562521199"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9162643,
+  "lng": 100.9153165,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1562521203"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9260028,
+  "lng": 100.9315782,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1562522807"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9259152,
+  "lng": 100.9360446,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1562528977"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9321397,
+  "lng": 100.9397115,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n1562530992"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9298574,
+  "lng": 100.9464757,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1562544464"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9268575,
+  "lng": 100.8994995,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1563465316"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9169965,
+  "lng": 100.8965825,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1563471787"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9215402,
+  "lng": 100.8872782,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1563484333"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – เฉลิมพระเกียรติ",
+  "lat": 12.9336883,
+  "lng": 100.8920241,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1563487435"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9258242,
+  "lng": 100.8848076,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1563487440"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9302559,
+  "lng": 100.9004275,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1563906576"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – ถนนพัทยาสายสอง",
+  "lat": 12.947757,
+  "lng": 100.8886638,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n1574189735"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9152135,
+  "lng": 100.8712412,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1584452402"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9142151,
+  "lng": 100.8709641,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1584452441"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9280503,
+  "lng": 100.8780034,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1585821933"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8620143,
+  "lng": 100.9493832,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1599818095"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9273116,
+  "lng": 100.8743731,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1600804781"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9263497,
+  "lng": 100.8731433,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1600807681"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9258106,
+  "lng": 100.8721318,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1600817358"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9253667,
+  "lng": 100.8705778,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1600826230"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8978932,
+  "lng": 100.8727541,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1603325137"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9356629,
+  "lng": 100.8843879,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1695014946"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9313745,
+  "lng": 100.908066,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1784322472"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9154198,
+  "lng": 100.879635,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1837350854"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8943278,
+  "lng": 100.8974612,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1839606891"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9225836,
+  "lng": 100.7883353,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1839621372"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9890475,
+  "lng": 100.9248141,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1841142561"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9479788,
+  "lng": 100.9037841,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1846526791"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9376829,
+  "lng": 100.9274015,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1867053225"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9289873,
+  "lng": 100.9270906,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1875964560"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9240061,
+  "lng": 100.9086351,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1877243073"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9096256,
+  "lng": 100.8997209,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1879020276"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9088806,
+  "lng": 100.9024975,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1879022215"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9076507,
+  "lng": 100.9062438,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1879076936"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9078729,
+  "lng": 100.9095349,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1879091890"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9402414,
+  "lng": 100.9193787,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1886598275"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.895631,
+  "lng": 100.9064463,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1911700435"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.944244,
+  "lng": 100.9398014,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1912643557"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9242881,
+  "lng": 100.9075039,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n1921509918"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9195807,
+  "lng": 100.8827763,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n2231708062"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9086932,
+  "lng": 100.8852706,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n2231717062"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9142414,
+  "lng": 100.8855063,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n2231717063"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9086697,
+  "lng": 100.8923486,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n2231717395"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9560641,
+  "lng": 100.8912607,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n2240487447"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9584333,
+  "lng": 100.8962626,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n2240491832"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9830715,
+  "lng": 100.9195727,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n2286594737"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9153708,
+  "lng": 100.8653376,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n2451243337"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9236543,
+  "lng": 100.8749911,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n2557027410"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – พัทยาสายสอง 16",
+  "lat": 12.9228291,
+  "lng": 100.8776128,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n2558008109"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – พัทยาสายสอง 16",
+  "lat": 12.9216455,
+  "lng": 100.8783462,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n2558011416"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – เฉลิมพระเกียรติ",
+  "lat": 12.9201439,
+  "lng": 100.8758251,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n2558011803"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – พัทยาสายสอง 16",
+  "lat": 12.924061,
+  "lng": 100.8762006,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n2558012927"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – พัทยาใต้",
+  "lat": 12.924157,
+  "lng": 100.8774028,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n2558022674"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – พัทยาสายสอง",
+  "lat": 12.9246611,
+  "lng": 100.8735141,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n2558027176"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9079703,
+  "lng": 100.9043228,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n2639576609"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8899026,
+  "lng": 100.8873002,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n2641802524"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 13.0118037,
+  "lng": 100.9957017,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n2655815793"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 13.0197971,
+  "lng": 100.9315542,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n2713300972"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9031013,
+  "lng": 100.8697343,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n2739066116"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9269778,
+  "lng": 100.8795312,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n2775056038"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9679607,
+  "lng": 100.8997647,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3026616275"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9693655,
+  "lng": 100.9019191,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3026616276"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 13.019877,
+  "lng": 100.954619,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3036631555"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 13.0194259,
+  "lng": 100.9322254,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3036632048"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 13.0207781,
+  "lng": 100.9413975,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3046685791"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 13.0192273,
+  "lng": 100.9438988,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3046948580"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9933896,
+  "lng": 100.9384861,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3053724395"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9730692,
+  "lng": 100.9065803,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3053764246"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9955049,
+  "lng": 100.9406999,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3053764248"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8401777,
+  "lng": 100.9117657,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3174890858"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – พัทยากลาง 13",
+  "lat": 12.9324603,
+  "lng": 100.8868251,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3199839593"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – อรุโณทัย",
+  "lat": 12.9316169,
+  "lng": 100.8942788,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n3217236871"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9521359,
+  "lng": 100.9822629,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3220070661"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9431977,
+  "lng": 100.9449525,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3220088084"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.928235,
+  "lng": 100.879008,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n3221318410"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – พัทยาสายสอง",
+  "lat": 12.9321424,
+  "lng": 100.8834745,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n3227751569"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9356685,
+  "lng": 100.9080472,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3229778806"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9376702,
+  "lng": 100.9117616,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3229817518"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9409316,
+  "lng": 100.921627,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3229817520"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9335145,
+  "lng": 100.9372266,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3229850168"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – ถนนพัทยาเหนือ",
+  "lat": 12.9500284,
+  "lng": 100.8951445,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n3239312871"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9330545,
+  "lng": 100.9013462,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3261380810"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9507891,
+  "lng": 100.9078379,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3262978089"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9269235,
+  "lng": 100.9364824,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3279855347"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9206526,
+  "lng": 100.8620667,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3294049052"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.92453,
+  "lng": 100.8719316,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3316674807"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9097116,
+  "lng": 100.8664343,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3338393231"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8884069,
+  "lng": 100.8764911,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n3350401522"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – ถนนราชวรุณ",
+  "lat": 12.9209397,
+  "lng": 100.8609126,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n3383371668"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9088719,
+  "lng": 100.8689341,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n3427229395"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.908112,
+  "lng": 100.8914167,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3440293842"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9247825,
+  "lng": 100.8671534,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3507438565"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8908989,
+  "lng": 100.8788659,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n3522325064"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8831848,
+  "lng": 100.8806755,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n3523578657"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8975596,
+  "lng": 100.8735048,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3525821279"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9122023,
+  "lng": 100.8696864,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3559036630"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9168503,
+  "lng": 100.8989608,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3619460893"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – พัทยาสายสอง",
+  "lat": 12.9317672,
+  "lng": 100.8830316,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n3775976784"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – พัทยาสายสอง",
+  "lat": 12.9273114,
+  "lng": 100.8764033,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3780680107"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8792324,
+  "lng": 100.8922302,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n3791826163"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9436542,
+  "lng": 100.8886063,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n3860089299"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – พัทยาสายสอง",
+  "lat": 12.9413056,
+  "lng": 100.8878904,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n3864282740"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9431949,
+  "lng": 100.9460199,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n3879836797"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9629178,
+  "lng": 100.8920549,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3895104619"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9302459,
+  "lng": 100.8812662,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3910588203"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8607915,
+  "lng": 100.9295753,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3986073175"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – พัทยาสายสอง",
+  "lat": 12.9225209,
+  "lng": 100.8715534,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n3994900344"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9289404,
+  "lng": 100.9242414,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n4036164001"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – เพนียดช้าง",
+  "lat": 12.9455641,
+  "lng": 100.9017021,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n4071766473"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9299908,
+  "lng": 100.9168459,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n4086153704"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8967121,
+  "lng": 100.9416534,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n4102256695"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9634261,
+  "lng": 100.9203471,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n4144195303"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9690173,
+  "lng": 100.8954942,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n4165354861"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9695629,
+  "lng": 100.9075253,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n4165362224"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9699327,
+  "lng": 100.9068587,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n4165362225"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9059065,
+  "lng": 100.8767096,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n4191049487"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9389425,
+  "lng": 100.887241,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n4201554945"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9233667,
+  "lng": 100.9105018,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n4209120394"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.857751,
+  "lng": 100.9097535,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n4212057411"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.7895758,
+  "lng": 100.9298296,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n4213632454"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9308009,
+  "lng": 100.9106581,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n4216834004"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9318034,
+  "lng": 100.9060636,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n4216834005"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9322863,
+  "lng": 100.9046079,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n4216834006"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – พัทยาใต้",
+  "lat": 12.923687,
+  "lng": 100.8813214,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n4268228561"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9546541,
+  "lng": 100.9007936,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n4291052300"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9696021,
+  "lng": 100.9105857,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n4291052301"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.841178,
+  "lng": 100.9110117,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n4316154472"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – พัทยาสายสอง",
+  "lat": 12.9254957,
+  "lng": 100.8741507,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n4427851135"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9345043,
+  "lng": 100.8880783,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n4491327552"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.924034,
+  "lng": 100.8782731,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n4493354799"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9247293,
+  "lng": 100.8766237,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n4493354800"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9647305,
+  "lng": 100.897669,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n4497104874"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.97437,
+  "lng": 100.9077469,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n4497358890"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9762213,
+  "lng": 100.9128518,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n4497389043"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9672122,
+  "lng": 100.9112813,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n4505155813"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9229914,
+  "lng": 100.876895,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n4510241341"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8800137,
+  "lng": 100.8948824,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n4668695821"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9487687,
+  "lng": 100.9141631,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n4713387292"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.7967157,
+  "lng": 100.9171898,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n6401944286"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8203654,
+  "lng": 100.9166712,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n6401944287"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.870137,
+  "lng": 100.8969086,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n6401944288"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8891205,
+  "lng": 100.8760115,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n6401961673"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8584361,
+  "lng": 100.9149881,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n6507514485"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – ถนนสุขุมวิท",
+  "lat": 13.0267303,
+  "lng": 100.930447,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n6697953070"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9283748,
+  "lng": 100.8759566,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n6789194636"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9263052,
+  "lng": 100.8818497,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n6789454627"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – พัทยาสายสอง",
+  "lat": 12.9293937,
+  "lng": 100.880002,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n6790824035"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.935183,
+  "lng": 100.8959671,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n6800564800"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – พัทยากลาง 12",
+  "lat": 12.9386968,
+  "lng": 100.8906933,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n6806404854"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – เฉลิมพระเกียรติ",
+  "lat": 12.9275338,
+  "lng": 100.8872419,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n6818176398"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – พระตำหนัก",
+  "lat": 12.9146544,
+  "lng": 100.8668022,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n6860523551"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8259465,
+  "lng": 100.9149975,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n6868196934"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8783061,
+  "lng": 100.8847339,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n7045688585"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – ทัพพระยา 12",
+  "lat": 12.9088095,
+  "lng": 100.8638905,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n10658212105"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8608279,
+  "lng": 100.8995894,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n10891439564"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9286565,
+  "lng": 100.8848118,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n11150190565"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9281846,
+  "lng": 100.8842631,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n11150190580"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9296412,
+  "lng": 100.885434,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n11151174158"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9250383,
+  "lng": 100.8983219,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n11181728271"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – Soi 13/2",
+  "lat": 12.9302717,
+  "lng": 100.8787487,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n11185238188"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9368602,
+  "lng": 100.8830025,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n11204053994"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9442604,
+  "lng": 100.8849538,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n11217408049"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9226839,
+  "lng": 100.8786901,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n11230911403"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8729444,
+  "lng": 100.8885865,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n11242735237"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9091056,
+  "lng": 100.8888262,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n11409498443"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8939933,
+  "lng": 100.8718273,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n11559635969"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8838433,
+  "lng": 100.9119683,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n11879492822"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8836926,
+  "lng": 100.9131962,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n11879536288"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8821723,
+  "lng": 100.8986908,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n11879966672"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8642251,
+  "lng": 100.9008984,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n11881626421"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8663933,
+  "lng": 100.9053772,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n11882020841"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8823554,
+  "lng": 100.9031945,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n11887394782"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8824234,
+  "lng": 100.9027025,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n11887394799"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8056787,
+  "lng": 100.9319512,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n11889865052"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9189787,
+  "lng": 100.941901,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n11985427220"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8871342,
+  "lng": 100.8828878,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n12081469673"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9101873,
+  "lng": 100.8593411,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n12092835007"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9717239,
+  "lng": 100.8936496,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n12397269101"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 13.0195658,
+  "lng": 100.9459307,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n12649859594"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8634451,
+  "lng": 100.9384561,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n12791539726"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9320944,
+  "lng": 100.8986473,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n12811201560"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9452476,
+  "lng": 100.9162159,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n12889618898"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8785889,
+  "lng": 100.8920805,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n13026575701"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9079544,
+  "lng": 100.8966097,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n13059485796"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.840671,
+  "lng": 100.9064031,
+  "note": "24 Stunden geöffnet",
+  "id": "711-n13447428901"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9150191,
+  "lng": 100.8622107,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n13528201764"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9029934,
+  "lng": 100.8693107,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n13749626493"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9194242,
+  "lng": 100.9687682,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n13805274977"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.913242,
+  "lng": 100.863789,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-n14250643197"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9215631,
+  "lng": 100.7880327,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w106843930"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9092998,
+  "lng": 100.8654265,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w311141639"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9437852,
+  "lng": 100.9037321,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w311224240"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8895286,
+  "lng": 100.885474,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w311224479"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – เฉลิมพระเกียรติ",
+  "lat": 12.9199422,
+  "lng": 100.878785,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w311526239"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.929162,
+  "lng": 100.8846158,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w312083893"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9407454,
+  "lng": 100.8909071,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w312193679"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9521183,
+  "lng": 100.9062434,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w312986054"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9647505,
+  "lng": 100.8874562,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w321635628"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9289165,
+  "lng": 100.882004,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w322203218"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – พระตำหนัก 4",
+  "lat": 12.9153225,
+  "lng": 100.8616717,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w322604508"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9624774,
+  "lng": 100.8960166,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w343356859"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9303635,
+  "lng": 100.8941247,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w351612465"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – พัทยากลาง 13",
+  "lat": 12.9335383,
+  "lng": 100.8875429,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w354679089"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – พระตำหนัก 6",
+  "lat": 12.9097418,
+  "lng": 100.8618971,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w401957101"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9211719,
+  "lng": 100.9139653,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w421219833"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8239828,
+  "lng": 100.9252362,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w421447349"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9296028,
+  "lng": 100.9195936,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w426326489"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9276346,
+  "lng": 100.8891467,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w427372663"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9192467,
+  "lng": 100.9679024,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w428471796"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9775953,
+  "lng": 100.9163185,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w431212672"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.914139,
+  "lng": 100.8803751,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w445321133"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9409562,
+  "lng": 100.8904277,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w451767535"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8333739,
+  "lng": 100.9130689,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w462581107"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9063651,
+  "lng": 100.8769744,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w472945981"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8901093,
+  "lng": 100.8801456,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w637721644"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9175991,
+  "lng": 100.8787466,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w709350936"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9196767,
+  "lng": 100.8810801,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w709367594"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9785169,
+  "lng": 100.959441,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w710347269"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – ถนนพัทยาเหนือ",
+  "lat": 12.9485929,
+  "lng": 100.9036905,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w722018774"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9711754,
+  "lng": 100.9707814,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w723882725"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.937838,
+  "lng": 100.8982468,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w725196110"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – เพ็ชรตระกูล",
+  "lat": 12.9453463,
+  "lng": 100.8920108,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w725928842"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – พัทยากลาง",
+  "lat": 12.935418,
+  "lng": 100.8906552,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w725961431"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9205975,
+  "lng": 100.886864,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w728201185"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – สุขุมวิท พัทยา 46/3",
+  "lat": 12.9202459,
+  "lng": 100.8925725,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w728217290"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – สุขุมวิท พัทยา 46/3",
+  "lat": 12.925097,
+  "lng": 100.8910963,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w728871932"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – อรุโณทัย",
+  "lat": 12.932567,
+  "lng": 100.8944178,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w729965157"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – พัทยาสายสอง 18",
+  "lat": 12.9221891,
+  "lng": 100.8746407,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w730868702"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – ถนนเกษตรสิน9",
+  "lat": 12.9186493,
+  "lng": 100.860617,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w732434243"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – พระตำหนัก",
+  "lat": 12.9163252,
+  "lng": 100.8666742,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w732641019"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9124419,
+  "lng": 100.8677351,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w732673744"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – ถนนสุขุมวิท",
+  "lat": 12.7954942,
+  "lng": 100.9181418,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w733123478"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – ทุ่งกลม-ตาลหมัน",
+  "lat": 12.8948689,
+  "lng": 100.9016372,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w741041237"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9288678,
+  "lng": 100.9321121,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w743094489"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – มาบยายเลีย 53",
+  "lat": 12.9294791,
+  "lng": 100.9211443,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w743121528"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven – บายพาสชลบุรี-พัทยา",
+  "lat": 12.8999138,
+  "lng": 100.9008557,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w744438350"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9089857,
+  "lng": 100.8581102,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1024487263"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9104115,
+  "lng": 100.8633669,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1024653504"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9305714,
+  "lng": 100.8893,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1118442424"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9293926,
+  "lng": 100.8941923,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1167336471"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9298395,
+  "lng": 100.8866454,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1171490819"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.948991,
+  "lng": 100.9747802,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w1192479045"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9203439,
+  "lng": 100.8904069,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1203021439"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9299834,
+  "lng": 100.897166,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1203417607"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9197446,
+  "lng": 100.889966,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w1205936649"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9252465,
+  "lng": 100.8887014,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1206316481"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9226399,
+  "lng": 100.8878284,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1206346361"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9639213,
+  "lng": 100.8874118,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1209704402"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9426482,
+  "lng": 100.8948086,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1217686649"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9558092,
+  "lng": 100.8983813,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1246961369"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9151394,
+  "lng": 100.8801352,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1267906607"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.889639,
+  "lng": 100.8843537,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1341327282"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8863214,
+  "lng": 100.8784802,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w1341334275"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8990446,
+  "lng": 100.8794409,
+  "note": "24 Stunden geöffnet",
+  "id": "711-w1393219423"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9401168,
+  "lng": 100.9171426,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1394222663"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9830379,
+  "lng": 100.9350235,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1446717473"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9833255,
+  "lng": 100.9345598,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1446717474"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9821168,
+  "lng": 100.9292495,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1446717475"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9427627,
+  "lng": 100.9447838,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1451250726"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9175622,
+  "lng": 100.9276337,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1451255364"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9437494,
+  "lng": 100.9729764,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1460488322"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8450506,
+  "lng": 100.9099038,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1466923940"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.8491615,
+  "lng": 100.9094834,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1466923945"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9672591,
+  "lng": 100.9064742,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1536522926"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.910085,
+  "lng": 100.8803314,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1556554868"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9181235,
+  "lng": 100.8603152,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1564859214"
+ },
+ {
+  "cat": "7-Eleven",
+  "name": "7-Eleven",
+  "lat": 12.9387669,
+  "lng": 100.898738,
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
+  "id": "711-w1567833437"
+ }
+]

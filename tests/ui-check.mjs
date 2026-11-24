@@ -108,6 +108,62 @@ for (const [name, engine] of [['chromium', chromium], ['webkit', webkit]]) {
     ok(iw <= 390, `${name}: Infos ohne Überbreite (${iw})`);
     await page.screenshot({ path: `${out}/kw-${name}-info.png`, fullPage: true });
     const imgs = await page.$$eval('.card img', i => i.filter(x => x.complete && x.naturalWidth > 0).length);
+    // Wohnfläche ab/bis
+    await page.click('#tabList'); await page.click('#filterBtn'); await page.waitForTimeout(300);
+    const cnt = () => page.$$eval('.card', cs => cs.length);
+    const setR = (id, v) => page.$eval(id, (e, v) => { e.value = v; e.dispatchEvent(new Event('input', {bubbles:true})); }, v);
+    await setR('#fSize', 0); await page.waitForTimeout(250); const nAll = await cnt();
+    await setR('#fSize', 80); await page.waitForTimeout(250); const n80 = await cnt();
+    await setR('#fSizeMax', 120); await page.waitForTimeout(250); const n80_120 = await cnt();
+    const sizes = await page.$$eval('.card .tag', ts => ts.map(t => t.textContent).filter(t => /m²/.test(t)).map(t => +t.replace(/[^\d]/g,'')));
+    const lbl = await page.$eval('#oSize', e => e.textContent) + ' / ' + await page.$eval('#oSizeMax', e => e.textContent);
+    await page.screenshot({ path: `${out}/kw-${name}-flaeche.png` });
+    ok(nAll > n80 && n80 >= n80_120 && sizes.length > 0 && sizes.every(s => s >= 80 && s <= 120), `${name}: Wohnfläche einstellbar (alle ${nAll}, ab 80: ${n80}, 80–120: ${n80_120}, Anzeige ${lbl})`);
+    await page.click('#fReset'); await page.waitForTimeout(250);
+    ok(await page.$eval('#oSize', e => e.textContent) === '50 m²' && await page.$eval('#oSizeMax', e => e.textContent) === 'unbegrenzt', `${name}: Zurücksetzen stellt 50 m² / unbegrenzt wieder ein`);
+    await page.click('#fClose');
+    // Stadtwechsel Krabi -> Pattaya -> Krabi
+    await page.click('[data-city="pattaya"]');
+    await page.waitForFunction(() => /Stand/.test(document.querySelector('#stand').textContent) && document.querySelector('[data-city="pattaya"]').classList.contains('on'));
+    await page.waitForSelector('.card');
+    const pCount = await page.$eval('#stand', e => e.textContent);
+    const pMap = await (async () => { await page.click('#tabMap'); await page.waitForSelector('.pin'); await page.waitForTimeout(1200);
+      return page.evaluate(() => [document.querySelectorAll('.pin').length, [...document.querySelectorAll('.poi')].filter(x => x.querySelector('.ico711')).length]); })();
+    ok(/Inserate/.test(pCount) && pMap[0] > 20 && pMap[1] > 100, `${name}: Pattaya geladen (${pCount.split('·')[1]?.trim()}, ${pMap[0]} Pins, ${pMap[1]} 7-Eleven)`);
+    await page.screenshot({ path: `${out}/kw-${name}-pattaya-map.png` });
+    await page.click('#tabInfo'); await page.waitForSelector('.bars .bar');
+    ok(await page.$eval('#info h2', e => /Pattaya/.test(e.textContent)), `${name}: Infos zeigen Pattaya`);
+    await page.click('#tabList'); await page.waitForSelector('.card');
+    await page.screenshot({ path: `${out}/kw-${name}-pattaya-list.png` });
+    const favP = await page.evaluate(() => JSON.parse(localStorage.getItem('krabiwohnen.pattaya.v1')||'{}').favs?.length||0);
+    await page.click('[data-city="krabi"]'); await page.waitForTimeout(1500);
+    const favK = await page.evaluate(() => JSON.parse(localStorage.getItem('krabiwohnen.v1')||'{}').favs?.length||0);
+    ok(favP === 0 && favK >= 1, `${name}: Merkliste getrennt je Stadt (Krabi ${favK}, Pattaya ${favP})`);
+    await page.reload({ waitUntil: 'networkidle' }); await page.waitForSelector('.card');
+    ok(await page.$eval('[data-city="krabi"]', b => b.classList.contains('on')), `${name}: Stadt bleibt nach Neuladen gewählt`);
+    // Eigenes Inserat (z. B. von Facebook) anlegen und auf Karte setzen
+    await page.click('#tabList');
+    await page.click('#ownAdd'); await page.waitForSelector('#own:not([hidden])');
+    await page.fill('#wUrl', 'https://www.facebook.com/marketplace/item/123456789/');
+    await page.fill('#wTitle', 'Testhaus Facebook'); await page.fill('#wPrice', '15000'); await page.fill('#wSize', '80');
+    await page.fill('#wBuilt', String(new Date().getFullYear()-1)); await page.selectOption('#wPool', 'privat');
+    await page.click('#ownForm button[type=submit]');
+    await page.waitForSelector('#viewMap:not([hidden])'); await page.waitForTimeout(600);
+    const mb = await page.$eval('#map', m => { const r = m.getBoundingClientRect(); return [r.x + r.width/2, r.y + r.height/2]; });
+    await page.mouse.click(mb[0], mb[1]); await page.waitForTimeout(500);
+    await page.click('#tabList'); await page.waitForTimeout(300);
+    const ownCard = await page.$$eval('.card', cs => cs.filter(c => c.innerText.includes('Testhaus Facebook')).map(c => c.innerText));
+    ok(ownCard.length === 1 && /Eigenes/.test(ownCard[0]) && /km/.test(ownCard[0]), `${name}: Eigenes Inserat mit Ort und Entfernungen sichtbar`);
+    // Facebook-Knopf öffnet Marketplace-Suche
+    const [fb] = await Promise.all([page.context().waitForEvent('page'), page.click('#fbSearch')]);
+    await fb.waitForURL(/facebook\.com/, {timeout: 15000}).catch(() => {});
+    ok(/facebook\.com\/(marketplace|login)/.test(fb.url()), `${name}: Facebook-Knopf öffnet Marketplace-Suche`);
+    await fb.close();
+    // Eigentümer-Filter
+    await page.click('#filterBtn'); await page.click('label:has(#fOwner) i'); await page.waitForTimeout(200);
+    const ownerOnly = await page.$$eval('.card', cs => cs.length);
+    await page.click('label:has(#fOwner) i'); await page.click('#fClose');
+    ok(ownerOnly >= 0, `${name}: Eigentümer-Filter schaltbar (${ownerOnly} Treffer)`);
     ok(errors.length === 0, `${name}: keine Konsolenfehler ${errors.join(' | ')}`);
     await ctx.close();
   } finally { await browser.close(); }

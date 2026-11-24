@@ -19,7 +19,9 @@
 <body>
 <header class="top">
   <div class="brand">
-    <h1>Krabi Wohnen</h1>
+    <div class="cityseg" role="group" aria-label="Stadt wählen">
+      <button data-city="krabi" aria-pressed="true">Krabi</button><button data-city="pattaya" aria-pressed="false">Pattaya</button>
+    </div>
     <p id="stand" class="muted">Lade Inserate …</p>
   </div>
   <div class="topbtns"><button id="shareApp" class="pill icon" aria-label="App teilen" title="App teilen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M6 11H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-1"/></svg></button>
@@ -46,6 +48,10 @@
       <button data-sort="seven">Nähe 7-Eleven</button>
       <button data-sort="market">Nähe Nachtmarkt</button>
     </div>
+    <div class="extbar">
+      <button id="fbSearch" class="ext fb" type="button"><b>f</b> Auf Facebook Marketplace suchen ↗</button>
+      <button id="ownAdd" class="ext" type="button">＋ Eigenes Inserat</button>
+    </div>
     <p id="summary" class="summary"></p>
     <div id="list" class="cards"></div>
   </section>
@@ -65,8 +71,10 @@
     <select id="fAge"><option value="3">3 Jahre</option><option value="5">5 Jahre</option><option value="7">7 Jahre</option><option value="10">10 Jahre</option><option value="15">15 Jahre</option></select></div>
   <label class="row toggle"><span><b>Nur mit Pool</b><small>privat oder Gemeinschaftspool</small></span><input type="checkbox" id="fPool"><i></i></label>
   <label class="row toggle"><span><b>Baujahr unbekannt zeigen</b><small>Inserat nennt kein Baujahr</small></span><input type="checkbox" id="fUnknown"><i></i></label>
+  <label class="row toggle"><span><b>Nur direkt vom Eigentümer</b><small>ohne Makler (wo das Inserat es angibt)</small></span><input type="checkbox" id="fOwner"><i></i></label>
   <label class="row toggle"><span><b>Nur sofort/bald frei</b><small>blendet „frei ab“ später als 2 Monate aus</small></span><input type="checkbox" id="fSoon"><i></i></label>
   <div class="row range"><label for="fSize"><b>Wohnfläche ab</b> <output id="oSize"></output></label><input type="range" id="fSize" min="0" max="200" step="5"></div>
+  <div class="row range"><label for="fSizeMax"><b>Wohnfläche bis</b> <output id="oSizeMax"></output></label><input type="range" id="fSizeMax" min="40" max="400" step="10"></div>
   <div class="row range"><label for="fPrice"><b>Miete bis</b> <output id="oPrice"></output></label><input type="range" id="fPrice" min="10000" max="150000" step="1000"></div>
   <div class="row range"><label for="fBeach"><b>Strand max.</b> <output id="oBeach"></output></label><input type="range" id="fBeach" min="2" max="30" step="1"></div>
   <div class="row"><label for="fSort"><b>Sortierung</b></label>
@@ -87,6 +95,24 @@
 </aside>
 
 <aside id="detail" class="sheet detail" role="dialog" aria-modal="true" aria-labelledby="dTitle" hidden></aside>
+
+<aside id="own" class="sheet" role="dialog" aria-modal="true" aria-labelledby="ownTitle" hidden>
+  <div class="grab"></div>
+  <h2 id="ownTitle">Eigenes Inserat hinzufügen</h2>
+  <p class="muted small">Zum Beispiel von Facebook Marketplace. Wird nur auf diesem Gerät gespeichert. Danach tippst du den Ort auf der Karte an.</p>
+  <form id="ownForm" class="ownform">
+    <input type="hidden" id="wId">
+    <label>Link zum Inserat<div class="pastewrap"><input id="wUrl" type="url" inputmode="url" placeholder="https://www.facebook.com/marketplace/item/…"><button type="button" id="ownPaste" class="ghost">Einfügen</button></div></label>
+    <label>Titel<input id="wTitle" type="text" placeholder="z. B. Haus 2 SZ in Nong Thale" maxlength="120"></label>
+    <div class="two"><label>Miete ฿ / Monat<input id="wPrice" type="number" inputmode="numeric" min="0" step="500" required></label>
+      <label>Wohnfläche m²<input id="wSize" type="number" inputmode="numeric" min="0"></label></div>
+    <div class="two"><label>Schlafzimmer<input id="wBeds" type="number" inputmode="numeric" min="0" max="10"></label>
+      <label>Baujahr<input id="wBuilt" type="number" inputmode="numeric" min="1950" max="2035" placeholder="z. B. 2023"></label></div>
+    <label>Pool<select id="wPool"><option value="">kein Pool</option><option value="gemeinschaft">Gemeinschaftspool</option><option value="privat">privater Pool</option></select></label>
+    <label>Notiz<textarea id="wNote" rows="3" maxlength="1500" placeholder="Kontakt, Kaution, Besonderheiten …"></textarea></label>
+    <div class="sheetActions"><button type="button" id="ownCancel" class="ghost">Abbrechen</button><button type="submit" class="primary">Speichern</button></div>
+  </form>
+</aside>
 
 <script src="vendor/leaflet/leaflet.js?v=__BUILD__"></script>
 <script src="app.js?v=__BUILD__"></script>

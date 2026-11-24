@@ -21,7 +21,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 75
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
@@ -33,13 +33,16 @@ jobs:
       - name: Inserate laden
         if: github.event_name != 'push'
         run: python3 scraper/scrape.py
+        env:
+          DETAIL_BUDGET: "1200"   # max. neue Detailseiten pro Lauf; Rest im nächsten Lauf
       - name: Daten speichern
         if: github.event_name != 'push'
         run: |
           git config user.name "krabi-wohnen-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add site/data/listings.json scraper/cache.json scraper/pois.json
+          git add site/data scraper/cache-*.json scraper/pois-*.json
           git diff --cached --quiet || git commit -m "Inserate aktualisiert $(date -u +%F\ %H:%M)"
+          git pull --rebase -q || true
           git push
       - name: Versionsnummer in Dateinamen (verhindert alte Versionen im Handy-Speicher)
         run: sed -i "s/__BUILD__/${GITHUB_SHA::8}/g" site/index.html
