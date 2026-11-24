@@ -5,7 +5,8 @@ const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 const KEY = 'krabiwohnen.v1';
 const DEFAULTS = { old:false, pool:false, unknown:false, soon:false, maxAge:5, size:50, price:60000, beach:30, sort:'price' };
 const LAYERS = { Strand:true, Moschee:true, 'Muay Thai':true, '7-Eleven':true, Einkauf:false, Krankenhaus:false };
-const POICOL = { Strand:['#1b8cb2','🏖'], Moschee:['#2f7d4b','🕌'], 'Muay Thai':['#7d54a4','🥊'], '7-Eleven':['#ee7a00','7‑11'], Einkauf:['#ad841a','🛒'], Krankenhaus:['#c0392b','🏥'] };
+const POICOL = { Strand:['#1b8cb2','🏖'], Moschee:['#2f7d4b','🕌'], 'Muay Thai':['#7d54a4','🥊'], '7-Eleven':['#ffffff','<svg class="ico711" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="6" fill="#fff"/><rect x="5" y="9" width="22" height="4" fill="#f58220"/><rect x="5" y="15" width="22" height="4" fill="#00843d"/><rect x="5" y="21" width="22" height="4" fill="#ee2737"/><path d="M10 5h13l-7 23h-5l6-18h-7z" fill="#00843d" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>'], Einkauf:['#ad841a','🛒'], Krankenhaus:['#c0392b','🏥'] };
+const TXTICON = c => c==='7-Eleven' ? '7-11' : POICOL[c][1];
 const DISTCATS = ['Strand','Moschee','Muay Thai','7-Eleven','Einkauf','Krankenhaus'];
 let state = load();
 let DATA = null, KLIMA = null, view = 'list', map = null, layer = null, poiLayers = {};
@@ -86,7 +87,7 @@ function card(l){
       <button class="cnav prev" data-nav="-1" aria-label="Vorheriges Foto">‹</button><button class="cnav next" data-nav="1" aria-label="Nächstes Foto">›</button>`:''}</div>` : `<div class="noimg">🏠</div>`;
   const e = eur(l.price);
   const d = l.dist || {};
-  const distTxt = ['Strand','Moschee','Muay Thai','7-Eleven'].filter(k=>d[k]).map(k=>`${POICOL[k][1]} ${String(d[k].km).replace('.',',')} km${d[k].min!=null?` · ${d[k].min} min`:''}`).join('   ');
+  const distTxt = ['Strand','Moschee','Muay Thai','7-Eleven'].filter(k=>d[k]).map(k=>`${TXTICON(k)} ${String(d[k].km).replace('.',',')} km${d[k].min!=null?` · ${d[k].min} min`:''}`).join('   ');
   return `<article class="card" data-id="${esc(l.id)}" tabindex="0" aria-label="${esc(l.title)}">
     ${img}
     <div class="badges">${isNew(l)?'<span class="badge new">NEU</span>':''}${l.price_before && l.price_before>l.price?'<span class="badge drop">Preis ↓</span>':''}</div>
@@ -226,7 +227,7 @@ function openDetail(id){
     ['Frei ab', l.available||'nicht angegeben'], ['Haustiere', l.pets||'–'],
     ['Aktualisiert', l.updated||'–'], ['Bei uns seit', l.first_seen||'–'], ['Quelle', l.source||'–'],
   ];
-  const dist = DISTCATS.filter(k=>d[k]).map(k=>[`${POICOL[k][1]} ${k}`, `${String(d[k].km).replace('.',',')} km${d[k].min!=null?`, ca. ${d[k].min} min`:''}${d[k].road?'':' (geschätzt)'} – ${d[k].name}`]);
+  const dist = DISTCATS.filter(k=>d[k]).map(k=>[`${TXTICON(k)==='7-11'?'🏪':TXTICON(k)} ${k}`, `${String(d[k].km).replace('.',',')} km${d[k].min!=null?`, ca. ${d[k].min} min`:''}${d[k].road?'':' (geschätzt)'} – ${d[k].name}`]);
   const nav = l.lat!=null ? `https://www.google.com/maps/dir/?api=1&destination=${l.lat},${l.lng}&travelmode=two-wheeler` : null;
   $('#detail').innerHTML = `<div class="grab"></div><button class="close" aria-label="Schließen">✕</button>
     ${gal?`<div class="gallery">${gal}</div>`:''}

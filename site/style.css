@@ -136,5 +136,10 @@ select{min-height:44px;border-radius:12px;border:1px solid var(--line);backgroun
 .detail .actions .ghost[data-share]{flex:0 0 56px}
 #map.far .poi{width:12px;height:12px;font-size:0;border-width:1.5px;transform:translate(7px,7px)}
 #map.far .pin{font-size:10px;padding:2px 5px}
-.poi.seven{font-size:9px;font-weight:800;letter-spacing:-.3px;white-space:nowrap}
+.ico711{width:22px;height:22px;display:block}
+.chip .ico711{display:inline-block;vertical-align:-6px;width:24px;height:24px}
+.poi.seven{padding:0;background:#fff!important;border-color:#00843d;overflow:hidden}
+.poi.seven .ico711{width:22px;height:22px}
+#map.far .poi.seven .ico711{display:none}
+#map.far .poi.seven{background:#f58220!important;border-color:#fff}
 .chip{white-space:nowrap}
