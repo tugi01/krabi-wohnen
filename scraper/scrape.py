@@ -369,6 +369,23 @@ def parse_detail(page: str) -> dict:
     return d
 
 
+# Nur echte Gewerbeobjekte: Hotel, Hostel, Gästehaus, „Resort mit 10 Zimmern“, Hotel-/Resort-Betrieb.
+# Wohnanlagen mit „Resort“ im Namen (z. B. Espana Condo Resort) und „for sale and rent“ bleiben drin.
+HOTEL = re.compile(r"\bhotel\b(?! zone)|\bhostel\b|guest ?house|\b\d{2,}\s*(?:rooms|keys)\b|"
+                   r"resort (?:business|for (?:rent|lease|sale))|(?:rent|lease|sale)\w* resort\b(?! ?(?:condo|style|-style))|"
+                   r"business for (?:sale|lease|rent)|(?<!bed)\brooms for rent", re.I)
+
+
+def keep_home(l):
+    """Nur Wohnungen/Häuser zum Wohnen: Miete 3.000–300.000 ฿, höchstens 10 Schlafzimmer, keine Hotels/Betriebe."""
+    p = l.get("price")
+    if p and not (3000 <= p <= 300000):
+        return False
+    if (l.get("beds") or 0) > 10 and (not l.get("size") or l["size"] >= 300):
+        return False   # ganzes Wohnhaus/Betrieb (bei kleiner Fläche ist die SZ-Zahl nur falsch gelesen)
+    return not HOTEL.search(l.get("title") or "")
+
+
 def c_ok(c):
     return bool(c and c.get("detail"))
 
@@ -576,7 +593,7 @@ def run_city(city: str, now: datetime, fx: dict, budget):
         except Exception as e:  # noqa: BLE001
             log(f"{city}: Quelle {fn.__name__} fehlgeschlagen", e)
     listings = sources.dedupe(dp + (scrape_aonangapartments() if CITIES[city]["landlords"] else []) + extra)
-    listings = [l for l in listings if not l.get("price") or l["price"] >= 3000]   # Tages-/Fehlpreise raus
+    listings = [l for l in listings if keep_home(l)]   # Tagespreise, Hotels, ganze Wohnhäuser raus
     log(f"{city}: DotProperty {len(dp)}, weitere Quellen {len(extra)}, nach Zusammenfassen {len(listings)}")
     uniq = {}
     for l in listings:
