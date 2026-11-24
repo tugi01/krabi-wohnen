@@ -34,7 +34,7 @@ YEAR = datetime.now(timezone.utc).year
 CITIES = {
     "krabi": {
         "name": "Krabi / Ao Nang",
-        "list": "https://www.dotproperty.co.th/en/properties-for-rent/krabi/mueang-krabi",
+        "list": {"Krabi": "https://www.dotproperty.co.th/en/properties-for-rent/krabi/mueang-krabi"},
         "params": "",
         "center": (8.0310923, 98.8218831), "radius_km": 25,
         "bbox": (7.94, 98.70, 8.16, 98.98),
@@ -42,12 +42,17 @@ CITIES = {
         "landlords": True,
     },
     "pattaya": {
-        "name": "Pattaya",
-        "list": "https://www.dotproperty.co.th/en/properties-for-rent/chonburi/pattaya",
+        "name": "Pattaya & Umgebung",
+        # Pattaya mit Jomtien/Naklua/Pratumnak + Umgebung, alles mit dem Roller erreichbar
+        "list": {"Pattaya": "https://www.dotproperty.co.th/en/properties-for-rent/chonburi/pattaya",
+                 "Sattahip / Na Jomtien / Bang Saray": "https://www.dotproperty.co.th/en/properties-for-rent/chonburi/sattahip",
+                 "Si Racha": "https://www.dotproperty.co.th/en/properties-for-rent/chonburi/si-racha",
+                 "Ban Chang": "https://www.dotproperty.co.th/en/properties-for-rent/rayong/ban-chang"},
         "params": f"minLivingArea=50&maxPrice=60000&minYearBuilt={YEAR - 10}",
-        "center": (12.9327, 100.8800), "radius_km": 20,
-        "bbox": (12.78, 100.76, 13.03, 101.00),
-        "boat": lambda lat, lon: lon < 100.80,   # Koh Larn – nur per Fähre
+        "center": (12.9327, 100.8800), "radius_km": 45,
+        "bbox": (12.60, 100.76, 13.22, 101.20),
+        # Koh Larn und Koh Si Chang – nur per Fähre
+        "boat": lambda lat, lon: lon < 100.80 or (lat > 13.10 and lon < 100.845),
         "landlords": False,
     },
 }
@@ -370,28 +375,36 @@ def c_ok(c):
 
 def scrape_dotproperty(cache: dict, now: datetime, budget):
     items, seen = [], set()
-    total = None
+    total = 0
     c = CITIES[CITY]
-    for p in range(1, MAX_PAGES + 1):
-        q = "&".join(x for x in (c["params"], f"page={p}" if p > 1 else "") if x)
-        page = fetch(c["list"] + ("?" + q if q else ""))
-        if total is None:
-            for j in ld_blocks(page):
-                if j.get("@type") == "ItemList":
-                    total = j.get("numberOfItems")
-        rows = [r for r in parse_list(page) if r["url"] not in seen]
-        log(f"Liste Seite {p}: {len(rows)} Inserate (gesamt laut Portal: {total})")
-        if not rows:
-            break
-        for r in rows:
-            seen.add(r["url"])
-            items.append(r)
-        if total and len(seen) >= total:
-            break
-        time.sleep(1.0)
+    for area, base in c["list"].items():
+        n_area = None
+        for p in range(1, MAX_PAGES + 1):
+            q = "&".join(x for x in (c["params"], f"page={p}" if p > 1 else "") if x)
+            try:
+                page = fetch(base + ("?" + q if q else ""))
+            except Exception as e:  # noqa: BLE001
+                log(f"Liste {area} Fehler", e)
+                break
+            if n_area is None:
+                for j in ld_blocks(page):
+                    if j.get("@type") == "ItemList":
+                        n_area = j.get("numberOfItems")
+            rows = [r for r in parse_list(page) if r["url"] not in seen]
+            log(f"Liste {area} Seite {p}: {len(rows)} Inserate (laut Portal: {n_area})")
+            if not rows:
+                break
+            for r in rows:
+                seen.add(r["url"])
+                r["area"] = area
+                items.append(r)
+            if n_area and sum(1 for x in items if x.get("area") == area) >= n_area:
+                break
+            time.sleep(1.0)
+        total += n_area or 0
     out = []
     for r in items:
-        if r["lat"] and r["lng"] and haversine(c["center"], (r["lat"], r["lng"])) > c["radius_km"]:
+        if r["lat"] and r["lng"] and not (c["bbox"][0] <= r["lat"] <= c["bbox"][2] and c["bbox"][1] <= r["lng"] <= c["bbox"][3]):
             continue
         cached = cache.get(r["url"])
         stale = (not cached or cached.get("price_list") != r["price"] or cached.get("title_list") != r["title"]
@@ -563,6 +576,7 @@ def run_city(city: str, now: datetime, fx: dict, budget):
         except Exception as e:  # noqa: BLE001
             log(f"{city}: Quelle {fn.__name__} fehlgeschlagen", e)
     listings = sources.dedupe(dp + (scrape_aonangapartments() if CITIES[city]["landlords"] else []) + extra)
+    listings = [l for l in listings if not l.get("price") or l["price"] >= 3000]   # Tages-/Fehlpreise raus
     log(f"{city}: DotProperty {len(dp)}, weitere Quellen {len(extra)}, nach Zusammenfassen {len(listings)}")
     uniq = {}
     for l in listings:

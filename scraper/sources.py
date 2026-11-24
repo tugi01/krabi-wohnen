@@ -27,7 +27,9 @@ AREAS = {
     "east pattaya": (12.9300, 100.9300), "nong prue": (12.9200, 100.9200), "nong-prue": (12.9200, 100.9200),
     "huay yai": (12.8300, 100.9700), "huai yai": (12.8300, 100.9700), "na jomtien": (12.8250, 100.9100),
     "bang saray": (12.7600, 100.9100), "nong pla lai": (12.9400, 100.9600), "nong-pla-lai": (12.9400, 100.9600),
-    "bang lamung": (13.0450, 100.9250), "bang-lamung": (13.0450, 100.9250), "pattaya": (12.9330, 100.8830),
+    "bang lamung": (13.0450, 100.9250), "sattahip": (12.6650, 100.9000), "si racha": (13.1650, 100.9300),
+    "sriracha": (13.1650, 100.9300), "si-racha": (13.1650, 100.9300), "ban chang": (12.7250, 101.0600),
+    "ban-chang": (12.7250, 101.0600), "bang saen": (13.2800, 100.9150), "laem chabang": (13.0800, 100.9000), "bang-lamung": (13.0450, 100.9250), "pattaya": (12.9330, 100.8830),
     # Krabi
     "ao nang": (8.0400, 98.8300), "ao-nang": (8.0400, 98.8300), "nong thale": (8.0850, 98.7950),
     "nong-thale": (8.0850, 98.7950), "sai thai": (8.0880, 98.8650), "sai-thai": (8.0880, 98.8650),
@@ -39,7 +41,9 @@ AREAS = {
 THAI_AREAS = {"บางละมุง": "bang lamung", "นาเกลือ": "naklua", "หนองปรือ": "nong prue", "หนองปลาไหล": "nong pla lai",
               "ห้วยใหญ่": "huai yai", "จอมเทียน": "jomtien", "พัทยา": "pattaya", "อ่าวนาง": "ao nang",
               "หนองทะเล": "nong thale", "ไสไทย": "sai thai", "กระบี่น้อย": "krabi noi", "ปากน้ำ": "pak nam",
-              "กระบี่ใหญ่": "krabi yai", "คลองประสงค์": "khlong prasong"}
+              "กระบี่ใหญ่": "krabi yai", "คลองประสงค์": "khlong prasong",
+              "สัตหีบ": "sattahip", "ศรีราชา": "si racha", "บ้านฉาง": "ban chang", "บางเสร่": "bang saray",
+              "นาจอมเทียน": "na jomtien", "แหลมฉบัง": "laem chabang"}
 
 
 def area_point(*texts):
@@ -175,7 +179,10 @@ def parse_bahtsold(page: str) -> dict:
 # ------------------------------------------------------------------ Meezub
 MEEZUB_LISTS = {
     "pattaya": ["condos-for-rent/chon-buri/bang-lamung", "houses-for-rent/chon-buri/bang-lamung",
-                "apartments-for-rent/chon-buri/bang-lamung"],
+                "apartments-for-rent/chon-buri/bang-lamung",
+                "condos-for-rent/chon-buri/sattahip", "houses-for-rent/chon-buri/sattahip",
+                "condos-for-rent/chon-buri/si-racha", "houses-for-rent/chon-buri/si-racha",
+                "houses-for-rent/rayong/ban-chang"],
     "krabi": ["houses-for-rent/krabi", "condos-for-rent/krabi", "townhouses-for-rent/krabi"],
 }
 MEEZUB_TYPE = {"condo": "Condo", "house": "Haus", "house-rent": "Haus", "townhouse": "Reihenhaus", "apartment": "Apartment"}
