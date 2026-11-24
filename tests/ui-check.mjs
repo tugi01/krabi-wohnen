@@ -95,6 +95,8 @@ for (const [name, engine] of [['chromium', chromium], ['webkit', webkit]]) {
     ok(mosques >= 10, `${name}: Karte zeigt ${mosques} Moscheen`);
     const sev = await page.$$eval('.poi', p => p.filter(x => x.querySelector('.ico711')).length);
     ok(sev >= 20, `${name}: Karte zeigt ${sev} 7-Eleven`);
+    const mk = await page.$$eval('.poi', p => p.filter(x => x.textContent.includes('🍜')).length);
+    ok(mk >= 15, `${name}: Karte zeigt ${mk} Nacht-/Essensmärkte`);
     await page.click('.chip[data-layer="Krankenhaus"]');
     const hosp = await page.$$eval('.poi', p => p.filter(x => x.textContent.includes('🏥')).length);
     ok(hosp >= 3, `${name}: Ebene Krankenhaus eingeblendet (${hosp})`);

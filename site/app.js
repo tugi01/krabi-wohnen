@@ -4,10 +4,10 @@ const $ = s => document.querySelector(s);
 const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const KEY = 'krabiwohnen.v1';
 const DEFAULTS = { old:false, pool:false, unknown:false, soon:false, maxAge:5, size:50, price:60000, beach:30, sort:'price' };
-const LAYERS = { Strand:true, Moschee:true, 'Muay Thai':true, '7-Eleven':true, Einkauf:false, Krankenhaus:false };
-const POICOL = { Strand:['#1b8cb2','🏖'], Moschee:['#2f7d4b','🕌'], 'Muay Thai':['#7d54a4','🥊'], '7-Eleven':['#ffffff','<svg class="ico711" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="6" fill="#fff"/><rect x="5" y="9" width="22" height="4" fill="#f58220"/><rect x="5" y="15" width="22" height="4" fill="#00843d"/><rect x="5" y="21" width="22" height="4" fill="#ee2737"/><path d="M10 5h13l-7 23h-5l6-18h-7z" fill="#00843d" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>'], Einkauf:['#ad841a','🛒'], Krankenhaus:['#c0392b','🏥'] };
+const LAYERS = { Strand:true, Moschee:true, 'Muay Thai':true, '7-Eleven':true, Markt:true, Einkauf:false, Krankenhaus:false };
+const POICOL = { Strand:['#1b8cb2','🏖'], Moschee:['#2f7d4b','🕌'], 'Muay Thai':['#7d54a4','🥊'], Markt:['#d9480f','🍜'], '7-Eleven':['#ffffff','<svg class="ico711" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="6" fill="#fff"/><rect x="5" y="9" width="22" height="4" fill="#f58220"/><rect x="5" y="15" width="22" height="4" fill="#00843d"/><rect x="5" y="21" width="22" height="4" fill="#ee2737"/><path d="M10 5h13l-7 23h-5l6-18h-7z" fill="#00843d" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>'], Einkauf:['#ad841a','🛒'], Krankenhaus:['#c0392b','🏥'] };
 const TXTICON = c => c==='7-Eleven' ? '7-11' : POICOL[c][1];
-const DISTCATS = ['Strand','Moschee','Muay Thai','7-Eleven','Einkauf','Krankenhaus'];
+const DISTCATS = ['Strand','Moschee','Muay Thai','7-Eleven','Markt','Einkauf','Krankenhaus'];
 let state = load();
 let DATA = null, KLIMA = null, view = 'list', map = null, layer = null, poiLayers = {};
 
@@ -71,6 +71,7 @@ function filtered(onlyFav=false){
     new:(a,b)=>String(b.first_seen).localeCompare(String(a.first_seen)) || (a.price-b.price),
     beach:(a,b)=>(a.dist?.Strand?.km??99)-(b.dist?.Strand?.km??99),
     mosque:(a,b)=>(a.dist?.Moschee?.km??99)-(b.dist?.Moschee?.km??99),
+    market:(a,b)=>(a.dist?.Markt?.km??99)-(b.dist?.Markt?.km??99),
     seven:(a,b)=>(a.dist?.['7-Eleven']?.km??99)-(b.dist?.['7-Eleven']?.km??99),
     gym:(a,b)=>(a.dist?.['Muay Thai']?.km??99)-(b.dist?.['Muay Thai']?.km??99),
     size:(a,b)=>(b.size||0)-(a.size||0),
@@ -187,7 +188,7 @@ function renderInfo(){
     <section class="panel"><h2>Fahrzeit ab Ao Nang</h2><table><tr><th>Ziel</th><th>km</th><th>min</th></tr>${drive}</table>
       <p class="muted">${esc(KLIMA.drive_source)}. Mit dem Roller ähnlich.</p></section>
     <section class="panel"><h2>Was rund um Ao Nang auf der Karte ist</h2>
-      <p>${nPois('Moschee')} Moscheen · ${nPois('Muay Thai')} Muay-Thai-Gyms · ${nPois('7-Eleven')} 7-Eleven · ${nPois('Einkauf')} Supermärkte, Märkte und Einkaufszentren · ${nPois('Krankenhaus')} Krankenhäuser · ${nPois('Strand')} Strände ohne Boot erreichbar</p>
+      <p>${nPois('Moschee')} Moscheen · ${nPois('Muay Thai')} Muay-Thai-Gyms · ${nPois('7-Eleven')} 7-Eleven · ${nPois('Markt')} Nacht- und Essensmärkte · ${nPois('Einkauf')} Supermärkte, Märkte und Einkaufszentren · ${nPois('Krankenhaus')} Krankenhäuser · ${nPois('Strand')} Strände ohne Boot erreichbar</p>
       <p class="muted">Orte aus OpenStreetMap. Gebetszeiten und Trainingszeiten vor Ort erfragen.</p></section>
     <section class="panel"><h2>Wetter-Vergleich der geprüften Orte</h2>
       <div class="tablewrap"><table><tr><th>Ort</th><th>Regen&shy;tage</th><th>mm</th><th>Ø max °C</th></tr>${rows}</table></div>
@@ -335,7 +336,11 @@ async function init(){
 }
 if('serviceWorker' in navigator){
   const hadCtrl = !!navigator.serviceWorker.controller; let reloaded = false;
-  navigator.serviceWorker.addEventListener('controllerchange', () => { if(hadCtrl && !reloaded){ reloaded = true; location.reload(); } });
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    // höchstens einmal pro Minute neu laden (verhindert Endlosschleifen)
+    const last = +sessionStorage.getItem('kw-reload') || 0;
+    if(hadCtrl && !reloaded && Date.now() - last > 60000){ reloaded = true; sessionStorage.setItem('kw-reload', Date.now()); location.reload(); }
+  });
   navigator.serviceWorker.register('sw.js', {updateViaCache:'none'}).then(r => r.update()).catch(()=>{});
 }
 init();

@@ -42,6 +42,45 @@ SEVEN_Q = ('[out:json][timeout:90];(nwr["brand"~"7-Eleven|7-11",i](7.94,98.70,8.
            'nwr["brand:wikidata"="Q259340"](7.94,98.70,8.16,98.98););out center tags;')
 
 
+MARKET_Q = ('[out:json][timeout:90];(nwr["amenity"="marketplace"](7.94,98.70,8.16,98.98);'
+            'nwr["amenity"="food_court"](7.94,98.70,8.16,98.98);'
+            'nwr["name"~"night market|walking street|food market|weekend market",i](7.94,98.70,8.16,98.98););out center tags;')
+
+
+def refresh_markets():
+    """Neue Nacht-/Essensmärkte aus OpenStreetMap ergänzen (bestehende Einträge mit deutschen Notizen bleiben)."""
+    global POIS
+    import urllib.parse
+    try:
+        body = urllib.parse.urlencode({"data": MARKET_Q}).encode()
+        req = urllib.request.Request("https://overpass-api.de/api/interpreter", data=body, headers={"User-Agent": "krabi-wohnen/1.0"})
+        with urllib.request.urlopen(req, timeout=120) as r:
+            els = json.loads(r.read().decode())["elements"]
+    except Exception as e:  # noqa: BLE001
+        log("Markt-Abfrage fehlgeschlagen", e)
+        return
+    have = [p for p in POIS if p["cat"] in ("Markt", "Einkauf")]
+    added = 0
+    for e in els:
+        t = e.get("tags", {})
+        lat = e.get("lat") or (e.get("center") or {}).get("lat")
+        lon = e.get("lon") or (e.get("center") or {}).get("lon")
+        name = t.get("name:en") or t.get("name") or ""
+        if lat is None or "minimart" in name.lower() or (lat < 8.02 and 98.83 < lon < 98.85):
+            continue
+        if any(haversine((lat, lon), (p["lat"], p["lng"])) < 0.08 for p in have):
+            continue
+        kind = "Essensmarkt" if t.get("amenity") == "food_court" else "Markt"
+        p = {"cat": "Markt", "name": name or f"{kind} (ohne Namen in OSM)", "lat": round(lat, 7), "lng": round(lon, 7),
+             "note": ("Öffnungszeiten laut OSM: " + t["opening_hours"]) if t.get("opening_hours") else "Öffnungszeiten vor Ort erfragen",
+             "id": f"mkt-{e['type'][0]}{e['id']}"}
+        POIS.append(p); have.append(p); added += 1
+    if added:
+        with open(POIS_FILE, "w", encoding="utf-8") as f:
+            json.dump(POIS, f, ensure_ascii=False, indent=1)
+    log(f"Märkte: {added} neu")
+
+
 def refresh_seven_eleven():
     """7-Eleven-Filialen aus OpenStreetMap neu laden (neue Filialen kommen dazu). Bei Fehler bleibt die alte Liste."""
     global POIS
@@ -393,6 +432,7 @@ def main():
         for l in json.load(open(OUT)).get("listings", []):
             prev[l["id"]] = l
     refresh_seven_eleven()
+    refresh_markets()
     dp, total = scrape_dotproperty(cache, now)
     if len(dp) < 20:
         raise SystemExit(f"Nur {len(dp)} Inserate gefunden – Abbruch, alte Daten bleiben bestehen.")

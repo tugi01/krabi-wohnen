@@ -41,6 +41,8 @@ jobs:
           git add site/data/listings.json scraper/cache.json scraper/pois.json
           git diff --cached --quiet || git commit -m "Inserate aktualisiert $(date -u +%F\ %H:%M)"
           git push
+      - name: Versionsnummer in Dateinamen (verhindert alte Versionen im Handy-Speicher)
+        run: sed -i "s/__BUILD__/${GITHUB_SHA::8}/g" site/index.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
