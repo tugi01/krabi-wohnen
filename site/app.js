@@ -224,7 +224,7 @@ function renderInfo(){
       <p class="muted">${esc(KLIMA.drive_source)}. Mit dem Roller ähnlich.</p></section>
     <section class="panel"><h2>Was in ${esc(name)} auf der Karte ist</h2>
       <p>${nPois('Moschee')} Moscheen · ${nPois('Muay Thai')} Muay-Thai-/Box-Gyms · ${nPois('7-Eleven')} 7-Eleven · ${nPois('Markt')} Nacht- und Essensmärkte · ${nPois('Einkauf')} Supermärkte und Einkaufszentren · ${nPois('Krankenhaus')} Krankenhäuser · ${nPois('Strand')} Strände ohne Boot erreichbar</p>
-      <p class="muted">Orte aus OpenStreetMap (dort fehlende Orte fehlen auch hier). ${esc(CITIES[CITY].note)}</p></section>
+      <p class="muted">Orte aus OpenStreetMap (dort fehlende Orte fehlen auch hier). ${CITY==="pattaya"?"Moscheen zusätzlich aus dem offiziellen Moschee-Verzeichnis des Zentralen Islamkomitees Thailands (CICOT) und Gebets-Verzeichnissen ergänzt, Lage mit mindestens einer Kartenquelle geprüft. ":""}${esc(CITIES[CITY].note)}</p></section>
     <section class="panel"><h2>Wetter-Vergleich der geprüften Orte</h2>
       <div class="tablewrap"><table><tr><th>Ort</th><th>Regen&shy;tage</th><th>mm</th><th>Ø max °C</th></tr>${rows}</table></div>
       <p class="muted">${esc(KLIMA.source)}. Modelldaten zählen eher zu viele Regentage; für den Vergleich untereinander taugen sie.</p></section>`;
