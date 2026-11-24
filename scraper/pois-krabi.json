@@ -436,6 +436,182 @@
   "id": "ein-70"
  },
  {
+  "cat": "Markt",
+  "name": "Markt (ohne Namen in OSM)",
+  "lat": 8.0358768,
+  "lng": 98.8617826,
+  "note": "So 15:00–19:00 Uhr",
+  "id": "mkt-n2582398256"
+ },
+ {
+  "cat": "Markt",
+  "name": "Nine Avenue",
+  "lat": 8.0345976,
+  "lng": 98.8298469,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-n3676113263"
+ },
+ {
+  "cat": "Markt",
+  "name": "Essensmarkt (ohne Namen in OSM)",
+  "lat": 8.0447457,
+  "lng": 98.8064438,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-n4464449476"
+ },
+ {
+  "cat": "Markt",
+  "name": "Weekend Night Market Ao Nang",
+  "lat": 8.0350967,
+  "lng": 98.8310835,
+  "note": "Nachtmarkt · Fr–So 18:00–23:00 Uhr",
+  "id": "mkt-n6021566103"
+ },
+ {
+  "cat": "Markt",
+  "name": "Vogue Food Court",
+  "lat": 8.064429,
+  "lng": 98.9157908,
+  "note": "täglich 10:30–20:00 Uhr",
+  "id": "mkt-n10120898316"
+ },
+ {
+  "cat": "Markt",
+  "name": "Black Crab Night Market (Essensmarkt)",
+  "lat": 8.0669948,
+  "lng": 98.9161269,
+  "note": "Nachtmarkt · täglich 16:00–22:00 Uhr",
+  "id": "mkt-n10123327219"
+ },
+ {
+  "cat": "Markt",
+  "name": "Krabi Walking Street",
+  "lat": 8.06416,
+  "lng": 98.9163978,
+  "note": "Nachtmarkt · Fr–So 17:00–22:00 Uhr",
+  "id": "mkt-n10123396869"
+ },
+ {
+  "cat": "Markt",
+  "name": "Markt (ohne Namen in OSM)",
+  "lat": 8.1028512,
+  "lng": 98.8955342,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-n10165695160"
+ },
+ {
+  "cat": "Markt",
+  "name": "Blüe Moüntain Market",
+  "lat": 8.0317385,
+  "lng": 98.8280477,
+  "note": "täglich 17:00–23:00 Uhr",
+  "id": "mkt-n13466164901"
+ },
+ {
+  "cat": "Markt",
+  "name": "Maharaj Market",
+  "lat": 8.0665363,
+  "lng": 98.9131644,
+  "note": "täglich 08:00–21:00 Uhr",
+  "id": "mkt-w242999436"
+ },
+ {
+  "cat": "Markt",
+  "name": "City Night Market",
+  "lat": 8.0653912,
+  "lng": 98.9162853,
+  "note": "Nachtmarkt · täglich 10:00–23:00 Uhr",
+  "id": "mkt-w336172409"
+ },
+ {
+  "cat": "Markt",
+  "name": "Chaofa Night Market",
+  "lat": 8.0625923,
+  "lng": 98.9192187,
+  "note": "Nachtmarkt · täglich 16:00–22:00 Uhr",
+  "id": "mkt-w410088249"
+ },
+ {
+  "cat": "Markt",
+  "name": "Markt (ohne Namen in OSM)",
+  "lat": 8.0351603,
+  "lng": 98.8618804,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w487667179"
+ },
+ {
+  "cat": "Markt",
+  "name": "Markt (ohne Namen in OSM)",
+  "lat": 8.0423287,
+  "lng": 98.8431376,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w487667180"
+ },
+ {
+  "cat": "Markt",
+  "name": "Baan Chiangmai (Essensmarkt & Nachtmarkt)",
+  "lat": 8.0332114,
+  "lng": 98.8281684,
+  "note": "Nachtmarkt · Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w639173137"
+ },
+ {
+  "cat": "Markt",
+  "name": "Ban Talat Kao Fresh Market",
+  "lat": 8.099688,
+  "lng": 98.9093098,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1109965287"
+ },
+ {
+  "cat": "Markt",
+  "name": "Ao-Nang Landmark Night Market",
+  "lat": 8.0429285,
+  "lng": 98.8123131,
+  "note": "Nachtmarkt · täglich 16:00–23:00 Uhr",
+  "id": "mkt-w1227067969"
+ },
+ {
+  "cat": "Markt",
+  "name": "Markt (ohne Namen in OSM)",
+  "lat": 8.0422836,
+  "lng": 98.812222,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1227067999"
+ },
+ {
+  "cat": "Markt",
+  "name": "Markt (ohne Namen in OSM)",
+  "lat": 8.0369776,
+  "lng": 98.8188821,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1227068065"
+ },
+ {
+  "cat": "Markt",
+  "name": "Markt (ohne Namen in OSM)",
+  "lat": 8.0504437,
+  "lng": 98.8150108,
+  "note": "Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-w1231625685"
+ },
+ {
+  "cat": "Markt",
+  "name": "Monday & Friday Market",
+  "lat": 8.0519559,
+  "lng": 98.7665904,
+  "note": "Mo & Fr 15:00–18:00 Uhr",
+  "id": "mkt-w1355319874"
+ },
+ {
+  "cat": "Markt",
+  "name": "Sunday & Tuesday Market",
+  "lat": 8.0531074,
+  "lng": 98.7638767,
+  "note": "So & Di · Uhrzeit vor Ort erfragen",
+  "id": "mkt-w1355342460"
+ },
+ {
   "cat": "7-Eleven",
   "name": "7-Eleven",
   "lat": 8.0330259,
@@ -826,181 +1002,5 @@
   "lng": 98.7572056,
   "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
   "id": "711-w1348633861"
- },
- {
-  "cat": "Markt",
-  "name": "Markt (ohne Namen in OSM)",
-  "lat": 8.0358768,
-  "lng": 98.8617826,
-  "note": "So 15:00–19:00 Uhr",
-  "id": "mkt-n2582398256"
- },
- {
-  "cat": "Markt",
-  "name": "Nine Avenue",
-  "lat": 8.0345976,
-  "lng": 98.8298469,
-  "note": "Öffnungszeiten vor Ort erfragen",
-  "id": "mkt-n3676113263"
- },
- {
-  "cat": "Markt",
-  "name": "Essensmarkt (ohne Namen in OSM)",
-  "lat": 8.0447457,
-  "lng": 98.8064438,
-  "note": "Öffnungszeiten vor Ort erfragen",
-  "id": "mkt-n4464449476"
- },
- {
-  "cat": "Markt",
-  "name": "Weekend Night Market Ao Nang",
-  "lat": 8.0350967,
-  "lng": 98.8310835,
-  "note": "Nachtmarkt · Fr–So 18:00–23:00 Uhr",
-  "id": "mkt-n6021566103"
- },
- {
-  "cat": "Markt",
-  "name": "Vogue Food Court",
-  "lat": 8.064429,
-  "lng": 98.9157908,
-  "note": "täglich 10:30–20:00 Uhr",
-  "id": "mkt-n10120898316"
- },
- {
-  "cat": "Markt",
-  "name": "Black Crab Night Market (Essensmarkt)",
-  "lat": 8.0669948,
-  "lng": 98.9161269,
-  "note": "Nachtmarkt · täglich 16:00–22:00 Uhr",
-  "id": "mkt-n10123327219"
- },
- {
-  "cat": "Markt",
-  "name": "Krabi Walking Street",
-  "lat": 8.06416,
-  "lng": 98.9163978,
-  "note": "Nachtmarkt · Fr–So 17:00–22:00 Uhr",
-  "id": "mkt-n10123396869"
- },
- {
-  "cat": "Markt",
-  "name": "Markt (ohne Namen in OSM)",
-  "lat": 8.1028512,
-  "lng": 98.8955342,
-  "note": "Öffnungszeiten vor Ort erfragen",
-  "id": "mkt-n10165695160"
- },
- {
-  "cat": "Markt",
-  "name": "Blüe Moüntain Market",
-  "lat": 8.0317385,
-  "lng": 98.8280477,
-  "note": "täglich 17:00–23:00 Uhr",
-  "id": "mkt-n13466164901"
- },
- {
-  "cat": "Markt",
-  "name": "Maharaj Market",
-  "lat": 8.0665363,
-  "lng": 98.9131644,
-  "note": "täglich 08:00–21:00 Uhr",
-  "id": "mkt-w242999436"
- },
- {
-  "cat": "Markt",
-  "name": "City Night Market",
-  "lat": 8.0653912,
-  "lng": 98.9162853,
-  "note": "Nachtmarkt · täglich 10:00–23:00 Uhr",
-  "id": "mkt-w336172409"
- },
- {
-  "cat": "Markt",
-  "name": "Chaofa Night Market",
-  "lat": 8.0625923,
-  "lng": 98.9192187,
-  "note": "Nachtmarkt · täglich 16:00–22:00 Uhr",
-  "id": "mkt-w410088249"
- },
- {
-  "cat": "Markt",
-  "name": "Markt (ohne Namen in OSM)",
-  "lat": 8.0351603,
-  "lng": 98.8618804,
-  "note": "Öffnungszeiten vor Ort erfragen",
-  "id": "mkt-w487667179"
- },
- {
-  "cat": "Markt",
-  "name": "Markt (ohne Namen in OSM)",
-  "lat": 8.0423287,
-  "lng": 98.8431376,
-  "note": "Öffnungszeiten vor Ort erfragen",
-  "id": "mkt-w487667180"
- },
- {
-  "cat": "Markt",
-  "name": "Baan Chiangmai (Essensmarkt & Nachtmarkt)",
-  "lat": 8.0332114,
-  "lng": 98.8281684,
-  "note": "Nachtmarkt · Öffnungszeiten vor Ort erfragen",
-  "id": "mkt-w639173137"
- },
- {
-  "cat": "Markt",
-  "name": "Ban Talat Kao Fresh Market",
-  "lat": 8.099688,
-  "lng": 98.9093098,
-  "note": "Öffnungszeiten vor Ort erfragen",
-  "id": "mkt-w1109965287"
- },
- {
-  "cat": "Markt",
-  "name": "Ao-Nang Landmark Night Market",
-  "lat": 8.0429285,
-  "lng": 98.8123131,
-  "note": "Nachtmarkt · täglich 16:00–23:00 Uhr",
-  "id": "mkt-w1227067969"
- },
- {
-  "cat": "Markt",
-  "name": "Markt (ohne Namen in OSM)",
-  "lat": 8.0422836,
-  "lng": 98.812222,
-  "note": "Öffnungszeiten vor Ort erfragen",
-  "id": "mkt-w1227067999"
- },
- {
-  "cat": "Markt",
-  "name": "Markt (ohne Namen in OSM)",
-  "lat": 8.0369776,
-  "lng": 98.8188821,
-  "note": "Öffnungszeiten vor Ort erfragen",
-  "id": "mkt-w1227068065"
- },
- {
-  "cat": "Markt",
-  "name": "Markt (ohne Namen in OSM)",
-  "lat": 8.0504437,
-  "lng": 98.8150108,
-  "note": "Öffnungszeiten vor Ort erfragen",
-  "id": "mkt-w1231625685"
- },
- {
-  "cat": "Markt",
-  "name": "Monday & Friday Market",
-  "lat": 8.0519559,
-  "lng": 98.7665904,
-  "note": "Mo & Fr 15:00–18:00 Uhr",
-  "id": "mkt-w1355319874"
- },
- {
-  "cat": "Markt",
-  "name": "Sunday & Tuesday Market",
-  "lat": 8.0531074,
-  "lng": 98.7638767,
-  "note": "So & Di · Uhrzeit vor Ort erfragen",
-  "id": "mkt-w1355342460"
  }
 ]

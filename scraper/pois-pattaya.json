@@ -2396,6 +2396,126 @@
   "id": "mkt-r6621233"
  },
  {
+  "cat": "Moschee",
+  "name": "Masjid Darul Abrar",
+  "lat": 12.93176,
+  "lng": 100.908667,
+  "note": "Soi Sukhumvit-Pattaya 53, Nong Prue · beim CICOT registriert · Quelle: pray.zone + esalah (35 m), CICOT 518",
+  "id": "mos-x-0"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Masjid Sheikh Muhammad Ali",
+  "lat": 12.93611,
+  "lng": 100.90858,
+  "note": "Pornprapanimit Rd, Nong Prue · beim CICOT registriert · Quelle: pray.zone + Google-Plus-Code WWP5+CCW, CICOT 510",
+  "id": "mos-x-1"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Masjid Anwar As-Sunnah",
+  "lat": 12.937122,
+  "lng": 100.910334,
+  "note": "Pornprapanimit Rd 225, Nong Prue · Quelle: pray.zone + esalah (45 m)",
+  "id": "mos-x-2"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Masjid Al-Furqan (Soi Noen Plap Wan)",
+  "lat": 12.933138,
+  "lng": 100.912641,
+  "note": "283 Moo 5, Nong Prue · beim CICOT registriert · Quelle: Plus-Code WWM7+732 + exa, CICOT 517",
+  "id": "mos-x-3"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Masjid Darul Faizin (Soi Sanam Golf)",
+  "lat": 12.935264,
+  "lng": 100.913119,
+  "note": "Moo 6, Nong Prue · beim CICOT registriert · Quelle: exa-Ortsverzeichnis, CICOT 513 (Lage aus einer Quelle)",
+  "id": "mos-x-4"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Masjid Miftahul Islam",
+  "lat": 12.9570321,
+  "lng": 100.9224597,
+  "note": "Naklua/Nong Prue (Ost) · Quelle: Google-Ortsdaten XW4C+RX8, havehalalwilltravel",
+  "id": "mos-x-5"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Masjid Nurul Muqarrabin (Ban Rong Po)",
+  "lat": 13.040459,
+  "lng": 100.940901,
+  "note": "128/1 Moo 1, Takhian Tia, Bang Lamung · beim CICOT registriert · Quelle: pray.zone + esalah (10 m), CICOT 516",
+  "id": "mos-x-6"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Masjid Al Taqwa",
+  "lat": 12.855891,
+  "lng": 100.946352,
+  "note": "Huai Yai / Jomtien Ost · Quelle: pray.zone, Plus-Code VW4W+9G5",
+  "id": "mos-x-7"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Gebetsraum Central Pattaya (ห้องละหมาด)",
+  "lat": 12.934214,
+  "lng": 100.884127,
+  "note": "Pattaya Second Road 1 · Gebetsraum, keine Moschee · Quelle: pray.zone",
+  "id": "mos-x-8"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Masjid Salamatullah",
+  "lat": 13.166395,
+  "lng": 101.003023,
+  "note": "Sriracha–Nong Kho 14, Surasak, Si Racha · beim CICOT registriert · Quelle: esalah + Google-Adresse, CICOT 493",
+  "id": "mos-x-9"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Masjid Al-Ittihat",
+  "lat": 13.055363,
+  "lng": 101.052953,
+  "note": "Soi Surao Saeng Wiman, Bo Win, Si Racha · beim CICOT registriert · Quelle: Plus-Code 3343+45W (trip.com), CICOT 509",
+  "id": "mos-x-10"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Masjid Nurul Islam (Phan Sadet Nai)",
+  "lat": 13.058523,
+  "lng": 101.116398,
+  "note": "85/16 Moo 4, Bo Win, Si Racha · beim CICOT registriert · Quelle: esalah, Plus-Code 3458+CGH, CICOT 514",
+  "id": "mos-x-11"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Masjid Sriracha",
+  "lat": 13.152662,
+  "lng": 100.951328,
+  "note": "Surasak, Si Racha · Quelle: Plus-Code 5X32+3G8 (trip.com)",
+  "id": "mos-x-12"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Masjid Al-Huda (auch „Bang Saray Masjid“)",
+  "lat": 12.706185,
+  "lng": 100.881525,
+  "note": "37/2 Moo 8, Sattahip (Soi Mu Ban Natda) · beim CICOT registriert · Quelle: pray.zone, halaltrip-Adresse, CICOT 515",
+  "id": "mos-x-13"
+ },
+ {
+  "cat": "Moschee",
+  "name": "Masjid Dawatil Islam (Ban Chang)",
+  "lat": 12.717885,
+  "lng": 101.051666,
+  "note": "Moo 5, Ban Chang, Rayong · beim CICOT registriert · Quelle: exa + Plus-Code P392+5M3, CICOT 3128",
+  "id": "mos-x-14"
+ },
+ {
   "cat": "7-Eleven",
   "name": "7-Eleven",
   "lat": 12.9274103,
@@ -6050,125 +6170,5 @@
   "lng": 100.898738,
   "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
   "id": "711-w1567833437"
- },
- {
-  "cat": "Moschee",
-  "name": "Masjid Darul Abrar",
-  "lat": 12.93176,
-  "lng": 100.908667,
-  "note": "Soi Sukhumvit-Pattaya 53, Nong Prue · beim CICOT registriert · Quelle: pray.zone + esalah (35 m), CICOT 518",
-  "id": "mos-x-0"
- },
- {
-  "cat": "Moschee",
-  "name": "Masjid Sheikh Muhammad Ali",
-  "lat": 12.93611,
-  "lng": 100.90858,
-  "note": "Pornprapanimit Rd, Nong Prue · beim CICOT registriert · Quelle: pray.zone + Google-Plus-Code WWP5+CCW, CICOT 510",
-  "id": "mos-x-1"
- },
- {
-  "cat": "Moschee",
-  "name": "Masjid Anwar As-Sunnah",
-  "lat": 12.937122,
-  "lng": 100.910334,
-  "note": "Pornprapanimit Rd 225, Nong Prue · Quelle: pray.zone + esalah (45 m)",
-  "id": "mos-x-2"
- },
- {
-  "cat": "Moschee",
-  "name": "Masjid Al-Furqan (Soi Noen Plap Wan)",
-  "lat": 12.933138,
-  "lng": 100.912641,
-  "note": "283 Moo 5, Nong Prue · beim CICOT registriert · Quelle: Plus-Code WWM7+732 + exa, CICOT 517",
-  "id": "mos-x-3"
- },
- {
-  "cat": "Moschee",
-  "name": "Masjid Darul Faizin (Soi Sanam Golf)",
-  "lat": 12.935264,
-  "lng": 100.913119,
-  "note": "Moo 6, Nong Prue · beim CICOT registriert · Quelle: exa-Ortsverzeichnis, CICOT 513 (Lage aus einer Quelle)",
-  "id": "mos-x-4"
- },
- {
-  "cat": "Moschee",
-  "name": "Masjid Miftahul Islam",
-  "lat": 12.9570321,
-  "lng": 100.9224597,
-  "note": "Naklua/Nong Prue (Ost) · Quelle: Google-Ortsdaten XW4C+RX8, havehalalwilltravel",
-  "id": "mos-x-5"
- },
- {
-  "cat": "Moschee",
-  "name": "Masjid Nurul Muqarrabin (Ban Rong Po)",
-  "lat": 13.040459,
-  "lng": 100.940901,
-  "note": "128/1 Moo 1, Takhian Tia, Bang Lamung · beim CICOT registriert · Quelle: pray.zone + esalah (10 m), CICOT 516",
-  "id": "mos-x-6"
- },
- {
-  "cat": "Moschee",
-  "name": "Masjid Al Taqwa",
-  "lat": 12.855891,
-  "lng": 100.946352,
-  "note": "Huai Yai / Jomtien Ost · Quelle: pray.zone, Plus-Code VW4W+9G5",
-  "id": "mos-x-7"
- },
- {
-  "cat": "Moschee",
-  "name": "Gebetsraum Central Pattaya (ห้องละหมาด)",
-  "lat": 12.934214,
-  "lng": 100.884127,
-  "note": "Pattaya Second Road 1 · Gebetsraum, keine Moschee · Quelle: pray.zone",
-  "id": "mos-x-8"
- },
- {
-  "cat": "Moschee",
-  "name": "Masjid Salamatullah",
-  "lat": 13.166395,
-  "lng": 101.003023,
-  "note": "Sriracha–Nong Kho 14, Surasak, Si Racha · beim CICOT registriert · Quelle: esalah + Google-Adresse, CICOT 493",
-  "id": "mos-x-9"
- },
- {
-  "cat": "Moschee",
-  "name": "Masjid Al-Ittihat",
-  "lat": 13.055363,
-  "lng": 101.052953,
-  "note": "Soi Surao Saeng Wiman, Bo Win, Si Racha · beim CICOT registriert · Quelle: Plus-Code 3343+45W (trip.com), CICOT 509",
-  "id": "mos-x-10"
- },
- {
-  "cat": "Moschee",
-  "name": "Masjid Nurul Islam (Phan Sadet Nai)",
-  "lat": 13.058523,
-  "lng": 101.116398,
-  "note": "85/16 Moo 4, Bo Win, Si Racha · beim CICOT registriert · Quelle: esalah, Plus-Code 3458+CGH, CICOT 514",
-  "id": "mos-x-11"
- },
- {
-  "cat": "Moschee",
-  "name": "Masjid Sriracha",
-  "lat": 13.152662,
-  "lng": 100.951328,
-  "note": "Surasak, Si Racha · Quelle: Plus-Code 5X32+3G8 (trip.com)",
-  "id": "mos-x-12"
- },
- {
-  "cat": "Moschee",
-  "name": "Masjid Al-Huda (auch „Bang Saray Masjid“)",
-  "lat": 12.706185,
-  "lng": 100.881525,
-  "note": "37/2 Moo 8, Sattahip (Soi Mu Ban Natda) · beim CICOT registriert · Quelle: pray.zone, halaltrip-Adresse, CICOT 515",
-  "id": "mos-x-13"
- },
- {
-  "cat": "Moschee",
-  "name": "Masjid Dawatil Islam (Ban Chang)",
-  "lat": 12.717885,
-  "lng": 101.051666,
-  "note": "Moo 5, Ban Chang, Rayong · beim CICOT registriert · Quelle: exa + Plus-Code P392+5M3, CICOT 3128",
-  "id": "mos-x-14"
  }
 ]
