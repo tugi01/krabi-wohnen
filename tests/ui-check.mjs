@@ -19,7 +19,7 @@ for (const [name, engine] of [['chromium', chromium], ['webkit', webkit]]) {
     await page.waitForSelector('.card');
     const vw = await page.evaluate(() => [innerWidth, document.documentElement.scrollWidth]);
     ok(vw[0] === 390 && vw[1] <= 390, `${name}: keine horizontale Überbreite (${vw})`);
-    const count = s => page.$$eval('.card', c => c.length);
+    const count = s => page.$eval('#summary', e => +e.textContent.match(/^(\d+)/)[1]);
     const base = await count();
     ok(base > 0, `${name}: Standardfilter zeigt ${base} Inserate`);
     // Standard: keine alten Gebäude sichtbar
@@ -110,7 +110,7 @@ for (const [name, engine] of [['chromium', chromium], ['webkit', webkit]]) {
     const imgs = await page.$$eval('.card img', i => i.filter(x => x.complete && x.naturalWidth > 0).length);
     // Wohnfläche ab/bis
     await page.click('#tabList'); await page.click('#filterBtn'); await page.waitForTimeout(300);
-    const cnt = () => page.$$eval('.card', cs => cs.length);
+    const cnt = () => page.$eval('#summary', e => +e.textContent.match(/^(\d+)/)[1]);
     const setR = (id, v) => page.$eval(id, (e, v) => { e.value = v; e.dispatchEvent(new Event('input', {bubbles:true})); }, v);
     await setR('#fSize', 0); await page.waitForTimeout(250); const nAll = await cnt();
     await setR('#fSize', 80); await page.waitForTimeout(250); const n80 = await cnt();
@@ -122,6 +122,19 @@ for (const [name, engine] of [['chromium', chromium], ['webkit', webkit]]) {
     await page.click('#fReset'); await page.waitForTimeout(250);
     ok(await page.$eval('#oSize', e => e.textContent) === '50 m²' && await page.$eval('#oSizeMax', e => e.textContent) === 'unbegrenzt', `${name}: Zurücksetzen stellt 50 m² / unbegrenzt wieder ein`);
     await page.click('#fClose');
+    // Liste in Portionen (Speicherschutz iPhone)
+    await page.click('[data-city="pattaya"]'); await page.waitForFunction(() => document.querySelector('[data-city="pattaya"]').classList.contains('on') && document.querySelector('.card'));
+    await page.click('#tabList'); await page.waitForTimeout(500);
+    const pg = await page.evaluate(() => ({cards: document.querySelectorAll('#list .card').length, imgs: document.querySelectorAll('#list img[src]').length, more: !!document.querySelector('#list .more'), total: +document.querySelector('#summary').textContent.match(/^(\d+)/)[1]}));
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight)); await page.waitForTimeout(800);
+    const pg2 = await page.$$eval('#list .card', cs => cs.length);
+    ok(pg.cards <= 31 && pg.imgs <= 31 && pg.more && pg2 > pg.cards && pg.total > 100, `${name}: Pattaya-Liste lädt portionsweise (${pg.cards} Karten/${pg.imgs} Fotos sofort, nach Scrollen ${pg2}, gesamt ${pg.total})`);
+    await page.click('[data-city="krabi"]'); await page.waitForFunction(() => document.querySelector('[data-city="krabi"]').classList.contains('on') && document.querySelector('.card'));
+    await page.waitForTimeout(4500);
+    // Absturzschutz: unfertiger Pattaya-Start -> Krabi
+    await page.evaluate(() => { localStorage.setItem('krabiwohnen.city','pattaya'); localStorage.setItem('krabiwohnen.booting','pattaya'); });
+    await page.reload(); await page.waitForSelector('.card'); await page.waitForTimeout(1200);
+    ok(await page.$eval('[data-city="krabi"]', b => b.classList.contains('on')), `${name}: nach Absturz startet die App sicher in Krabi`);
     // Stadtwechsel Krabi -> Pattaya -> Krabi
     await page.click('[data-city="pattaya"]');
     await page.waitForFunction(() => /Stand/.test(document.querySelector('#stand').textContent) && document.querySelector('[data-city="pattaya"]').classList.contains('on'));

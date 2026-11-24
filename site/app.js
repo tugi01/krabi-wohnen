@@ -94,7 +94,7 @@ function filtered(onlyFav=false){
 function card(l){
   const a = ageInfo(l, new Date(DATA.generated));
   const pics = (l.images||[]).slice(0,6);
-  const img = pics.length ? `<div class="media"><div class="cgal" data-gal>${pics.map((u,i)=>`<img loading="lazy" src="${esc(imgSrc(u,640))}" alt="Foto ${i+1} von ${pics.length}" draggable="false">`).join('')}</div>
+  const img = pics.length ? `<div class="media"><div class="cgal" data-gal>${pics.map((u,i)=>`<img loading="lazy" ${i?'data-src':'src'}="${esc(imgSrc(u,640))}" decoding="async" alt="Foto ${i+1} von ${pics.length}" draggable="false">`).join('')}</div>
       ${pics.length>1?`<div class="cdots" aria-hidden="true">${pics.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div><span class="ccount">1/${pics.length}</span>
       <button class="cnav prev" data-nav="-1" aria-label="Vorheriges Foto">‹</button><button class="cnav next" data-nav="1" aria-label="Nächstes Foto">›</button>`:''}</div>` : `<div class="noimg">🏠</div>`;
   const e = eur(l.price);
@@ -134,14 +134,33 @@ function render(){
   if(hidden.soon) parts.push(`${hidden.soon} erst später frei`);
   $('#summary').textContent = onlyFav ? `${rows.length} gemerkte Inserate` :
     `${rows.length} von ${DATA.count + state.own.length} Inseraten` + (parts.length ? ` · ausgeblendet: ${parts.join(', ')}` : '');
-  $('#list').innerHTML = rows.length ? rows.map(card).join('') :
+  listRows = rows; shown = 0;
+  $('#list').innerHTML = rows.length ? '' :
     `<p class="empty">${onlyFav?'Noch nichts gemerkt – tippe ☆ auf einem Inserat.':'Keine Inserate passen zu den Filtern.'}</p>`;
-  bindGalleries();
+  if(rows.length && view!=='map' && view!=='info') moreCards();
   const active = Object.keys(DEFAULTS).filter(k => k!=='sort' && state.filters[k]!==DEFAULTS[k]).length;
   $('#filterCount').textContent = active || '';
   if(view==='map') drawMap(rows);
   if(view==='info') renderInfo();
   const sub = document.getElementById('oldSub'); if(sub) sub.textContent = `Baujahr vor ${new Date(DATA.generated).getFullYear()-state.filters.maxAge} und nicht kernsaniert`;
+}
+
+// Liste in Portionen: Safari auf dem iPhone stürzt sonst bei Hunderten Karten mit Fotos ab.
+const PAGE = 30; let listRows = [], shown = 0, moreObs = null;
+function moreCards(){
+  const list = $('#list'); list.querySelector('.more')?.remove();
+  const next = listRows.slice(shown, shown + PAGE); shown += next.length;
+  list.insertAdjacentHTML('beforeend', next.map(card).join(''));
+  if(shown < listRows.length){
+    list.insertAdjacentHTML('beforeend', `<button class="more" type="button">Weitere ${Math.min(PAGE, listRows.length-shown)} von noch ${listRows.length-shown} anzeigen</button>`);
+    const btn = list.querySelector('.more'); btn.onclick = moreCards;
+    if('IntersectionObserver' in window){
+      moreObs?.disconnect();
+      moreObs = new IntersectionObserver(es => { if(es.some(x=>x.isIntersecting)){ moreObs.disconnect(); moreCards(); } }, {rootMargin:'600px'});
+      moreObs.observe(btn);
+    }
+  }
+  bindGalleries();
 }
 
 function drawMap(rows){
@@ -305,12 +324,13 @@ function bindFilters(){
   set();
 }
 
+function wakeImgs(g){ g.querySelectorAll('img[data-src]').forEach(i => { i.src = i.dataset.src; i.removeAttribute('data-src'); }); }
 function bindGalleries(){
   document.querySelectorAll('[data-gal]').forEach(g => {
     if(g.dataset.bound) return; g.dataset.bound = 1;
     const card = g.closest('.card'), dots = card.querySelectorAll('.cdots i'), cnt = card.querySelector('.ccount');
     let raf = 0;
-    g.addEventListener('scroll', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => {
+    g.addEventListener('scroll', () => { wakeImgs(g); cancelAnimationFrame(raf); raf = requestAnimationFrame(() => {
       const i = Math.round(g.scrollLeft / g.clientWidth);
       dots.forEach((d,k)=>d.classList.toggle('on', k===i)); if(cnt) cnt.textContent = `${i+1}/${dots.length}`;
     }); }, {passive:true});
@@ -326,7 +346,7 @@ function bindUi(){
   });
   document.addEventListener('click', e => {
     const nb = e.target.closest('[data-nav]');
-    if(nb){ e.stopPropagation(); const g = nb.closest('.media').querySelector('[data-gal]'); g.scrollBy({left: g.clientWidth * +nb.dataset.nav, behavior:'smooth'}); return; }
+    if(nb){ e.stopPropagation(); const g = nb.closest('.media').querySelector('[data-gal]'); wakeImgs(g); g.scrollBy({left: g.clientWidth * +nb.dataset.nav, behavior:'smooth'}); return; }
     const sb = e.target.closest('[data-share]');
     if(sb){ e.stopPropagation(); shareListing(sb.dataset.share); return; }
     if(e.target.closest('#shareApp')){ shareApp(); return; }
@@ -358,6 +378,7 @@ function syncCityUi(){
 }
 async function loadCity(city){
   CITY = city; localStorage.setItem('krabiwohnen.city', city);
+  localStorage.setItem('krabiwohnen.booting', city);
   state = load(city); syncCityUi();
   if(map){ map.remove(); map = null; poiLayers = {}; layer = null; }
   DATA = null; $('#list').innerHTML = '<p class="empty">Lade Inserate …</p>'; $('#summary').textContent = '';
@@ -371,6 +392,7 @@ async function loadCity(city){
   const g = new Date(DATA.generated);
   $('#stand').textContent = `Stand ${g.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})} ${g.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})} · ${DATA.count} Inserate · 1 € = ${(Math.round(DATA.fx.rate*10)/10).toLocaleString('de-DE')} ฿`;
   setFilterUi(); render();
+  setTimeout(() => localStorage.removeItem('krabiwohnen.booting'), 4000);
 }
 function switchCity(city){ if(city===CITY || !CITIES[city]) return; closeSheets(); window.scrollTo({top:0}); loadCity(city); }
 
@@ -430,6 +452,8 @@ function setOwnPos(id, ll){
 }
 
 async function init(){
+  const crashed = localStorage.getItem('krabiwohnen.booting');
+  if(crashed && crashed !== 'krabi'){ CITY = 'krabi'; setTimeout(() => toast(`${CITIES[crashed]?.name||crashed} wurde zuletzt nicht fertig geladen – Krabi geöffnet`), 800); }
   bindUi();
   bindFilters();
   fetch('data/klima.json', {cache:'no-cache'}).then(x=>x.json()).then(k=>{ KLIMA=k; if(view==='info') renderInfo(); }).catch(()=>{});

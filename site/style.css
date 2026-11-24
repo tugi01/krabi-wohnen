@@ -162,3 +162,4 @@ body.picking #map{cursor:crosshair;outline:3px solid var(--accent)}
 .badge.owner{background:#2f7d4b;color:#fff}
 .badge.approx{background:rgba(255,255,255,.9);color:#7b4c00}
 .pin.approx{background:#b0603f;border-style:dashed;opacity:.9}
+.cards .more{display:block;width:100%;margin:6px 0 18px;padding:12px;border-radius:14px;border:1px solid var(--line,#d6dde0);background:rgba(255,255,255,.55);backdrop-filter:blur(10px);font:inherit;font-weight:600;color:inherit}
