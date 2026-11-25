@@ -70,6 +70,8 @@ def count(prov, query):
             return n or 0
         except Exception as e:  # noqa: BLE001
             log("Zählfehler", prov, query, str(e)[:80])
+            if "403" in str(e) or "429" in str(e):
+                sys.exit(3)                 # gesperrt: Vorbereitung abbrechen
             time.sleep(5)
     return None
 
@@ -230,6 +232,10 @@ def crawl_query(prov, query, p_from, p_to, sink, stats):
         except Exception as e:  # noqa: BLE001
             if "404" in str(e):
                 break                       # hinter der letzten Seite
+            if "403" in str(e) or "429" in str(e):
+                stats["blocked"] = True     # Portal verweigert den Zugriff: sofort aufhören, nicht umgehen
+                log("Zugriff verweigert (", str(e)[:60], ") – Abruf wird beendet")
+                return None
             fails += 1
             log("Fehler", prov, query, p, str(e)[:120])
             if fails >= 3:
@@ -326,7 +332,7 @@ def cmd_crawl(a):
     t0 = time.time()
     budget_s = float(os.environ.get("TH_MAX_SECONDS", "18000"))
     for kind, prov, q, p_from, p_to, _ in mine:
-        if time.time() - t0 > budget_s:
+        if stats.get("blocked") or time.time() - t0 > budget_s:
             out["failed"].append([kind, prov, q, p_from])
             continue
         if kind == "base":
@@ -354,6 +360,8 @@ def cmd_crawl(a):
     log(f"Shard {a.shard} fertig: {stats['pages']} Seiten, {len(out['base'])} Inserate, "
         f"{len(out['attr'])} Stufen-Zuordnungen, {len(out['failed'])} Pakete fehlgeschlagen, {time.time() - t0:.0f} s")
     save_gz(a.out, out)
+    if stats.get("blocked"):
+        sys.exit(3)                         # Job rot -> nichts wird veröffentlicht
 
 
 # ---------------------------------------------------------------- build
@@ -464,6 +472,9 @@ def cmd_build(a):
             seen[k] = today
             new += 1
     log(f"Basis: {len(base)} Inserate, {new} neu, {removed} entfernt, {kept} aus altem Stand (Fehler in {sorted(failed_provs)})")
+    if old_base and len(base) < 0.85 * len(old_base):
+        log(f"ABBRUCH: nur {len(base)} statt bisher {len(old_base)} Inserate – alter Stand bleibt veröffentlicht")
+        sys.exit(4)
     # Stufen eintragen
     items = []
     for k, v in base.items():
