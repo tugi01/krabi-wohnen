@@ -220,38 +220,55 @@ def parse_page(page: str, prov: str):
 
 
 def crawl_query(prov, query, p_from, p_to, sink, stats):
-    """Seiten p_from..p_to (p_to=None: bis leer). Rückgabe: Gesamtzahl laut Portal oder None bei Fehler."""
+    """Seiten p_from..p_to (p_to=None: bis zum Ende). Rückgabe: Gesamtzahl laut Portal, None bei Fehler.
+
+    Liefert das Portal vor dem erwarteten Ende eine leere Seite (oder 404), wird sie nach einer Pause
+    erneut geladen; bleibt sie leer, gilt das Paket als unvollständig (None) – die Provinz behält dann
+    ihren alten Stand statt Inserate zu verlieren."""
     total = None
     p = p_from
     fails = 0
+    got = 0
+    retried = set()
     while p_to is None or p <= p_to:
         url = BASE + prov + "?" + "&".join(x for x in (query, f"page={p}" if p > 1 else "") if x)
         try:
             page = scrape.fetch(url)
             fails = 0
         except Exception as e:  # noqa: BLE001
-            if "404" in str(e):
-                break                       # hinter der letzten Seite
             if "403" in str(e) or "429" in str(e):
                 stats["blocked"] = True     # Portal verweigert den Zugriff: sofort aufhören, nicht umgehen
                 log("Zugriff verweigert (", str(e)[:60], ") – Abruf wird beendet")
                 return None
-            fails += 1
-            log("Fehler", prov, query, p, str(e)[:120])
-            if fails >= 3:
-                return None
-            time.sleep(10)
-            continue
-        items, n = parse_page(page, prov)
+            if "404" in str(e):
+                page = ""                   # wie leere Seite behandeln (unten geprüft)
+            else:
+                fails += 1
+                log("Fehler", prov, query, p, str(e)[:120])
+                if fails >= 3:
+                    return None
+                time.sleep(10)
+                continue
+        items, n = parse_page(page, prov) if page else ([], None)
         stats["pages"] += 1
+        total = n if total is None else total
+        expected_end = math.ceil(total / 30) if total else None
+        if not items:
+            if expected_end and p <= expected_end and p not in retried:
+                retried.add(p)
+                log(f"Leere Seite {p} von {expected_end} ({prov} {query}) – neuer Versuch")
+                time.sleep(15)
+                continue
+            if expected_end and p <= expected_end and (p_to is None or p <= p_to):
+                log(f"UNVOLLSTÄNDIG: {prov} {query} endet bei Seite {p} von {expected_end}")
+                return None
+            break
         if p > 334:
             log("Warnung: über Seite 334 (Portal-Grenze)", prov, query)
             break
-        total = n if total is None else total
-        if not items:
-            break
+        got += len(items)
         sink(items)
-        if n is not None and p * 30 >= n:
+        if expected_end and p >= expected_end:
             break
         p += 1
         time.sleep(DELAY)

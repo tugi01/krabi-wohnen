@@ -67,7 +67,7 @@ function onlineInfo(l){
   const d = l.posted || l.first_seen; if(!d || l.own) return null;
   const days = Math.max(0, Math.round((new Date(DATA?.generated || Date.now()) - new Date(d)) / 864e5));
   const dt = new Date(d).toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric'});
-  const ago = days === 0 ? 'heute' : days === 1 ? '1 Tag' : days < 60 ? `${days} Tage` : days < 730 ? `${Math.round(days/30.4)} Monate` : `${Math.round(days/365)} Jahre`;
+  const ago = days === 0 ? 'heute' : days === 1 ? '1 Tag' : days < 60 ? `${days} Tage` : days < 730 ? `${Math.floor(days/30.4)} Monate` : `über ${Math.floor(days/365)} Jahre`;
   return { posted: !!l.posted, date: dt, days, label: l.posted ? `online seit ${dt}` : `bei uns seit ${dt}`, ago };
 }
 const sizeOf = l => l.size ?? l.sizeh ?? (l.sz ? (l.sz[1] >= 9999 ? l.sz[0] : (l.sz[0]+l.sz[1])/2) : null);
