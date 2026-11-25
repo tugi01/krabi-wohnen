@@ -3,8 +3,8 @@
 const $ = s => document.querySelector(s);
 const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const CITIES = {
-  thailand:{ name:'Thailand', long:'Ganz Thailand', key:'krabiwohnen.th.v1', center:[13.2,100.9], fb:'Thailand',
-             note:'Ganz Thailand: alle Mietinserate von DotProperty (alle Provinzen), dazu BahtSold und Meezub für Krabi und Pattaya. Fläche und Baujahr stammen aus den Suchfiltern des Portals (in Stufen); genaue Angaben, Pool und alle Fotos werden beim Öffnen eines Inserats nachgeladen.' },
+  thailand:{ name:'Thailand', long:'Küsten & Chiang Mai', key:'krabiwohnen.th.v1', center:[11.5,100.3], fb:'Thailand',
+             note:'Thailand (Küsten-Provinzen und Chiang Mai, ohne Bangkok): alle Mietinserate von DotProperty in 20 Provinzen, dazu BahtSold und Meezub für Krabi und Pattaya. Fläche und Baujahr stammen aus den Suchfiltern des Portals (in Stufen); genaue Angaben, Pool und alle Fotos werden beim Öffnen eines Inserats nachgeladen.' },
   krabi:   { name:'Krabi', long:'Krabi / Ao Nang', key:'krabiwohnen.v1', center:[8.045,98.83], fb:'Ao Nang Krabi',
              note:'Alle Inserate in Mueang Krabi bis 25 km um Ao Nang.' },
   pattaya: { name:'Pattaya', long:'Pattaya & Umgebung', key:'krabiwohnen.pattaya.v1', center:[12.93,100.89], fb:'Pattaya',
@@ -157,7 +157,7 @@ function render(){
   if(DATA.th && !onlyFav && view!=='map' && view!=='info'){
     const inView = TH.bounds ? TH.countIn(TH.bounds) : 0;
     if(!TH.bounds || inView > TH.LOAD_LIMIT || !TH.listingsIn(TH.bounds).length && !TH.loadingT.size){
-      $('#summary').textContent = TH.bounds && inView > TH.LOAD_LIMIT ? `${fmt(inView)} Inserate im Kartenausschnitt – bitte näher heranzoomen oder eine Gegend wählen` : `${fmt(TH.idx?.count||0)} Inserate in ganz Thailand`;
+      $('#summary').textContent = TH.bounds && inView > TH.LOAD_LIMIT ? `${fmt(inView)} Inserate im Kartenausschnitt – bitte näher heranzoomen oder eine Gegend wählen` : `${fmt(TH.idx?.count||0)} Inserate an Thailands Küsten und in Chiang Mai`;
       $('#list').innerHTML = thPicker(); return;
     }
   }
@@ -322,7 +322,7 @@ function renderInfo(){
     const pr = (i.provinces||[]).map(p=>`<tr><td><button class="linkbtn" data-prov="${esc(p.key)}">${esc(p.name)}</button></td><td>${fmt(p.n)}</td></tr>`).join('');
     const src = Object.entries(i.sources||{}).filter(([,v])=>v).map(([k,v])=>`${esc(k)} ${fmt(v)}`).join(' · ');
     const pc = TH.poiIdx?.counts || {};
-    box.innerHTML = `<section class="panel"><h2>Ganz Thailand – was in der App steckt</h2>
+    box.innerHTML = `<section class="panel"><h2>Thailand (Küsten & Chiang Mai) – was in der App steckt</h2>
       <p><b>${fmt(i.count)}</b> Mietinserate · ${src}</p>
       <p>Fläche bekannt (genau oder als Stufe): <b>${fmt(cov.sz)}</b> · Baujahr bekannt: <b>${fmt(cov.by)}</b>. Fehlende Angaben stehen oft auf der Inseratsseite – sie werden beim Öffnen nachgeladen.</p>
       <p>Neu seit dem letzten Lauf: ${fmt(i.new_since_last)} · entfernt: ${fmt(i.removed_since_last)}</p>
