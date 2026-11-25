@@ -846,14 +846,6 @@
  {
   "cat": "7-Eleven",
   "name": "7-Eleven",
-  "lat": 8.0426709,
-  "lng": 98.8110501,
-  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
-  "id": "711-n11360073176"
- },
- {
-  "cat": "7-Eleven",
-  "name": "7-Eleven",
   "lat": 8.0341483,
   "lng": 98.828505,
   "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
@@ -928,7 +920,7 @@
   "name": "7-Eleven",
   "lat": 8.0333878,
   "lng": 98.8619545,
-  "note": "24 Stunden geöffnet",
+  "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
   "id": "711-w581590280"
  },
  {
