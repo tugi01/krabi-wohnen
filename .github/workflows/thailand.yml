@@ -1,0 +1,74 @@
+name: Ganz Thailand aktualisieren
+
+# Nachts alle Listenseiten aller Provinzen (6 parallele Teile), dann Kacheln bauen und veröffentlichen.
+# Daten liegen NICHT im Repo, sondern im Release "th-data" (th-data.tar.gz = Kacheln + Orte, th-state.json.gz = Zustand).
+on:
+  schedule:
+    - cron: "0 19 * * *"    # 02:00 Uhr Thailand
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Letzten Zustand holen
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: gh release download th-data -p th-state.json.gz -D . || echo "noch kein Zustand"
+      - name: Listenseiten laden
+        env: { TH_MAX_SECONDS: "17500" }
+        run: python3 scraper/th_crawl.py crawl --shard ${{ matrix.shard }} --of 6 --state th-state.json.gz --out shards/s${{ matrix.shard }}.json.gz
+      - uses: actions/upload-artifact@v4
+        with: { name: "shard-${{ matrix.shard }}", path: shards/, retention-days: 2 }
+
+  build:
+    needs: crawl
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    concurrency: { group: pages, cancel-in-progress: false }
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: actions/download-artifact@v4
+        with: { pattern: "shard-*", path: shards, merge-multiple: true }
+      - name: Alten Stand + Orte holen
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          gh release download th-data -p th-state.json.gz -D . || true
+          gh release download th-data -p th-data.tar.gz -D . && tar -xzf th-data.tar.gz -C site/data || true
+          ls shards
+      - name: Kacheln bauen
+        run: python3 scraper/th_crawl.py build --shards shards --state th-state.json.gz --out site/data/th
+      - name: Im Release sichern
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          mv site/data/th/state.json.gz th-state.json.gz
+          tar -czf th-data.tar.gz -C site/data th
+          gh release upload th-data th-data.tar.gz th-state.json.gz --clobber
+          echo '{"ready":true}' > site/data/th-status.json
+          du -sh site/data/th
+      - name: Versionsnummer in Dateinamen
+        run: sed -i "s/__BUILD__/${GITHUB_SHA::8}/g" site/index.html
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: site }
+      - run: sleep 20
+      - id: deploy
+        uses: actions/deploy-pages@v4

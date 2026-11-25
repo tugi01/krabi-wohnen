@@ -44,6 +44,12 @@ jobs:
           git diff --cached --quiet || git commit -m "Inserate aktualisiert $(date -u +%F\ %H:%M)"
           git pull --rebase -q || true
           git push
+      - name: Ganz-Thailand-Daten dazulegen (liegen im Release, nicht im Repo)
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          if gh release download th-data -p th-data.tar.gz -D /tmp; then
+            tar -xzf /tmp/th-data.tar.gz -C site/data && test -f site/data/th/index.json && echo '{"ready":true}' > site/data/th-status.json
+          fi
       - name: Versionsnummer in Dateinamen (verhindert alte Versionen im Handy-Speicher)
         run: sed -i "s/__BUILD__/${GITHUB_SHA::8}/g" site/index.html
       - uses: actions/configure-pages@v5

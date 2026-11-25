@@ -160,7 +160,14 @@ def crawl_query(prov, query, p_from, p_to, sink, stats):
 
 def plan_units(state, day_index):
     """Arbeitspakete: Basis (alle Provinzen, alle Seiten) + heutiger Anteil der Stufen-Abfragen."""
-    counts = state.get("counts", {})
+    counts = dict(state.get("counts", {}))
+    try:   # gemessene Provinz-Größen (24.11.2026) als Startwert, damit Bangkok sofort aufgeteilt wird
+        seed = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "th_counts_seed.json")))
+        for k, v in seed.items():
+            if v is not None:
+                counts.setdefault(k, v)
+    except Exception:  # noqa: BLE001
+        pass
     units = []
     for prov in PROVINCES:
         n = counts.get(prov)
@@ -168,7 +175,7 @@ def plan_units(state, day_index):
         if pages and pages > CHUNK:
             for a in range(1, pages + 1, CHUNK):
                 last = a + CHUNK - 1 >= pages
-                units.append(("base", prov, "", a, None if last else a + CHUNK - 1, pages - a + 1 if not last else CHUNK))
+                units.append(("base", prov, "", a, None if last else a + CHUNK - 1, CHUNK if not last else pages - a + 1))
         else:
             units.append(("base", prov, "", 1, None, pages or 1))
     for kind, bins in (("sz", SIZE_BINS), ("by", YEAR_BINS)):
@@ -177,16 +184,17 @@ def plan_units(state, day_index):
                 key = f"{prov}|{kind}|{rng[0]}-{rng[1]}"
                 if prov in counts and not counts[prov]:
                     continue                      # Provinz ohne Inserate
-                if (hash_str(key) % BUCKET_DAYS) != day_index % BUCKET_DAYS and key in counts:
-                    continue                      # nicht heute dran (beim ersten Mal immer)
+                if (hash_str(key) % BUCKET_DAYS) != day_index % BUCKET_DAYS:
+                    continue                      # jede Stufe einmal pro Woche
                 n = counts.get(key)
                 pages = math.ceil(n / 30) if n else None
                 if pages and pages > CHUNK:
                     for a in range(1, pages + 1, CHUNK):
                         last = a + CHUNK - 1 >= pages
-                        units.append((kind, prov, q + "|" + key, a, None if last else a + CHUNK - 1, CHUNK))
+                        units.append((kind, prov, q + "|" + key, a, None if last else a + CHUNK - 1, CHUNK if not last else pages - a + 1))
                 else:
-                    units.append((kind, prov, q + "|" + key, 1, None, pages or 1))
+                    est = pages or max(1, math.ceil((counts.get(prov) or 30) / 30 / (len(SIZE_BINS) if kind == "sz" else len(YEAR_BINS)) * 1.3))
+                    units.append((kind, prov, q + "|" + key, 1, None, est))
     return units
 
 
