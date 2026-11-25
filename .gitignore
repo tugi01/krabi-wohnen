@@ -3,3 +3,7 @@ __pycache__/
 *.tmp
 .wrangler/
 node_modules/
+
+# Thailand-Daten (werden als Pages-Artefakt veröffentlicht)
+site/data/th/
+scraper/.pois-th-cache/

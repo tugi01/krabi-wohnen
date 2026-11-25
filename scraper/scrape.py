@@ -594,6 +594,15 @@ def run_city(city: str, now: datetime, fx: dict, budget):
             log(f"{city}: Quelle {fn.__name__} fehlgeschlagen", e)
     listings = sources.dedupe(dp + (scrape_aonangapartments() if CITIES[city]["landlords"] else []) + extra)
     listings = [l for l in listings if keep_home(l)]   # Tagespreise, Hotels, ganze Wohnhäuser raus
+    s_, w_, n_, e_ = CITIES[city]["bbox"]
+    for l in listings:   # Kartenpunkt außerhalb des Gebiets = Fehler beim Anbieter -> nur Ortsteil (ungefähr)
+        if l.get("lat") is not None and not (s_ <= l["lat"] <= n_ and w_ <= l["lng"] <= e_):
+            import sources as _src  # noqa: PLC0415
+            ll = _src.area_point(l.get("title"), l.get("description"), l.get("place"))
+            if ll:
+                l["lat"], l["lng"], l["approx"] = ll[0], ll[1], True
+            else:
+                l["lat"] = l["lng"] = None
     log(f"{city}: DotProperty {len(dp)}, weitere Quellen {len(extra)}, nach Zusammenfassen {len(listings)}")
     uniq = {}
     for l in listings:

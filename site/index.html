@@ -20,7 +20,7 @@
 <header class="top">
   <div class="brand">
     <div class="cityseg" role="group" aria-label="Stadt wählen">
-      <button data-city="krabi" aria-pressed="true">Krabi</button><button data-city="pattaya" aria-pressed="false">Pattaya</button>
+      <button data-city="thailand" aria-pressed="true">Thailand</button><button data-city="krabi" aria-pressed="false">Krabi</button><button data-city="pattaya" aria-pressed="false">Pattaya</button>
     </div>
     <p id="stand" class="muted">Lade Inserate …</p>
   </div>
@@ -57,6 +57,7 @@
   </section>
   <section id="viewMap" class="view" hidden>
     <div id="map" aria-label="Karte der Inserate"></div>
+    <p id="mapHint" class="maphint" aria-live="polite"></p>
     <div class="legend"><span class="dot l"></span>Wohnung (Preis) · Oben rechts Orte ein- und ausblenden · blasse Strände nur per Boot</div>
   </section>
   <section id="viewInfo" class="view" hidden><div id="info"></div></section>
@@ -71,6 +72,7 @@
     <select id="fAge"><option value="3">3 Jahre</option><option value="5">5 Jahre</option><option value="7">7 Jahre</option><option value="10">10 Jahre</option><option value="15">15 Jahre</option></select></div>
   <label class="row toggle"><span><b>Nur mit Pool</b><small>privat oder Gemeinschaftspool</small></span><input type="checkbox" id="fPool"><i></i></label>
   <label class="row toggle"><span><b>Baujahr unbekannt zeigen</b><small>Inserat nennt kein Baujahr</small></span><input type="checkbox" id="fUnknown"><i></i></label>
+  <label class="row toggle"><span><b>Ohne m²-Angabe zeigen</b><small>Inserat nennt keine Wohnfläche</small></span><input type="checkbox" id="fSizeUnknown"><i></i></label>
   <label class="row toggle"><span><b>Nur direkt vom Eigentümer</b><small>ohne Makler (wo das Inserat es angibt)</small></span><input type="checkbox" id="fOwner"><i></i></label>
   <label class="row toggle"><span><b>Nur sofort/bald frei</b><small>blendet „frei ab“ später als 2 Monate aus</small></span><input type="checkbox" id="fSoon"><i></i></label>
   <div class="row range"><label for="fSize"><b>Wohnfläche ab</b> <output id="oSize"></output></label><input type="range" id="fSize" min="0" max="200" step="5"></div>
@@ -115,6 +117,7 @@
 </aside>
 
 <script src="vendor/leaflet/leaflet.js?v=__BUILD__"></script>
+<script src="th.js?v=__BUILD__"></script>
 <script src="app.js?v=__BUILD__"></script>
 </body>
 </html>
