@@ -57,6 +57,97 @@ YEAR_BINS = [((YEAR - 2, YEAR + 1), f"minYearBuilt={YEAR - 2}"),
              ((YEAR - 25, YEAR - 16), f"minYearBuilt={YEAR - 25}&maxYearBuilt={YEAR - 16}"),
              ((1900, YEAR - 26), f"maxYearBuilt={YEAR - 26}")]
 BUCKET_DAYS = 7          # jede Stufe einmal pro Woche
+CAP = 9900               # DotProperty liefert je Suche höchstens ~10.000 Treffer (Seite 334+ wiederholt sich)
+PRICE_MAX = 10_000_000
+
+
+def count(prov, query):
+    url = BASE + prov + ("?" + query if query else "")
+    for _ in range(3):
+        try:
+            _, n = parse_page(scrape.fetch(url), prov)
+            time.sleep(DELAY)
+            return n or 0
+        except Exception as e:  # noqa: BLE001
+            log("Zählfehler", prov, query, str(e)[:80])
+            time.sleep(5)
+    return None
+
+
+def price_q(lo, hi):
+    return "&".join(x for x in (f"minPrice={lo}" if lo else "", f"maxPrice={hi}" if hi is not None else "") if x)
+
+
+def split_bands(prov, query, total):
+    """Preisbänder [lo, hi, n] (hi=None offen) mit je <= CAP Treffern. Bisektion über den Preis."""
+    out = []
+
+    def rec(lo, hi, n):
+        if n is None:
+            return
+        if n <= CAP or (hi is not None and hi - lo <= 1):
+            if n:
+                out.append([lo, hi, n])
+            return
+        top = hi if hi is not None else PRICE_MAX
+        mid = int(round((max(lo, 1000) * top) ** 0.5)) if lo else max(1000, top // 8)
+        mid = max(lo + 1, min(mid, top - 1))
+        n1 = count(prov, "&".join(x for x in (query, price_q(lo, mid)) if x))
+        n2 = count(prov, "&".join(x for x in (query, price_q(mid + 1, hi)) if x))
+        rec(lo, mid, n1)
+        rec(mid + 1, hi, n2)
+
+    rec(0, None, total)
+    return out
+
+
+def cmd_bands(a):
+    """Vorbereitung (1 Job): Größen messen und große Suchen in Preisbänder teilen. Schreibt den Zustand zurück."""
+    state = load_gz(a.state, {})
+    counts = state.setdefault("counts", {})
+    bands = state.setdefault("bands", {})
+    try:
+        seed = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "th_counts_seed.json")))
+    except Exception:  # noqa: BLE001
+        seed = {}
+    keys = []
+    for prov in PROVINCES:
+        keys.append((prov, ""))
+        n = counts.get(prov, seed.get(prov)) or 0
+        if n > CAP:   # Stufen-Suchen großer Provinzen können auch über 10.000 liegen
+            for kind, bins in (("sz", SIZE_BINS), ("by", YEAR_BINS)):
+                for rng, q in bins:
+                    keys.append((f"{prov}|{kind}|{rng[0]}-{rng[1]}", q))
+    t0 = time.time()
+    for key, q in keys:
+        prov = key.split("|")[0]
+        known = counts.get(key, seed.get(key) if "|" not in key else None)
+        if known is not None and known <= CAP and key not in bands:
+            continue                                # klein genug, nichts zu tun
+        n = count(prov, q)
+        if n is None:
+            continue
+        counts[key] = n
+        if n <= CAP:
+            bands.pop(key, None)
+            continue
+        old = bands.get(key)
+        if old and abs(sum(b[2] for b in old) - n) / n < 0.03:
+            fresh, ok = [], True     # Bänder vom Vortag nur nachzählen
+            for lo, hi, _ in old:
+                m = count(prov, "&".join(x for x in (q, price_q(lo, hi)) if x))
+                if m is None or m > CAP:
+                    ok = False
+                    break
+                fresh.append([lo, hi, m])
+            if ok:
+                bands[key] = fresh
+                continue
+        bands[key] = split_bands(prov, q, n)
+        log(f"{key}: {n} Treffer -> {len(bands[key])} Preisbänder, Summe {sum(b[2] for b in bands[key])}")
+    log(f"Bänder fertig in {time.time() - t0:.0f} s: {sum(len(v) for v in bands.values())} Bänder für {len(bands)} Suchen")
+    save_gz(a.out, state)
+
 
 
 def log(*a):
@@ -147,6 +238,9 @@ def crawl_query(prov, query, p_from, p_to, sink, stats):
             continue
         items, n = parse_page(page, prov)
         stats["pages"] += 1
+        if p > 334:
+            log("Warnung: über Seite 334 (Portal-Grenze)", prov, query)
+            break
         total = n if total is None else total
         if not items:
             break
@@ -169,7 +263,12 @@ def plan_units(state, day_index):
     except Exception:  # noqa: BLE001
         pass
     units = []
+    bands = state.get("bands", {})
     for prov in PROVINCES:
+        if prov in bands:
+            for lo, hi, n in bands[prov]:
+                units.append(("base", prov, "|" + price_q(lo, hi), 1, None, math.ceil(n / 30)))
+            continue
         n = counts.get(prov)
         pages = math.ceil(n / 30) if n else None
         if pages and pages > CHUNK:
@@ -186,6 +285,10 @@ def plan_units(state, day_index):
                     continue                      # Provinz ohne Inserate
                 if (hash_str(key) % BUCKET_DAYS) != day_index % BUCKET_DAYS:
                     continue                      # jede Stufe einmal pro Woche
+                if key in bands:
+                    for lo, hi, n in bands[key]:
+                        units.append((kind, prov, "&".join(x for x in (q, price_q(lo, hi)) if x) + "|" + key, 1, None, math.ceil(n / 30)))
+                    continue
                 n = counts.get(key)
                 pages = math.ceil(n / 30) if n else None
                 if pages and pages > CHUNK:
@@ -230,8 +333,8 @@ def cmd_crawl(a):
             def sink(items, prov=prov):
                 for it in items:
                     out["base"][it["id"]] = it
-            n = crawl_query(prov, "", p_from, p_to, sink, stats)
-            key = prov
+            n = crawl_query(prov, q[1:] if q.startswith("|") else "", p_from, p_to, sink, stats)
+            key = prov if not q else None
         else:
             query, key = q.split("|", 1)
             rng = [int(x) for x in key.rsplit("|", 1)[1].split("-")]
@@ -243,7 +346,7 @@ def cmd_crawl(a):
         if n is None:
             out["failed"].append([kind, prov, q, p_from])
         else:
-            if p_from == 1:
+            if p_from == 1 and key and "minPrice" not in q and "maxPrice" not in q:
                 out["counts"][key] = n
             out["done"].append([kind, prov, q, p_from])
         if stats["pages"] % 200 == 0:
@@ -435,7 +538,7 @@ def cmd_build(a):
         "sources": {s: sum(1 for it in items if it.get("src") == s) for s in ("DotProperty", "BahtSold", "Meezub", "aonangapartments")},
         "coverage": {"sz": sum(1 for it in items if it.get("sz") or it.get("size")),
                      "by": sum(1 for it in items if it.get("by") or it.get("built"))},
-        "portal_total": sum(v for k, v in counts.items() if "|" not in k),
+        "portal_total": sum(v for k, v in counts.items() if "|" not in k and k in PROVINCES),
         "provinces": sorted([{"key": k, "name": k.replace("-", " ").title(), "n": len(v),
                               "lat": round(centers.get(k, (0, 0))[0], 4), "lng": round(centers.get(k, (0, 0))[1], 4)}
                              for k, v in provs.items()], key=lambda x: -x["n"]),
@@ -446,7 +549,8 @@ def cmd_build(a):
     # Zustand für den nächsten Lauf (nur DotProperty-Basis)
     keep_ids = set(base)
     state = {"base": base, "attr": {k: v for k, v in attrs.items() if k in keep_ids},
-             "counts": counts, "first": {k: v for k, v in seen.items() if k in keep_ids}, "generated": idx["generated"]}
+             "counts": counts, "first": {k: v for k, v in seen.items() if k in keep_ids}, "generated": idx["generated"],
+             "bands": state.get("bands", {})}
     save_gz(os.path.join(a.out, "state.json.gz"), state)
     log(f"Fertig: {len(items)} Inserate in {len(tiles)} Kacheln (größte {max(len(t[2]) for t in tiles)}), "
         f"Fläche bekannt {idx['coverage']['sz']}, Baujahr bekannt {idx['coverage']['by']}")
@@ -460,12 +564,15 @@ def main():
     c.add_argument("--of", type=int, required=True)
     c.add_argument("--state", default="state.json.gz")
     c.add_argument("--out", required=True)
+    bd = sub.add_parser("bands")
+    bd.add_argument("--state", default="state.json.gz")
+    bd.add_argument("--out", required=True)
     b = sub.add_parser("build")
     b.add_argument("--shards", required=True)
     b.add_argument("--state", default="state.json.gz")
     b.add_argument("--out", default=os.path.join(ROOT, "site", "data", "th"))
     a = ap.parse_args()
-    (cmd_crawl if a.cmd == "crawl" else cmd_build)(a)
+    {"crawl": cmd_crawl, "build": cmd_build, "bands": cmd_bands}[a.cmd](a)
 
 
 if __name__ == "__main__":
