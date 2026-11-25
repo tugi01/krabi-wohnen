@@ -62,6 +62,14 @@ const fmt = n => n==null ? '–' : n.toLocaleString('de-DE');
 const eur = thb => DATA?.fx?.rate ? Math.round(thb / DATA.fx.rate) : null;
 const isNew = l => DATA && !l.own && l.first_seen && (new Date(DATA.generated) - new Date(l.first_seen)) / 864e5 <= 7 && DATA.listings.some(x => x.first_seen !== l.first_seen);
 const isFav = id => state.favs.includes(id);
+// Seit wann online: DotProperty nennt das Einstelldatum; sonst „bei uns seit“ (erstmals von der App gefunden)
+function onlineInfo(l){
+  const d = l.posted || l.first_seen; if(!d || l.own) return null;
+  const days = Math.max(0, Math.round((new Date(DATA?.generated || Date.now()) - new Date(d)) / 864e5));
+  const dt = new Date(d).toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric'});
+  const ago = days === 0 ? 'heute' : days === 1 ? '1 Tag' : days < 60 ? `${days} Tage` : days < 730 ? `${Math.round(days/30.4)} Monate` : `${Math.round(days/365)} Jahre`;
+  return { posted: !!l.posted, date: dt, days, label: l.posted ? `online seit ${dt}` : `bei uns seit ${dt}`, ago };
+}
 const sizeOf = l => l.size ?? l.sizeh ?? (l.sz ? (l.sz[1] >= 9999 ? l.sz[0] : (l.sz[0]+l.sz[1])/2) : null);
 const sizeTxt = l => l.size ? `${fmt(l.size)} m²` : l.sizeh ? `≈ ${fmt(l.sizeh)} m²` : l.sz ? (l.sz[1] >= 9999 ? `ab ${l.sz[0]} m²` : l.sz[0] === 0 ? `bis ${l.sz[1]} m²` : `${l.sz[0]}–${l.sz[1]} m²`) : null;
 const PROVNAME = k => (k||'').replace(/-/g,' ').replace(/\b\w/g, c => c.toUpperCase());
@@ -98,7 +106,7 @@ function filtered(onlyFav=false){
     price:(a,b)=>(a.price||1e9)-(b.price||1e9),
     priceDesc:(a,b)=>(b.price||0)-(a.price||0),
     sqm:(a,b)=>((a.price||1e9)/(sizeOf(a)||1e9))-((b.price||1e9)/(sizeOf(b)||1e9)),
-    new:(a,b)=>String(b.first_seen).localeCompare(String(a.first_seen)) || (a.price-b.price),
+    new:(a,b)=>String(b.posted||b.first_seen).localeCompare(String(a.posted||a.first_seen)) || (a.price-b.price),
     beach:(a,b)=>(a.dist?.Strand?.km??99)-(b.dist?.Strand?.km??99),
     mosque:(a,b)=>(a.dist?.Moschee?.km??99)-(b.dist?.Moschee?.km??99),
     market:(a,b)=>(a.dist?.Markt?.km??99)-(b.dist?.Markt?.km??99),
@@ -126,6 +134,7 @@ function card(l){
     <div class="body">
       <div class="price">${fmt(l.price)} ฿ <small>/ Monat${e?` · ≈ ${fmt(e)} €`:''}</small></div>
       <div class="title">${esc(l.title)}</div>
+      ${(o => o ? `<div class="online ${o.days<=7?'fresh':''}" title="${o.posted?'Einstelldatum beim Anbieter':'Datum, an dem die App das Inserat zuerst gefunden hat'}">🕒 ${esc(o.label)} (${esc(o.ago)})</div>` : '')(onlineInfo(l))}
       <div class="facts">
         ${sizeTxt(l)?`<span class="tag">${sizeTxt(l)}</span>`:''}${l.th && l.prov && !l.full?`<span class="tag area">📍 ${esc(PROVNAME(l.prov))}</span>`:''}${l.area && !['Pattaya','Krabi'].includes(l.area)?`<span class="tag area">📍 ${esc(l.area.split(' / ')[0])}</span>`:''}
         ${l.beds!=null?`<span class="tag grey">${l.beds} SZ</span>`:''}
@@ -380,9 +389,9 @@ function openDetail(id){
     ['Gebäude', `${a.label}${l.built_src?` (Quelle: ${l.built_src})`:''}`],
     ['Typ', l.type||'–'], ['Möbliert', ({'Fully Furnished':'voll möbliert','Partly Furnished':'teilmöbliert','Unfurnished':'unmöbliert'})[l.furniture]||l.furniture||'–'], ['Pool', l.pool?(l.pool==='privat'?'privater Pool':'Gemeinschaftspool'):'kein Pool angegeben'],
     ['Frei ab', l.available||'nicht angegeben'], ['Haustiere', l.pets||'–'],
-    ...(l.area ? [['Gegend', l.area]] : []), ['Anbieter', l.seller||'–'], ['Aktualisiert', l.updated||'–'], ['Bei uns seit', l.first_seen||'–'], ['Quelle', (l.source||'–') + (l.also?.length ? ` (auch bei ${l.also.map(a=>a.source).join(', ')})` : '')],
+    ...(l.area ? [['Gegend', l.area]] : []), ['Anbieter', l.seller||'–'], ['Online seit', l.posted ? `${onlineInfo(l).date} (${onlineInfo(l).ago}, laut Anbieter)` : 'Anbieter nennt kein Einstelldatum'], ['Aktualisiert', l.updated||'–'], ['Bei uns seit', l.first_seen ? new Date(l.first_seen).toLocaleDateString('de-DE') : '–'], ['Quelle', (l.source||'–') + (l.also?.length ? ` (auch bei ${l.also.map(a=>a.source).join(', ')})` : '')],
     ...(l.approx && !l.own ? [['Lage', 'nur ungefähr (Ortsteil) – genaue Adresse beim Anbieter erfragen']] : []),
-    ...(l.th && !l.full ? [['Provinz', PROVNAME(l.prov)], ['Eingestellt', l.posted||'–']] : []),
+    ...(l.th && !l.full ? [['Provinz', PROVNAME(l.prov)]] : []),
     ...(l.gone ? [['Status', 'Beim Anbieter nicht mehr online – wird beim nächsten Lauf entfernt']] : []),
   ];
   const dist = DISTCATS.filter(k=>d[k]).map(k=>{

@@ -290,6 +290,7 @@ def parse_list(page: str):
                 "lat": geo.get("latitude"), "lng": geo.get("longitude"),
                 "price": price,
                 "beds": about.get("numberOfBedrooms"),
+                "posted": (it.get("datePosted") or "")[:10] or None,   # beim Anbieter online seit
             })
     return out
 

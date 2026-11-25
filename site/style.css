@@ -193,3 +193,4 @@ body.picking #map{cursor:crosshair;outline:3px solid var(--accent)}
   #filterBtn{padding:0 12px}
 }
 @media (max-width:360px){ .cityseg button{padding:0 7px;font-size:.85rem} }
+.card .online{font-size:.78rem;color:var(--muted,#5b6870);margin:2px 0 4px}.card .online.fresh{color:var(--accent,#0e7a69);font-weight:600}
