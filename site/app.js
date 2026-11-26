@@ -779,11 +779,16 @@ async function goTo(lat, lng, prov){
   window.scrollTo({top:0});
 }
 // ---- Meine Orte: selbst gewählte Orte als Knöpfe oben (lokal gespeichert) ----
-const TOWNS = [['Koh Samui',9.512,100.013],['Koh Phangan',9.731,100.028],['Hua Hin',12.568,99.958],['Cha-am',12.80,99.97],['Pranburi',12.39,99.91],
-  ['Khao Lak',8.637,98.248],['Ao Nang',8.032,98.823],['Krabi Stadt',8.086,98.906],['Koh Lanta',7.62,99.04],['Phuket Stadt',7.884,98.391],['Patong',7.896,98.297],
-  ['Rawai',7.778,98.326],['Kata/Karon',7.83,98.30],['Jomtien',12.88,100.88],['Si Racha',13.174,100.93],['Ban Chang',12.73,101.06],['Rayong',12.68,101.27],
-  ['Koh Chang',12.06,102.33],['Chiang Mai',18.788,98.986],['Trang',7.557,99.611],['Hat Yai',7.008,100.475],['Songkhla',7.19,100.6],['Chumphon',10.49,99.18],
-  ['Nakhon Si Thammarat',8.43,99.96],['Satun',6.62,100.07]];
+// beliebte Orte, nach Gegend geordnet (nur abgedeckte Provinzen: Küsten + Chiang Mai)
+const TOWN_GROUPS = [
+  ['Pattaya & Ostküste', [['Pattaya Zentrum',12.935,100.883],['Jomtien',12.88,100.88],['Na Jomtien',12.80,100.91],['Pratumnak',12.917,100.866],['Naklua/Wongamat',12.965,100.888],['Huai Yai',12.84,100.99],['Bang Saray',12.75,100.91],['Sattahip',12.66,100.90],['Si Racha',13.174,100.93],['Bang Saen',13.28,100.91],['Ban Chang',12.73,101.06],['Rayong',12.68,101.27],['Koh Samet',12.56,101.45],['Chanthaburi',12.61,102.10],['Trat',12.24,102.51],['Koh Chang',12.06,102.33],['Koh Kood',11.65,102.56]]],
+  ['Hua Hin & Golf West', [['Hua Hin',12.568,99.958],['Khao Takiab',12.52,99.97],['Cha-am',12.80,99.97],['Pranburi',12.39,99.91],['Sam Roi Yot',12.20,99.97],['Prachuap Khiri Khan',11.81,99.80],['Ban Krut',11.38,99.58],['Bang Saphan',11.21,99.51],['Chumphon',10.49,99.18]]],
+  ['Samui & Golf Süd', [['Koh Samui',9.512,100.013],['Chaweng',9.53,100.06],['Lamai',9.47,100.04],['Bophut',9.56,100.03],['Maenam',9.57,99.99],['Koh Phangan',9.731,100.028],['Koh Tao',10.09,99.84],['Surat Thani',9.14,99.33],['Khanom',9.22,99.86],['Sichon',9.01,99.90],['Nakhon Si Thammarat',8.43,99.96],['Songkhla',7.19,100.6],['Hat Yai',7.008,100.475]]],
+  ['Phuket', [['Phuket Stadt',7.884,98.391],['Patong',7.896,98.297],['Kata/Karon',7.83,98.30],['Rawai',7.778,98.326],['Nai Harn',7.78,98.31],['Chalong',7.84,98.34],['Kamala',7.95,98.28],['Bang Tao/Cherng Talay',8.0,98.30],['Surin',7.97,98.28],['Kathu',7.91,98.33],['Thalang',8.03,98.33],['Mai Khao',8.13,98.30]]],
+  ['Krabi & Andamanen', [['Ao Nang',8.032,98.823],['Krabi Stadt',8.086,98.906],['Klong Muang/Tub Kaek',8.06,98.75],['Railay',8.01,98.84],['Nong Thale',8.07,98.78],['Koh Lanta',7.62,99.04],['Khao Lak',8.637,98.248],['Takua Pa',8.86,98.35],['Phang Nga',8.45,98.53],['Koh Yao',8.07,98.58],['Ranong',9.96,98.64],['Koh Phayam',9.73,98.40],['Trang',7.557,99.611],['Koh Lipe',6.49,99.30],['Satun',6.62,100.07]]],
+  ['Chiang Mai', [['Chiang Mai Altstadt',18.788,98.986],['Nimman',18.80,98.967],['Hang Dong',18.69,98.92],['Mae Rim',18.91,98.94],['San Sai',18.86,99.04],['San Kamphaeng',18.75,99.12],['Saraphi',18.71,99.04]]],
+];
+const TOWNS = TOWN_GROUPS.flatMap(g => g[1]);
 const PKEY = 'krabiwohnen.places.v1';
 const DEF_PLACES = [{name:'Krabi', city:'krabi'}, {name:'Pattaya', city:'pattaya'}];
 let PLACES = (() => { try { const p = JSON.parse(localStorage.getItem(PKEY)); return Array.isArray(p) ? p : DEF_PLACES; } catch { return DEF_PLACES; } })();
@@ -809,8 +814,10 @@ function renderPlaceSheet(){
   mine.innerHTML = PLACES.length ? PLACES.map((p, i) => `<span class="plchip">${esc(p.name)}<button type="button" data-pldel="${i}" aria-label="${esc(p.name)} entfernen">✕</button></span>`).join('')
     : '<p class="muted">Noch keine Orte gewählt.</p>';
   const have = new Set(PLACES.map(p => p.name));
-  $('#plSugg').innerHTML = [...(have.has('Krabi') ? [] : [['Krabi', null, null, 'krabi']]), ...(have.has('Pattaya') ? [] : [['Pattaya', null, null, 'pattaya']]), ...TOWNS.filter(t => !have.has(t[0]))]
-    .map(t => `<button type="button" class="pl" data-pladd='${esc(JSON.stringify(t[3] ? {name:t[0], city:t[3]} : {name:t[0], lat:t[1], lng:t[2]}))}'>＋ ${esc(t[0])}</button>`).join('');
+  const btn = t => `<button type="button" class="pl" data-pladd='${esc(JSON.stringify(t[3] ? {name:t[0], city:t[3]} : {name:t[0], lat:t[1], lng:t[2]}))}'>＋ ${esc(t[0])}</button>`;
+  const rich = [['Krabi', null, null, 'krabi'], ['Pattaya', null, null, 'pattaya']].filter(t => !have.has(t[0]));
+  $('#plSugg').innerHTML = (rich.length ? `<h4>Ausführlich (Straßen-km)</h4><div class="plrow">${rich.map(btn).join('')}</div>` : '') +
+    TOWN_GROUPS.map(([g, ts]) => { const free = ts.filter(t => !have.has(t[0])); return free.length ? `<h4>${esc(g)}</h4><div class="plrow">${free.map(btn).join('')}</div>` : ''; }).join('');
 }
 async function searchPlace(q){
   const hits = $('#plHits'); q = q.trim(); if(!q) return;

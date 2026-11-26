@@ -254,3 +254,4 @@ input.bad{outline:2px solid #c0392b;outline-offset:1px}
 #places h3{font-size:.95rem;margin:14px 0 8px}
 .placebar{position:static;padding-top:10px;padding-bottom:2px}
 .provs button em{font-style:normal;font-weight:500;color:var(--muted);font-size:.8em}
+#plSugg{display:block}#plSugg h4{margin:12px 0 6px;font-size:.82rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}.plrow{display:flex;flex-wrap:wrap;gap:8px}
