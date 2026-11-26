@@ -415,11 +415,16 @@ def quadtree(items, b, tid, out):
             quadtree(sub, boxes[k], tid + k, out)
 
 
+def muay_ok(p):
+    """„หมวย“ (Spitzname, z. B. Cafés/Salons) ist kein Muay-Thai-Gym."""
+    return p.get("cat") != "Muay Thai" or not re.search(r"หมวย", p.get("name", "")) or re.search(r"(?<!ห)มวย|muay|boxing", p.get("name", ""), re.I)
+
+
 def load_pois(pois_dir):
     pois = []
     for f in glob.glob(os.path.join(pois_dir, "*_*.json")):
         try:
-            pois += json.load(open(f, encoding="utf-8"))["pois"]
+            pois += [p for p in json.load(open(f, encoding="utf-8"))["pois"] if muay_ok(p)]
         except Exception:  # noqa: BLE001
             pass
     return pois
@@ -534,7 +539,7 @@ def cmd_build(a):
         p = os.path.join(ROOT, "site", "data", city, "listings.json")
         if not os.path.exists(p):
             continue
-        for l in json.load(open(p, encoding="utf-8"))["listings"]:
+        for l in scrape.read_site_listings(p):
             r = from_city(l, prov)
             if l["url"] in by_url:
                 old = items[by_url[l["url"]]]

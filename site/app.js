@@ -100,6 +100,20 @@ const pCheck = l => !l.own && !l.price_list && !l.detailLoaded && l.price && (l.
 const NOT_HOME_URL = /\/ads\/(?:studio-|\d+-bedroom-)?(?:warehouse|office|retail-space|land|hotel|whole-building|restaurant|factory)-for-(?:rent|sale)/;
 const NOT_HOME_TITLE = /^(?!.*\b(?:houses?|villas?|condos?|apartments?|bedrooms?|beds?|br|homes?|townhouses?|studios?)\b).*\b(?:land|plot|rai|warehouse|factory|office|retail|showroom|restaurant)\b/i;
 const isHome = l => !(NOT_HOME_URL.test(l.url||'') || (!/dotproperty/.test(l.url||'') && NOT_HOME_TITLE.test(l.title||'')));
+// kompakte Entfernungen [km, min, Name, Straße?] -> {km, min, name, road}
+function unpackDist(list){
+  for(const l of list){ const d = l.dist; if(!d) continue;
+    for(const c in d){ const v = d[c]; if(Array.isArray(v)) d[c] = {km:v[0], min:v[1], name:v[2], road:!!v[3]}; } }
+}
+// Beschreibungen liegen in Teil-Dateien und werden erst beim Öffnen eines Inserats geladen
+const descShards = new Map();
+function descShard(id){ let h = 0; for(const ch of id) h = (h * 31 + ch.charCodeAt(0)) % 1000003; return h % (DATA?.desc_shards || 32); }
+async function loadDesc(l){
+  if(l.description || !l.hasDesc || !DATA || DATA.th || l.city && l.city !== CITY) return false;
+  const k = CITY + ':' + descShard(l.id);
+  if(!descShards.has(k)) descShards.set(k, fetch(`data/${CITY}/d/${descShard(l.id)}.json`).then(r => r.ok ? r.json() : {}).catch(() => ({})));
+  const part = await descShards.get(k); if(part[l.id]){ l.description = part[l.id]; return true; } return false;
+}
 function markCoarse(list){
   const g = new Map();
   for(const l of list){ if(l.lat==null) continue; const k = (+l.lat).toFixed(5)+','+(+l.lng).toFixed(5); (g.get(k) || g.set(k, []).get(k)).push(l); }
@@ -573,6 +587,7 @@ function openDetail(id){
     </div>
     ${l.own?`<div class="sheetActions"><button class="ghost" data-ownedit="${esc(l.id)}">Bearbeiten</button><button class="ghost" data-ownpos="${esc(l.id)}">Ort auf Karte setzen</button><button class="ghost danger" data-owndel="${esc(l.id)}">Löschen</button></div>`:''}`;
   if($('#detail').hidden) openSheet('#detail', linkOf(l)); else { try { history.replaceState({sheet:1}, '', location.pathname + linkOf(l)); } catch {} }
+  if(l.hasDesc && !l.description) loadDesc(l).then(ok => { if(ok && !$('#detail').hidden && $('#detail [data-fav]')?.dataset.fav === l.id) openDetail(l.id); });
   if(!l.own && !l.detailLoaded && !l.detailTried && !l.gone && /dotproperty\.co\.th\/en\/ads\//.test(l.url||'')){
     $('#detail h2').insertAdjacentHTML('afterend', '<p class="loading">Lade Details vom Anbieter …</p>');
     TH.loadDetail(l).then(() => { if(!$('#detail').hidden && $('#detail [data-fav]')?.dataset.fav === l.id) openDetail(l.id); });
@@ -797,7 +812,7 @@ async function loadCity(city){
     } else {
       const r = await fetch(`data/${city}/listings.json`, {cache:'no-cache'});
       if(!r.ok) throw new Error(r.status);
-      const d = await r.json(); if(city !== CITY) return; DATA = d; DATA.listings = DATA.listings.filter(isHome); if(!DATA.th) DATA.count = DATA.listings.length; markCoarse(DATA.listings);
+      const d = await r.json(); if(city !== CITY) return; DATA = d; DATA.listings = DATA.listings.filter(isHome); unpackDist(DATA.listings); if(!DATA.th) DATA.count = DATA.listings.length; markCoarse(DATA.listings);
     }
   }catch(err){
     $('#stand').textContent = 'Daten konnten nicht geladen werden (offline?).'; $('#list').innerHTML = ''; return;

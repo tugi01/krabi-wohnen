@@ -587,6 +587,52 @@ def thb_per_eur() -> dict:
         return {"rate": 37.24, "date": None, "source": "Fallback (EZB 23.11.2026)"}
 
 
+DESC_SHARDS = 32
+
+
+def shard_of(lid: str) -> int:
+    h = 0
+    for ch in lid:
+        h = (h * 31 + ord(ch)) % 1000003
+    return h % DESC_SHARDS
+
+
+def write_site(data: dict, out_dir: str):
+    """Schlanke Liste fürs Handy + Beschreibungen in 32 Teil-Dateien (erst beim Öffnen eines Inserats geladen).
+    Entfernungen kompakt als [km, min, Name, Straße?] – die App packt sie beim Laden wieder aus."""
+    slim, desc = [], [{} for _ in range(DESC_SHARDS)]
+    for l in data["listings"]:
+        r = {k: v for k, v in l.items() if k not in ("description", "amenities", "title_th", "listed", "listing_id", "place")}   # nur, was die App braucht
+        if l.get("description"):
+            desc[shard_of(l["id"])][l["id"]] = l["description"]
+            r["hasDesc"] = 1
+        if isinstance(l.get("dist"), dict):
+            r["dist"] = {c: [v.get("km"), v.get("min"), v.get("name"), 1 if v.get("road") else 0] for c, v in l["dist"].items()}
+        slim.append(r)
+    out = os.path.join(out_dir, "listings.json")
+    tmp = out + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump({**data, "listings": slim, "dist_format": "array", "desc_shards": DESC_SHARDS}, f, ensure_ascii=False, separators=(",", ":"))
+    os.replace(tmp, out)
+    dd = os.path.join(out_dir, "d")
+    os.makedirs(dd, exist_ok=True)
+    for i, part in enumerate(desc):
+        with open(os.path.join(dd, f"{i}.json"), "w", encoding="utf-8") as f:
+            json.dump(part, f, ensure_ascii=False, separators=(",", ":"))
+
+
+def read_site_listings(path: str) -> list:
+    """listings.json lesen und Entfernungen wieder ins ausführliche Format bringen."""
+    if not os.path.exists(path):
+        return []
+    ls = json.load(open(path, encoding="utf-8")).get("listings", [])
+    for l in ls:
+        d = l.get("dist")
+        if isinstance(d, dict):
+            l["dist"] = {c: ({"km": v[0], "min": v[1], "name": v[2], "road": bool(v[3])} if isinstance(v, list) else v) for c, v in d.items()}
+    return ls
+
+
 def run_city(city: str, now: datetime, fx: dict, budget):
     set_city(city)
     out_dir = os.path.join(ROOT, "site", "data", city)
@@ -594,9 +640,8 @@ def run_city(city: str, now: datetime, fx: dict, budget):
     cache_file = os.path.join(ROOT, "scraper", f"cache-{city}.json")
     cache = json.load(open(cache_file)) if os.path.exists(cache_file) else {}
     prev = {}
-    if os.path.exists(out):
-        for l in json.load(open(out)).get("listings", []):
-            prev[l["id"]] = l
+    for l in read_site_listings(out):
+        prev[l["id"]] = l
     refresh_seven_eleven()
     refresh_markets()
     dp, total = scrape_dotproperty(cache, now, budget)
@@ -653,10 +698,7 @@ def run_city(city: str, now: datetime, fx: dict, budget):
         "listings": sorted(listings, key=lambda l: (l.get("price") or 10**9)),
     }
     os.makedirs(out_dir, exist_ok=True)
-    tmp = out + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
-    os.replace(tmp, out)
+    write_site(data, out_dir)
     with open(cache_file, "w", encoding="utf-8") as f:
         json.dump(cache, f, ensure_ascii=False)
     log(f"{city}: {len(listings)} Inserate, {len(removed)} entfernt, {data['new_since_last']} neu")

@@ -64,7 +64,7 @@ const TH = {
     if(ids.length > 12) return false;      // zu weit herausgezoomt
     await Promise.all(ids.map(async id => {
       TH.loadingC.add(id);
-      try { const j = await (await fetch(`data/th/pois/${id}.json`)).json(); TH.cells.set(id, j.pois); } catch { TH.cells.set(id, []); }
+      try { const j = await (await fetch(`data/th/pois/${id}.json`)).json(); TH.cells.set(id, j.pois.filter(p => p.cat !== 'Muay Thai' || !/หมวย/.test(p.name) || /(?<!ห)มวย|muay|boxing/i.test(p.name))); } catch { TH.cells.set(id, []); }
       finally { TH.loadingC.delete(id); }
     }));
     return true;

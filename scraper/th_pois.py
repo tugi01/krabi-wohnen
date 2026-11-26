@@ -104,7 +104,7 @@ def polite():
 
 # Dieselben Namensmuster wie scrape.py, aber ohne ",i": Overpass ist mit Groß/Klein-Varianten im Muster
 # rund doppelt so schnell. Die genaue (case-insensitive) Prüfung macht categories().
-NAME_RX = ("มัสยิด|สุเหร่า|มวย|เซเว่น|[Mm](asjid|osque|ASJID|OSQUE)|[Mm]uay ?[Tt]hai|MUAY ?THAI|[Bb]oxing|BOXING"
+NAME_RX = ("มัสยิด|สุเหร่า|(?<!ห)มวย|เซเว่น|[Mm](asjid|osque|ASJID|OSQUE)|[Mm]uay ?[Tt]hai|MUAY ?THAI|[Bb]oxing|BOXING"
            "|[Ff]airtex|FAIRTEX|[Ss]ityodtong|SITYODTONG|[Kk]ombat|KOMBAT|7-?(Eleven|ELEVEN|eleven|11)|7 Eleven"
            "|[Nn]ight [Mm]arket|NIGHT MARKET|[Ww]alking [Ss]treet|WALKING STREET|[Ff]ood [Mm]arket|FOOD MARKET"
            "|[Ww]eekend [Mm]arket|WEEKEND MARKET|[Ff]loating [Mm]arket|FLOATING MARKET")
@@ -206,7 +206,7 @@ def fetch_cell(lat, lng, refresh=False):
 # ---------------------------------------------------------------- Klassifizierung
 RX_MOSQUE = re.compile(r"มัสยิด|สุเหร่า|masjid|mosque", re.I)
 RX_MUAY_SPORT = re.compile(r"muay_thai|boxing|kickboxing|thai_boxing")
-RX_MUAY_NAME = re.compile(r"muay ?thai|boxing|fairtex|sityodtong|kombat|มวย", re.I)
+RX_MUAY_NAME = re.compile(r"muay ?thai|boxing|fairtex|sityodtong|kombat|(?<!ห)มวย", re.I)   # „หมวย“ ist ein Spitzname (Cafés, Salons), kein Boxen
 RX_MUAY_BAD = re.compile(r"hotel|resort|shop|store|restaurant|bar$", re.I)
 RX_SHOP = re.compile(r"^(supermarket|mall|department_store|wholesale)$")
 RX_711_BRAND = re.compile(r"7-Eleven|7-11", re.I)
