@@ -562,9 +562,14 @@ def osrm_distances(listings):
                         tt = data["durations"][i][k]
                         km = v / 1000 if v is not None else None
                         mins = round(tt / 60) if tt is not None else None
+                    air = haversine((l["lat"], l["lng"]), (p["lat"], p["lng"]))
+                    # Route viel länger als die Luftlinie (z. B. 29 km für 0,8 km): OSRM hat den Punkt auf eine
+                    # falsche Straße gelegt (Autobahn, Werksgelände) – dann lieber ehrlich schätzen
+                    if km is not None and km > max(5, 6 * air):
+                        km = mins = None
                     road = km is not None
                     if km is None:
-                        km = haversine((l["lat"], l["lng"]), (p["lat"], p["lng"])) * 1.3
+                        km = air * 1.3
                     if best is None or km < best["km"]:
                         best = {"km": km, "min": mins, "name": p["name"], "road": road}
                 best["km"] = round(best["km"], 1)
