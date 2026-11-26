@@ -36,7 +36,7 @@ jobs:
         id: crawl
         env: { TH_EXTRA_DELAY: "2", TH_EXTRA_LIST_SECONDS: "15000", TH_EXTRA_MAX_SECONDS: "19500" }
         run: python3 scraper/th_extra.py crawl --source ${{ matrix.source }} --state old/th-extra-${{ matrix.source }}.json.gz --out th-extra-${{ matrix.source }}.json.gz
-      - name: Im Release sichern (auch nach Sperre: enthält dann den alten Stand + bis dahin Neues)
+      - name: "Im Release sichern (auch nach Sperre - enthält dann den alten Stand + bis dahin Neues)"
         if: always()
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
