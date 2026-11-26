@@ -3,7 +3,7 @@
 const $ = s => document.querySelector(s);
 const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const CITIES = {
-  thailand:{ name:'Thailand', long:'Küsten & Chiang Mai', key:'krabiwohnen.th.v1', center:[11.5,100.3], fb:'Thailand',
+  thailand:{ name:'Thailand', long:'ganz Thailand', key:'krabiwohnen.th.v1', center:[11.5,100.3], fb:'Thailand',
              note:'Thailand (Küsten-Provinzen und Chiang Mai, ohne Bangkok): alle Mietinserate von DotProperty in 20 Provinzen, dazu BahtSold und Meezub für Krabi und Pattaya. Fläche und Baujahr stammen aus den Suchfiltern des Portals (in Stufen); genaue Angaben, Pool und alle Fotos werden beim Öffnen eines Inserats nachgeladen.' },
   krabi:   { name:'Krabi', long:'Krabi / Ao Nang', key:'krabiwohnen.v1', center:[8.045,98.83], fb:'Ao Nang Krabi',
              note:'Alle Inserate in Mueang Krabi bis 25 km um Ao Nang.' },
@@ -122,6 +122,31 @@ function cardDesc(l){
   const more = l.description ? l.description.replace(/\s+/g,' ').length > 260 : / …$/.test(l.desc || '');
   return `<div class="cdesc" data-descbox="${esc(l.id)}"><p>${esc(short)}</p>${more ? `<button type="button" class="morebtn" data-more="${esc(l.id)}">Mehr lesen ▾</button>` : ''}</div>`;
 }
+// ---- Sehenswürdigkeiten (OSM, nur mit Wikipedia-/Wikidata-Eintrag) – Zellen à 1°, bei Bedarf geladen ----
+const SIGHTS = {cells:new Map(), idx:null, loading:new Map()};
+const hav = (a, b, c, d) => { const R = 6371, x = (c-a)*Math.PI/180, y = (d-b)*Math.PI/180;
+  const h = Math.sin(x/2)**2 + Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(y/2)**2; return 2*R*Math.asin(Math.sqrt(h)); };
+function sightCellsAround(lat, lng){ const ids = []; for(let a = Math.floor(lat-0.15); a <= Math.floor(lat+0.15); a++) for(let b = Math.floor(lng-0.15); b <= Math.floor(lng+0.15); b++) ids.push(`${a}_${b}`); return ids; }
+async function ensureSights(rows){
+  if(!SIGHTS.idx) SIGHTS.idx = fetch('data/sights/index.json').then(r => r.ok ? r.json() : {cells:[]}).then(j => new Set(j.cells)).catch(() => new Set());
+  const have = await SIGHTS.idx; const need = new Set();
+  for(const l of rows){ if(l.lat == null) continue; for(const id of sightCellsAround(+l.lat, +l.lng)) if(have.has(id) && !SIGHTS.cells.has(id)) need.add(id); }
+  if(!need.size) return false;
+  await Promise.all([...need].map(id => { if(!SIGHTS.loading.has(id)) SIGHTS.loading.set(id, fetch(`data/sights/${id}.json`).then(r => r.json()).catch(() => []).then(v => SIGHTS.cells.set(id, v)));
+    return SIGHTS.loading.get(id); }));
+  return true;
+}
+function nearSights(l, max = 2, within = 15){
+  if(l.lat == null || !SIGHTS.cells.size) return [];
+  const la = +l.lat, ln = +l.lng, out = [];
+  for(const id of sightCellsAround(la, ln)) for(const s of SIGHTS.cells.get(id) || []){
+    if(s[3] === 'Insel' || s[3] === 'Inselgruppe') continue;    // Insel-Mittelpunkt ist kein Ausflugsziel „in der Nähe“
+    const km = hav(la, ln, s[0], s[1]); if(km <= within) out.push({lat:s[0], lng:s[1], name:s[2], kind:s[3], km: Math.round(km*1.3*10)/10});
+  }
+  return out.sort((a, b) => a.km - b.km).slice(0, max);
+}
+let sightTimer = null;
+function loadSightsFor(rows){ ensureSights(rows.slice(0, 400)).then(nw => { if(nw){ clearTimeout(sightTimer); sightTimer = setTimeout(() => { if($('#detail').hidden && $('#lightbox')?.hidden !== false) render(); }, 150); } }); }
 function markCoarse(list){
   const g = new Map();
   for(const l of list){ if(l.lat==null) continue; const k = (+l.lat).toFixed(5)+','+(+l.lng).toFixed(5); (g.get(k) || g.set(k, []).get(k)).push(l); }
@@ -208,6 +233,7 @@ function filtered(onlyFav=false){
   rows.sort(by);
   if(state.filters.sort === 'price'){ const ok = rows.filter(l => !pCheck(l)), chk = rows.filter(pCheck); rows.length = 0; rows.push(...ok, ...chk); }
   verifyPrices(rows);
+  loadSightsFor(rows);
   return {rows, hidden};
 }
 
@@ -219,10 +245,9 @@ function card(l){
       <button class="cnav prev" data-nav="-1" aria-label="Vorheriges Foto">‹</button><button class="cnav next" data-nav="1" aria-label="Nächstes Foto">›</button>`:''}</div>` : `<div class="noimg">🏠</div>`;
   const e = eur(l.price);
   const d = l.dist || {};
-  // Entfernungen: bei Sortierung nach Markt/Einkauf/Krankenhaus diese Kategorie mit zeigen; bei grober Lage nur „ca.“
-  const extra = {market:'Markt'}[state.filters.sort];
-  const cats = ['Strand','Moschee','Muay Thai','7-Eleven', ...(extra && !['Strand','Moschee','Muay Thai','7-Eleven'].includes(extra) ? [extra] : [])];
-  const distTxt = cats.filter(k=>d[k]).map(k=>`${TXTICON(k)} ${l.approx?'ca. ':''}${String(d[k].km).replace('.',',')} km${d[k].min!=null && !l.approx?` · ${d[k].min} min`:''}`).join('   ');
+  // alle Entfernungen direkt in der Liste (bei grober Lage nur „ca.“)
+  const distTxt = DISTCATS.filter(k=>d[k]).map(k=>`<span class="dchip" title="${esc(k)}: ${esc(d[k].name||'')}">${k==='7-Eleven'?'<b class="d711">7-11</b>':TXTICON(k)} ${l.approx?'ca. ':''}${String(d[k].km).replace('.',',')} km${d[k].min!=null && !l.approx?` <small>${d[k].min} min</small>`:''}</span>`).join('');
+  const sg = nearSights(l, 2, 15);
   return `<article class="card" data-id="${esc(l.id)}" tabindex="0" aria-label="${esc(l.title)}">
     ${img}
     <div class="badges">${l.seller==='Eigentümer'?'<span class="badge owner">Eigentümer</span>':''}${l.approx&&!l.own&&l.lat!=null?'<span class="badge approx" title="Lage nur ungefähr: der Anbieter nennt nur den Ortsteil">Lage ≈</span>':''}${l.own?`<span class="badge own">Eigenes${/facebook\.com|fb\.me/i.test(l.url||'')?' · Facebook':''}</span>`:''}${isNew(l)?'<span class="badge new" title="in den letzten 7 Tagen eingestellt">NEU eingestellt</span>':''}${l.price_before && l.price_before>l.price?'<span class="badge drop">Preis ↓</span>':''}${pCheck(l)?'<span class="badge warnb" title="Ungewöhnlich günstig für die Fläche – Preis beim Anbieter prüfen">Preis prüfen</span>':''}${l.price_list && l.price_list !== l.price ? `<span class="badge fixp" title="Die Suchliste nannte ${fmt(l.price_list)} ฿ – übernommen wurde der Preis der Inseratseite">Preis laut Inserat</span>` : ''}${l.gone ? '<span class="badge warnb">nicht mehr online</span>' : ''}</div>
@@ -241,7 +266,8 @@ function card(l){
         ${/fully/i.test(l.furniture||'')?'<span class="tag grey">möbliert</span>':''}
       </div>
       ${cardDesc(l)}
-      ${distTxt?`<div class="dist">${esc(distTxt)}${l.th && !l.full?' <small>(geschätzt)</small>':''}</div>`:'<div class="dist">Lage im Inserat nicht verortet</div>'}
+      ${distTxt?`<div class="dist">${distTxt}${l.th && !l.full?' <small class="est">(geschätzt)</small>':''}</div>`:'<div class="dist">Lage im Inserat nicht verortet</div>'}
+      ${sg.length ? `<div class="csights">${sg.map(x => `<span>${esc(x.name)} <small>${esc(x.kind)} · ${l.approx?'ca. ':''}${String(x.km).replace('.',',')} km</small></span>`).join('')}</div>` : ''}
     </div></article>`;
 }
 
@@ -502,7 +528,7 @@ function renderInfo(){
     const pr = (i.provinces||[]).map(p=>`<tr><td><button class="linkbtn" data-prov="${esc(p.key)}">${esc(p.name)}</button></td><td>${fmt(p.n)}</td></tr>`).join('');
     const src = Object.entries(i.sources||{}).filter(([,v])=>v).map(([k,v])=>`${esc(k)} ${fmt(v)}`).join(' · ');
     const pc = TH.poiIdx?.counts || {};
-    box.innerHTML = `<section class="panel"><h2>Thailand (Küsten & Chiang Mai) – was in der App steckt</h2>
+    box.innerHTML = `<section class="panel"><h2>Thailand – was in der App steckt</h2>
       <p><b>${fmt(i.count)}</b> Mietinserate · ${src}</p>
       <p>Fläche bekannt (genau oder als Stufe): <b>${fmt(cov.sz)}</b> · Baujahr bekannt: <b>${fmt(cov.by)}</b>. Fehlende Angaben stehen oft auf der Inseratsseite – sie werden beim Öffnen nachgeladen.</p>
       <p>Neu seit dem letzten Lauf: ${fmt(i.new_since_last)} · entfernt: ${fmt(i.removed_since_last)}</p>
@@ -582,12 +608,14 @@ function openDetail(id){
     return [`${TXTICON(k)==='7-11'?'🏪':TXTICON(k)} ${k}`, `${l.approx?'ca. ':''}${String(d[k].km).replace('.',',')} km${d[k].min!=null && !l.approx?`, ca. ${d[k].min} min`:''}${l.approx?' (Lage nur ungefähr)':d[k].road?'':' (geschätzt)'} – ${d[k].name}`,
       poi ? gmRoute(l, poi) : null];
   });
+  const sights = nearSights(l, 5, 20).map(x => [`⭐ ${x.kind}`, `ca. ${String(x.km).replace('.',',')} km – ${x.name}`, gmRoute(l, x)]);
+  if(!sights.length && l.lat != null) ensureSights([l]).then(nw => { if(nw && !$('#detail').hidden && $('#detail [data-fav]')?.dataset.fav === l.id) openDetail(l.id); });
   const nav = l.lat!=null ? gmPlace(l.lat, l.lng) : null;
   const back = lastGroup ? `<button class="close back" aria-label="Zurück zur Liste">‹ ${lastGroup.length}</button>` : `<button class="close" aria-label="Schließen">✕</button>`;
   $('#detail').innerHTML = `<div class="grab"></div>${back}
     ${gal?`<div class="gallery">${gal}</div>`:''}
     <h2 id="dTitle">${esc(l.title)}</h2>
-    <dl>${[...rows, ...dist].map(([k,v,u])=>`<dt>${esc(k)}</dt><dd>${esc(v)}${u?` <a class="rlink" href="${esc(u)}" target="_blank" rel="noopener" aria-label="Route vom Objekt zu ${esc(k)} in Google Maps">Route ↗</a>`:''}</dd>`).join('')}</dl>
+    <dl>${[...rows, ...dist, ...sights].map(([k,v,u])=>`<dt>${esc(k)}</dt><dd>${esc(v)}${u?` <a class="rlink" href="${esc(u)}" target="_blank" rel="noopener" aria-label="Route vom Objekt zu ${esc(k)} in Google Maps">Route ↗</a>`:''}</dd>`).join('')}</dl>
     ${l.description?`<p class="desc">${esc(fmtDesc(l.description))}</p>`:''}
     <p class="note">${l.own ? 'Von dir eingetragen. Entfernungen sind Schätzungen (Luftlinie × 1,3) ab dem Ort, den du auf der Karte gesetzt hast.'
       : `Angaben aus dem Inserat, nicht vom Vermieter bestätigt. Vor jeder Zahlung besichtigen und Vertrag prüfen. ${l.th && !l.full || l.approx ? 'Entfernungen sind Schätzungen (Luftlinie × 1,3)' : 'Entfernungen: Straßen-km und Fahrzeit (Auto-Profil, Roller ähnlich)'} ab dem Kartenpunkt des Inserats zum nächstgelegenen Ort; Strände nur, wenn ohne Boot erreichbar.`}</p>
@@ -814,7 +842,7 @@ function bindUi(){
 
 function syncCityUi(){
   document.querySelectorAll('[data-city]').forEach(b => { const on = b.dataset.city===CITY; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
-  document.title = CITY==='thailand' ? 'Thailand Wohnen – Küsten & Chiang Mai' : `${CITIES[CITY].long} – Thailand Wohnen`;
+  document.title = CITY==='thailand' ? 'Thailand Wohnen' : `${CITIES[CITY].long} – Thailand Wohnen`;
 }
 async function loadCity(city){
   CITY = city; localStorage.setItem('krabiwohnen.city', city);
@@ -841,7 +869,7 @@ async function loadCity(city){
   const g = new Date(DATA.generated);
   $('#appTitle').textContent = CITY==='thailand' ? 'Thailand Wohnen' : CITIES[CITY].name==='Krabi' ? 'Krabi / Ao Nang' : 'Pattaya & Umgebung';
   renderPlaces();
-  $('#stand').innerHTML = `${CITY==='thailand' ? 'Küsten & Chiang Mai · ' : CITY==='pattaya' ? 'Si Racha bis Ban Chang · ' : ''}${fmt(DATA.count)} Inserate · Stand ${g.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})} ${g.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})} · <span class="fx">1&nbsp;€&nbsp;=&nbsp;${(Math.round(DATA.fx.rate*10)/10).toLocaleString('de-DE')}&nbsp;฿</span>`;
+  $('#stand').innerHTML = `${CITY==='thailand' ? ((TH.idx?.provinces||[]).length > 30 ? 'ganz Thailand · ' : 'Küsten & Chiang Mai · ') : CITY==='pattaya' ? 'Si Racha bis Ban Chang · ' : ''}${fmt(DATA.count)} Inserate · Stand ${g.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})} ${g.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})} · <span class="fx">1&nbsp;€&nbsp;=&nbsp;${(Math.round(DATA.fx.rate*10)/10).toLocaleString('de-DE')}&nbsp;฿</span>`;
   migrateFavs(); syncFavTab(); setFilterUi(); render();
   setTimeout(() => localStorage.removeItem('krabiwohnen.booting'), 4000);
 }
@@ -866,6 +894,10 @@ const TOWN_GROUPS = [
   ['Samui & Golf Süd', [['Koh Samui',9.512,100.013],['Chaweng',9.53,100.06],['Lamai',9.47,100.04],['Bophut',9.56,100.03],['Maenam',9.57,99.99],['Koh Phangan',9.731,100.028],['Koh Tao',10.09,99.84],['Surat Thani',9.14,99.33],['Khanom',9.22,99.86],['Sichon',9.01,99.90],['Nakhon Si Thammarat',8.43,99.96],['Songkhla',7.19,100.6],['Hat Yai',7.008,100.475]]],
   ['Phuket', [['Phuket Stadt',7.884,98.391],['Patong',7.896,98.297],['Kata/Karon',7.83,98.30],['Rawai',7.778,98.326],['Nai Harn',7.78,98.31],['Chalong',7.84,98.34],['Kamala',7.95,98.28],['Bang Tao/Cherng Talay',8.0,98.30],['Surin',7.97,98.28],['Kathu',7.91,98.33],['Thalang',8.03,98.33],['Mai Khao',8.13,98.30]]],
   ['Krabi & Andamanen', [['Ao Nang',8.032,98.823],['Krabi Stadt',8.086,98.906],['Klong Muang/Tub Kaek',8.06,98.75],['Railay',8.01,98.84],['Nong Thale',8.07,98.78],['Koh Lanta',7.62,99.04],['Khao Lak',8.637,98.248],['Takua Pa',8.86,98.35],['Phang Nga',8.45,98.53],['Koh Yao',8.07,98.58],['Ranong',9.96,98.64],['Koh Phayam',9.73,98.40],['Trang',7.557,99.611],['Koh Lipe',6.49,99.30],['Satun',6.62,100.07]]],
+  ['Bangkok & Umgebung', [['Bangkok Sukhumvit',13.737,100.56],['Bangkok Silom/Sathorn',13.722,100.53],['Bangkok Ari',13.78,100.545],['Bangkok Ramkhamhaeng (viele Muslime)',13.756,100.62],['Bangkok Nong Chok (muslimisch)',13.85,100.86],['Bangkok Min Buri',13.81,100.75],['Nonthaburi',13.86,100.51],['Samut Prakan/Bang Na',13.6,100.6],['Pathum Thani',14.02,100.53],['Ayutthaya',14.35,100.57]]],
+  ['Norden', [['Chiang Rai',19.91,99.83],['Pai',19.36,98.44],['Lampang',18.29,99.49],['Nan',18.78,100.78],['Phitsanulok',16.82,100.26],['Sukhothai',17.01,99.82]]],
+  ['Isaan & Westen', [['Khon Kaen',16.43,102.83],['Udon Thani',17.41,102.79],['Nakhon Ratchasima (Korat)',14.97,102.1],['Ubon Ratchathani',15.24,104.85],['Nong Khai',17.88,102.74],['Kanchanaburi',14.02,99.53],['Hua Hin Hinterland/Ratchaburi',13.54,99.82]]],
+  ['Tiefer Süden (muslimisch)', [['Pattani',6.87,101.25],['Yala',6.54,101.28],['Narathiwat',6.43,101.82]]],
   ['Chiang Mai', [['Chiang Mai Altstadt',18.788,98.986],['Nimman',18.80,98.967],['Hang Dong',18.69,98.92],['Mae Rim',18.91,98.94],['San Sai',18.86,99.04],['San Kamphaeng',18.75,99.12],['Saraphi',18.71,99.04]]],
 ];
 const TOWNS = TOWN_GROUPS.flatMap(g => g[1]);

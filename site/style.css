@@ -275,3 +275,15 @@ body.lbopen-body{overflow:hidden}
 .cdesc p{margin:0;white-space:pre-line;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;color:var(--muted)}
 .cdesc.open p{display:block;-webkit-line-clamp:unset;color:inherit}
 .morebtn{border:0;background:none;padding:4px 0;color:var(--accent);font:inherit;font-weight:700;font-size:.82rem;cursor:pointer}
+
+/* Entfernungen + Sehenswürdigkeiten in der Liste */
+.dist{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center}
+.dchip{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:999px;background:var(--chip,rgba(14,122,105,.07));color:var(--fg,inherit);font-size:.76rem;white-space:nowrap}
+.dchip small{color:var(--muted);font-size:.7rem}
+.d711{font-size:.62rem;font-weight:800;color:#fff;background:linear-gradient(#f58220 0 33%,#00843d 33% 66%,#ee2737 66%);border-radius:4px;padding:1px 3px}
+.dist .est{color:var(--muted);font-size:.7rem}
+.csights{margin-top:6px;font-size:.8rem;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.csights span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.csights small{color:var(--muted)}
+@media (prefers-color-scheme:dark){.dchip{background:rgba(255,255,255,.07)}}
+.csights{flex-direction:column;gap:2px}.csights span::before{content:'⭐ '}

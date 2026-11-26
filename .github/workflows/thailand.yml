@@ -1,15 +1,17 @@
-name: Thailand Küsten + Chiang Mai aktualisieren
+name: Ganz Thailand aktualisieren
 
-# Nachts alle Listenseiten aller Provinzen (6 parallele Teile), dann Kacheln bauen und veröffentlichen.
+# Nachts alle Listenseiten aller 77 Provinzen – in 4 Teilen NACHEINANDER (nie zwei Abrufe gleichzeitig,
+# das Portal hatte parallele Abrufe gesperrt), dann Kacheln bauen und veröffentlichen.
 # Daten liegen NICHT im Repo, sondern im Release "th-data" (th-data.tar.gz = Kacheln + Orte, th-state.json.gz = Zustand).
 on:
   schedule:
     - cron: "0 19 * * *"    # 02:00 Uhr Thailand
   workflow_dispatch:
 
-env:
-  # Küsten-Provinzen + Chiang Mai (ohne Bangkok-Großraum), ca. 50.000 Inserate
-  TH_PROVINCES: "chonburi,rayong,chanthaburi,trat,phuket,krabi,phang-nga,ranong,trang,satun,prachuap-khiri-khan,phetchaburi,chumphon,surat-thani,nakhon-si-thammarat,songkhla,pattani,narathiwat,samut-songkhram,chiang-mai"
+# nie zwei Thailand-Abrufe gleichzeitig (ein Lauf dauert 8–9 h; der nächste wartet)
+concurrency:
+  group: th-crawl
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -39,8 +41,9 @@ jobs:
     timeout-minutes: 330
     strategy:
       fail-fast: false
+      max-parallel: 1       # bewusst nur EIN Abruf gleichzeitig (Portal hat parallele Abrufe gesperrt)
       matrix:
-        shard: [0]          # bewusst nur EIN Abruf gleichzeitig (Portal hat parallele Abrufe gesperrt)
+        shard: [0, 1, 2, 3] # ca. 7.000 Seiten à 3 s -> 4 Teile à ca. 2,5 h (je Teil max. 6 h erlaubt)
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -49,7 +52,7 @@ jobs:
         with: { name: state, path: . }
       - name: Listenseiten laden
         env: { TH_MAX_SECONDS: "17500", TH_DELAY: "3" }
-        run: python3 scraper/th_crawl.py crawl --shard ${{ matrix.shard }} --of 1 --state th-state.json.gz --out shards/s${{ matrix.shard }}.json.gz
+        run: python3 scraper/th_crawl.py crawl --shard ${{ matrix.shard }} --of 4 --state th-state.json.gz --out shards/s${{ matrix.shard }}.json.gz
       - uses: actions/upload-artifact@v4
         with: { name: "shard-${{ matrix.shard }}", path: shards/, retention-days: 2 }
 
