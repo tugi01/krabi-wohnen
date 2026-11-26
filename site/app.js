@@ -538,8 +538,8 @@ function renderInfo(){
       <p>Fläche bekannt (genau oder als Stufe): <b>${fmt(cov.sz)}</b> · Baujahr bekannt: <b>${fmt(cov.by)}</b>. Fehlende Angaben stehen oft auf der Inseratsseite – sie werden beim Öffnen nachgeladen.</p>
       <p>Neu seit dem letzten Lauf: ${fmt(i.new_since_last)} · entfernt: ${fmt(i.removed_since_last)}</p>
       ${Object.keys(pc).length?`<p>Auf der Karte: ${fmt(pc['Moschee'])} Moscheen · ${fmt(pc['Muay Thai'])} Muay-Thai-/Box-Gyms · ${fmt(pc['7-Eleven'])} 7-Eleven · ${fmt(pc['Markt'])} Märkte · ${fmt(pc['Strand'])} Strände · ${fmt(pc['Einkauf'])} Einkauf · ${fmt(pc['Krankenhaus'])} Krankenhäuser</p>`:''}
-      <p class="muted">${esc(CITIES.thailand.note)} Nicht enthalten: Facebook (verbietet automatisches Auslesen), Livinginsider/DDproperty/Hipflat (sperren es technisch), PropertyHub (AGB). Orte aus OpenStreetMap, Moscheen in Pattaya zusätzlich aus dem CICOT-Verzeichnis.</p></section>
-      <section class="panel"><h2>Inserate je Provinz</h2><div class="tablewrap"><table><tr><th>Provinz</th><th>Inserate</th></tr>${pr}</table></div></section>`;
+      <p class="muted">${esc(CITIES.thailand.note)} Quellen: DotProperty/FazWaz, PropertyHub, Renthub, BahtSold, Meezub. Nicht enthalten: Facebook (verbietet automatisches Auslesen), FazWaz-Direktseite, Hipflat, DDproperty, Nestopa, Livinginsider (sperren Programme aus), Thailand-Property (verbietet es). Orte aus OpenStreetMap, Moscheen in Pattaya zusätzlich aus dem CICOT-Verzeichnis.</p></section>
+      <section class="panel"><h2>Inserate je Provinz</h2><div class="tablewrap"><table><tr><th>Provinz</th><th>Inserate</th></tr>${pr}</table></div></section>${settingsPanel()}`;
     return;
   }
   const ci = KLIMA.cities[CITY], name = CITIES[CITY].name;
@@ -563,8 +563,17 @@ function renderInfo(){
       <p class="muted">Orte aus OpenStreetMap (dort fehlende Orte fehlen auch hier). ${CITY==="pattaya"?"Moscheen zusätzlich aus dem offiziellen Moschee-Verzeichnis des Zentralen Islamkomitees Thailands (CICOT) und Gebets-Verzeichnissen ergänzt, Lage mit mindestens einer Kartenquelle geprüft. ":""}${esc(CITIES[CITY].note)}</p></section>
     <section class="panel"><h2>Wetter-Vergleich der geprüften Orte</h2>
       <div class="tablewrap"><table><tr><th>Ort</th><th>Regen&shy;tage</th><th>mm</th><th>Ø max °C</th></tr>${rows}</table></div>
-      <p class="muted">${esc(KLIMA.source)}. Modelldaten zählen eher zu viele Regentage; für den Vergleich untereinander taugen sie.</p></section>`;
+      <p class="muted">${esc(KLIMA.source)}. Modelldaten zählen eher zu viele Regentage; für den Vergleich untereinander taugen sie.</p></section>${settingsPanel()}`;
 }
+// Einstellungen: Rückmeldung beim Antippen (touch.js)
+function settingsPanel(){
+  const hap = typeof TAP === 'undefined' || TAP.on();
+  const red = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return `<section class="panel"><h2>Bedienung</h2>
+    <label class="row toggle"><span><b>Vibration zur Bestätigung</b><small>kurzes Klick-Gefühl beim Merken, Filtern, Sortieren und Speichern${/iPhone|iPad/.test(navigator.userAgent) ? ' (iPhone: ab iOS 18)' : ''}</small></span><input type="checkbox" id="setHaptic" ${hap ? 'checked' : ''}><i></i></label>
+    <p class="muted">Wellen und schimmernder Rand beim Antippen ${red ? 'sind aus, weil am Gerät „Bewegung reduzieren“ eingeschaltet ist' : 'folgen der Geräte-Einstellung „Bewegung reduzieren“'}.</p></section>`;
+}
+document.addEventListener('change', e => { if(e.target.id === 'setHaptic' && typeof TAP !== 'undefined'){ TAP.set(e.target.checked); if(e.target.checked) TAP.haptic(); } });
 
 // Google Maps: Position als Pin anzeigen (von dort Route starten) bzw. Route vom Objekt zum Ziel (Roller)
 function gmPlace(lat, lng){ return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`; }

@@ -15,7 +15,7 @@ await p.evaluate(() => switchCity('krabi')); await p.waitForSelector('.card'); a
 
 const audit = async (view) => p.evaluate((view) => {
   const vis = e => { const r = e.getBoundingClientRect(), s = getComputedStyle(e);
-    return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none' && r.bottom > 0 && r.top < innerHeight && !e.closest('[hidden]'); };
+    return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none' && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth && !e.closest('[hidden]'); };
   const label = e => (e.getAttribute('aria-label') || e.textContent || e.title || e.className || e.tagName).trim().replace(/\s+/g, ' ').slice(0, 28);
   const small = [], inputs = [], tiny = [];
   for(const e of document.querySelectorAll('button, a[href], [role=button], input, select, summary, label[for], [data-fav], [data-relax]')){

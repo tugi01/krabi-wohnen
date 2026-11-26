@@ -303,3 +303,28 @@ select{-webkit-appearance:none;appearance:none;min-height:44px;font-size:16px;co
 #places .close{position:absolute;top:10px;right:14px;width:44px;height:44px;border-radius:22px;border:0;background:var(--card);font-size:1.1rem;cursor:pointer;color:inherit}
 .plchip button{width:44px;height:44px;margin:-8px -12px -8px -4px;border-radius:22px}
 .linkbtn{margin:4px 0}
+
+/* ---- Antipp-Rückmeldung (touch.js): Welle wie auf stillem Wasser + schimmernder Rand ---- */
+#tapfx{position:fixed;inset:0;pointer-events:none;z-index:2147483000}
+.tapfx-box{position:fixed;overflow:hidden;pointer-events:none;isolation:isolate}
+.tapfx-wave{position:absolute;border-radius:50%;pointer-events:none;transform:scale(.04);opacity:0;
+  background:radial-gradient(circle,rgba(14,122,105,.10) 0 38%,rgba(14,122,105,.0) 50%,rgba(14,122,105,.30) 58%,rgba(255,255,255,.55) 61%,rgba(14,122,105,.0) 68%);
+  animation:tapwave .78s cubic-bezier(.2,.7,.2,1) forwards}
+.tapfx-wave+.tapfx-wave{background:radial-gradient(circle,transparent 0 52%,rgba(14,122,105,.22) 60%,rgba(255,255,255,.4) 62%,transparent 70%)}
+.tapfx-box.soft .tapfx-wave{opacity:0;filter:saturate(.6)}
+@keyframes tapwave{0%{transform:scale(.04);opacity:.95}70%{opacity:.55}100%{transform:scale(1);opacity:0}}
+@property --tapa{syntax:'<angle>';inherits:false;initial-value:0deg}
+.tapfx-ring{position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;
+  background:conic-gradient(from var(--tapa),transparent 0 58%,rgba(255,255,255,.95) 72%,rgba(110,225,205,.9) 80%,rgba(255,255,255,.6) 86%,transparent 94%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+  animation:tapring .7s ease-out forwards}
+@keyframes tapring{0%{--tapa:-40deg;opacity:0}15%{opacity:1}100%{--tapa:320deg;opacity:0}}
+@media (prefers-color-scheme:dark){
+  .tapfx-wave{background:radial-gradient(circle,rgba(255,255,255,.08) 0 38%,transparent 50%,rgba(150,235,220,.28) 58%,rgba(255,255,255,.45) 61%,transparent 68%)}
+  .tapfx-wave+.tapfx-wave{background:radial-gradient(circle,transparent 0 52%,rgba(150,235,220,.2) 60%,rgba(255,255,255,.3) 62%,transparent 70%)}}
+/* gedrückt: Knopf gibt leicht nach (wie iOS) */
+@media (prefers-reduced-motion:no-preference){
+  button,.pl,[role=button]{transition:transform .12s ease}
+  button:active,.pl:active,[role=button]:active{transform:scale(.97)}
+  .card:has(.body:active){transform:scale(.992);transition:transform .15s ease}}
+.tapfx-hidden{position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
