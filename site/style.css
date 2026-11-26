@@ -269,3 +269,9 @@ body.lbopen-body{overflow:hidden}
 .lbopen{margin-left:auto;min-height:44px;padding:0 18px;border-radius:999px;border:0;background:var(--accent,#0e7a69);color:#fff;font:inherit;font-weight:700;cursor:pointer}
 .card [data-gal] img,#detail .gallery img{cursor:zoom-in}
 .badge.fixp{background:#e6f4ef;color:#0e6b5b}@media (prefers-color-scheme:dark){.badge.fixp{background:#173a32;color:#8fe0c8}}
+
+/* Beschreibung in der Liste */
+.cdesc{margin:6px 0 4px;font-size:.86rem;line-height:1.42;color:var(--fg,inherit)}
+.cdesc p{margin:0;white-space:pre-line;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;color:var(--muted)}
+.cdesc.open p{display:block;-webkit-line-clamp:unset;color:inherit}
+.morebtn{border:0;background:none;padding:4px 0;color:var(--accent);font:inherit;font-weight:700;font-size:.82rem;cursor:pointer}

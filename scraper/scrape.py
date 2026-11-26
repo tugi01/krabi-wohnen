@@ -606,6 +606,8 @@ def write_site(data: dict, out_dir: str):
         if l.get("description"):
             desc[shard_of(l["id"])][l["id"]] = l["description"]
             r["hasDesc"] = 1
+            t = " ".join(l["description"].split())
+            r["desc"] = t if len(t) <= 240 else t[:240].rsplit(" ", 1)[0] + " …"   # Vorschau für die Liste
         if isinstance(l.get("dist"), dict):
             r["dist"] = {c: [v.get("km"), v.get("min"), v.get("name"), 1 if v.get("road") else 0] for c, v in l["dist"].items()}
         slim.append(r)

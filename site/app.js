@@ -114,6 +114,14 @@ async function loadDesc(l){
   if(!descShards.has(k)) descShards.set(k, fetch(`data/${CITY}/d/${descShard(l.id)}.json`).then(r => r.ok ? r.json() : {}).catch(() => ({})));
   const part = await descShards.get(k); if(part[l.id]){ l.description = part[l.id]; return true; } return false;
 }
+const fmtDesc = t => t.replace(/\s*([•●▪✔✅🔹🔸]|(?<=[.!?])\s+(?=[A-ZÄÖÜ]))\s*/gu, (m, b) => b && b.trim() ? '\n' + b + ' ' : '\n').replace(/\n{3,}/g,'\n\n').trim();
+// Beschreibung direkt in der Liste: Vorschau sofort, „Mehr lesen“ klappt den ganzen Text auf (ohne das Inserat zu öffnen)
+function cardDesc(l){
+  const t = l.description || l.desc; if(!t) return '';
+  const short = (l.desc || t.replace(/\s+/g,' ')).slice(0, 260);
+  const more = l.description ? l.description.replace(/\s+/g,' ').length > 260 : / …$/.test(l.desc || '');
+  return `<div class="cdesc" data-descbox="${esc(l.id)}"><p>${esc(short)}</p>${more ? `<button type="button" class="morebtn" data-more="${esc(l.id)}">Mehr lesen ▾</button>` : ''}</div>`;
+}
 function markCoarse(list){
   const g = new Map();
   for(const l of list){ if(l.lat==null) continue; const k = (+l.lat).toFixed(5)+','+(+l.lng).toFixed(5); (g.get(k) || g.set(k, []).get(k)).push(l); }
@@ -232,6 +240,7 @@ function card(l){
         ${(d => d ? `<span class="tag avail">frei ab ${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}</span>` : '')(availLater(l))}
         ${/fully/i.test(l.furniture||'')?'<span class="tag grey">möbliert</span>':''}
       </div>
+      ${cardDesc(l)}
       ${distTxt?`<div class="dist">${esc(distTxt)}${l.th && !l.full?' <small>(geschätzt)</small>':''}</div>`:'<div class="dist">Lage im Inserat nicht verortet</div>'}
     </div></article>`;
 }
@@ -324,13 +333,18 @@ function photoPump(){
 }
 function refreshCard(l){
   const el = document.querySelector(`.card[data-id="${CSS.escape(l.id)}"]`); if(!el) return;
-  if(!l.price_list && !l.gone && (l.images||[]).length === el.querySelectorAll('[data-gal] img').length) return;   // nichts geändert
-  const x = document.createElement('div'); x.innerHTML = card(l); el.replaceWith(x.firstElementChild); bindGalleries();
+  if(!l.price_list && !l.gone && (l.images||[]).length === el.querySelectorAll('[data-gal] img').length && (!l.description || el.querySelector('.cdesc'))) return;   // nichts geändert
+  const wasOpen = el.querySelector('.cdesc.open'), pos = el.querySelector('[data-gal]')?.scrollLeft || 0;
+  const x = document.createElement('div'); x.innerHTML = card(l); const nu = x.firstElementChild; el.replaceWith(nu); bindGalleries();
+  if(wasOpen){ const box = nu.querySelector('.cdesc'); box?.classList.add('open'); if(box){ box.querySelector('p').textContent = fmtDesc(l.description || l.desc); const mb = box.querySelector('.morebtn'); if(mb) mb.textContent = 'Weniger ▴'; } }
+  if(pos){ const g = nu.querySelector('[data-gal]'); if(g){ wakeImgs(g); g.scrollLeft = pos; } }
 }
 function watchPhotoCards(){
   if(!DATA || !('IntersectionObserver' in window)) return;
   photoObs ||= new IntersectionObserver(es => { for(const e of es){ if(!e.isIntersecting) continue; photoObs.unobserve(e.target);
-    const l = getListing(e.target.dataset.id); if(l && !l.detailTried && !l.own && /dotproperty\.co\.th\/en\/ads\//.test(l.url||'')){ photoQ.push(l); photoPump(); } } }, {rootMargin:'300px 0px'});
+    const l = getListing(e.target.dataset.id); if(!l) continue;
+    if(l.hasDesc && !l.desc && !l.description) loadDesc(l).then(ok => ok && refreshCard(l));      // Beschreibung für die Liste
+    if(!l.detailTried && !l.own && /dotproperty\.co\.th\/en\/ads\//.test(l.url||'')){ photoQ.push(l); photoPump(); } } }, {rootMargin:'900px 0px'});
   document.querySelectorAll('#list .card:not([data-pw])').forEach(c => { c.dataset.pw = 1; photoObs.observe(c); });
 }
 
@@ -574,7 +588,7 @@ function openDetail(id){
     ${gal?`<div class="gallery">${gal}</div>`:''}
     <h2 id="dTitle">${esc(l.title)}</h2>
     <dl>${[...rows, ...dist].map(([k,v,u])=>`<dt>${esc(k)}</dt><dd>${esc(v)}${u?` <a class="rlink" href="${esc(u)}" target="_blank" rel="noopener" aria-label="Route vom Objekt zu ${esc(k)} in Google Maps">Route ↗</a>`:''}</dd>`).join('')}</dl>
-    ${l.description?`<p class="desc">${esc(l.description.replace(/\s*([•●▪✔✅🔹🔸]|(?<=[.!?])\s+(?=[A-ZÄÖÜ]))\s*/gu, (m, b) => b && b.trim() ? '\n' + b + ' ' : '\n').replace(/\n{3,}/g,'\n\n').trim())}</p>`:''}
+    ${l.description?`<p class="desc">${esc(fmtDesc(l.description))}</p>`:''}
     <p class="note">${l.own ? 'Von dir eingetragen. Entfernungen sind Schätzungen (Luftlinie × 1,3) ab dem Ort, den du auf der Karte gesetzt hast.'
       : `Angaben aus dem Inserat, nicht vom Vermieter bestätigt. Vor jeder Zahlung besichtigen und Vertrag prüfen. ${l.th && !l.full || l.approx ? 'Entfernungen sind Schätzungen (Luftlinie × 1,3)' : 'Entfernungen: Straßen-km und Fahrzeit (Auto-Profil, Roller ähnlich)'} ab dem Kartenpunkt des Inserats zum nächstgelegenen Ort; Strände nur, wenn ohne Boot erreichbar.`}</p>
     <div class="actions">
@@ -748,6 +762,13 @@ function bindUi(){
       else Object.assign(f, {...DEF_OF('thailand'), sort:f.sort});
       save(); setFilterUi(); render(); toast('Filter gelockert'); return; }
     if(e.target.closest('[data-zoomgrp]') && curGroup){ const g = curGroup; userClose(); setTimeout(() => map.fitBounds(L.latLngBounds(g.map(x=>[x.lat,x.lng])), {padding:[60,60], maxZoom:17}), 150); return; }
+    const mo = e.target.closest('[data-more]');
+    if(mo){ const l = getListing(mo.dataset.more), box = mo.closest('.cdesc'); if(!l || !box) return;
+      if(box.classList.toggle('open')){ mo.textContent = 'Weniger ▴';
+        const show = () => { if(box.classList.contains('open')) box.querySelector('p').textContent = fmtDesc(l.description || l.desc); };
+        show(); if(!l.description) (l.hasDesc ? loadDesc(l) : TH.loadDetail(l)).then(show); }
+      else { mo.textContent = 'Mehr lesen ▾'; box.querySelector('p').textContent = (l.desc || (l.description||'').replace(/\s+/g,' ')).slice(0, 260); }
+      return; }
     const pl = e.target.closest('[data-pl]');
     if(pl){ const k = pl.dataset.pl;
       if(k === '__add'){ renderPlaceSheet(); $('#plHits').innerHTML = ''; openSheet('#places'); return; }
