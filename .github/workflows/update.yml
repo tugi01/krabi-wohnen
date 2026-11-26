@@ -27,6 +27,7 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with: { ref: main }   # neuester Stand (ein wartender älterer Lauf darf keine neuere App-Version überschreiben)
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
