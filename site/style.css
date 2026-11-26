@@ -194,3 +194,21 @@ body.picking #map{cursor:crosshair;outline:3px solid var(--accent)}
 }
 @media (max-width:360px){ .cityseg button{padding:0 7px;font-size:.85rem} }
 .card .online{font-size:.78rem;color:var(--muted,#5b6870);margin:2px 0 4px}.card .online.fresh{color:var(--accent,#0e7a69);font-weight:600}
+
+/* Review-Korrekturen */
+.ownform label,.ownform .two>*{min-width:0}
+.ownform input,.ownform select,.ownform textarea{width:100%;min-width:0;box-sizing:border-box}
+.ownform .two{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.sheet{background:var(--sheet-solid,#f7fafa)}
+@media (prefers-color-scheme:dark){.sheet{background:var(--sheet-solid-d,#141c1f)}}
+.desc{white-space:pre-line}
+.emptybox{padding:8px 0 24px}.emptyacts{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.emptyacts button{min-height:46px;border-radius:14px;font:inherit;font-weight:700;border:1px solid var(--line);background:var(--card);color:inherit}
+.emptyacts .primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.hidehint,.regionbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:0 0 10px;padding:10px 12px;border-radius:14px;background:var(--card);border:1px solid var(--line);font-size:.85rem}
+.regionbar small{color:var(--muted)}
+.detail .close.back{width:auto;padding:0 12px;font-weight:700}
+#stand .fx{white-space:nowrap}
+@media (max-width:340px){ #shareApp{display:none} }
+.thpick .intro{margin:4px 0 6px;font-size:.95rem}
+.tag.avail{background:#e8f0fb;color:#2b5a9e}@media (prefers-color-scheme:dark){.tag.avail{background:#1d2b40;color:#9cc2f5}}

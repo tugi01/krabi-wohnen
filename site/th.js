@@ -41,7 +41,7 @@ const TH = {
     const need = TH.tilesIn(q).filter(t => !TH.tiles.has(t.id) && !TH.loadingT.has(t.id));
     await Promise.all(need.map(async t => {
       TH.loadingT.add(t.id);
-      try { const j = await (await fetch(`data/th/t/${t.id}.json`)).json(); TH.tiles.set(t.id, {at:Date.now(), b:t.b, listings:j.listings.map(TH.norm)}); }
+      try { const j = await (await fetch(`data/th/t/${t.id}.json`)).json(); TH.tiles.set(t.id, {at:Date.now(), b:t.b, listings:markCoarse(j.listings.map(TH.norm))}); }
       catch {} finally { TH.loadingT.delete(t.id); }
     }));
     // Speicher begrenzen: älteste Kacheln außerhalb des Ausschnitts verwerfen

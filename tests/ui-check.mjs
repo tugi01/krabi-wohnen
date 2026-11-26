@@ -19,7 +19,7 @@ for (const [name, engine] of [['chromium', chromium], ['webkit', webkit]]) {
     await page.waitForSelector('.card');
     const vw = await page.evaluate(() => [innerWidth, document.documentElement.scrollWidth]);
     ok(vw[0] === 390 && vw[1] <= 390, `${name}: keine horizontale Überbreite (${vw})`);
-    const count = s => page.$eval('#summary', e => +e.textContent.match(/^(\d+)/)[1]);
+    const count = s => page.$eval('#summary', e => +e.textContent.replace(/\./g,'').match(/^(\d+)/)[1]);
     const base = await count();
     ok(base > 0, `${name}: Standardfilter zeigt ${base} Inserate`);
     // Standard: keine alten Gebäude sichtbar
@@ -117,7 +117,7 @@ for (const [name, engine] of [['chromium', chromium], ['webkit', webkit]]) {
     await page.click('#detail .close');
     // Wohnfläche ab/bis
     await page.click('#tabList'); await page.click('#filterBtn'); await page.waitForTimeout(300);
-    const cnt = () => page.$eval('#summary', e => +e.textContent.match(/^(\d+)/)[1]);
+    const cnt = () => page.$eval('#summary', e => +e.textContent.replace(/\./g,'').match(/^(\d+)/)[1]);
     const setR = (id, v) => page.$eval(id, (e, v) => { e.value = v; e.dispatchEvent(new Event('input', {bubbles:true})); }, v);
     await setR('#fSize', 0); await page.waitForTimeout(250); const nAll = await cnt();
     await setR('#fSize', 80); await page.waitForTimeout(250); const n80 = await cnt();
@@ -155,10 +155,10 @@ for (const [name, engine] of [['chromium', chromium], ['webkit', webkit]]) {
     ok(await page.$eval('#info h2', e => /Pattaya/.test(e.textContent)), `${name}: Infos zeigen Pattaya`);
     await page.click('#tabList'); await page.waitForSelector('.card');
     await page.screenshot({ path: `${out}/kw-${name}-pattaya-list.png` });
-    const favP = await page.evaluate(() => JSON.parse(localStorage.getItem('krabiwohnen.pattaya.v1')||'{}').favs?.length||0);
+    const favG = await page.evaluate(() => Object.keys(JSON.parse(localStorage.getItem('krabiwohnen.favs.global')||'{}')).length);
+    const tabP = await page.$eval('#tabFav', e => e.textContent);
     await page.click('[data-city="krabi"]'); await page.waitForTimeout(1500);
-    const favK = await page.evaluate(() => JSON.parse(localStorage.getItem('krabiwohnen.v1')||'{}').favs?.length||0);
-    ok(favP === 0 && favK >= 1, `${name}: Merkliste getrennt je Stadt (Krabi ${favK}, Pattaya ${favP})`);
+    ok(favG >= 1 && /\(\d+\)/.test(tabP), `${name}: Merkliste gilt für alle Gegenden (${favG} gemerkt, in Pattaya „${tabP}“)`);
     await page.reload({ waitUntil: 'networkidle' }); await page.waitForSelector('.card');
     ok(await page.$eval('[data-city="krabi"]', b => b.classList.contains('on')), `${name}: Stadt bleibt nach Neuladen gewählt`);
     // Eigenes Inserat (z. B. von Facebook) anlegen und auf Karte setzen

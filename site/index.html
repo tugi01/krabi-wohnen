@@ -68,7 +68,7 @@
   <div class="grab"></div>
   <h2 id="fTitle">Filter</h2>
   <label class="row toggle"><span><b>Ältere Gebäude zeigen</b><small id="oldSub">älter als die Altersgrenze und nicht kernsaniert</small></span><input type="checkbox" id="fOld"><i></i></label>
-  <div class="row"><label for="fAge"><b>Altersgrenze</b><small>gilt als „neu“, wenn jünger oder kernsaniert</small></label>
+  <div class="row"><label for="fAge"><b>Altersgrenze</b><small>Gebäude zählt als „jung“, wenn es jünger oder kernsaniert ist</small></label>
     <select id="fAge"><option value="3">3 Jahre</option><option value="5">5 Jahre</option><option value="7">7 Jahre</option><option value="10">10 Jahre</option><option value="15">15 Jahre</option></select></div>
   <label class="row toggle"><span><b>Nur mit Pool</b><small>privat oder Gemeinschaftspool</small></span><input type="checkbox" id="fPool"><i></i></label>
   <label class="row toggle"><span><b>Baujahr unbekannt zeigen</b><small>Inserat nennt kein Baujahr</small></span><input type="checkbox" id="fUnknown"><i></i></label>
@@ -106,7 +106,7 @@
     <input type="hidden" id="wId">
     <label>Link zum Inserat<div class="pastewrap"><input id="wUrl" type="url" inputmode="url" placeholder="https://www.facebook.com/marketplace/item/…"><button type="button" id="ownPaste" class="ghost">Einfügen</button></div></label>
     <label>Titel<input id="wTitle" type="text" placeholder="z. B. Haus 2 SZ in Nong Thale" maxlength="120"></label>
-    <div class="two"><label>Miete ฿ / Monat<input id="wPrice" type="number" inputmode="numeric" min="0" step="500" required></label>
+    <div class="two"><label>Miete ฿ / Monat<input id="wPrice" type="number" inputmode="numeric" min="0" step="1" required></label>
       <label>Wohnfläche m²<input id="wSize" type="number" inputmode="numeric" min="0"></label></div>
     <div class="two"><label>Schlafzimmer<input id="wBeds" type="number" inputmode="numeric" min="0" max="10"></label>
       <label>Baujahr<input id="wBuilt" type="number" inputmode="numeric" min="1950" max="2035" placeholder="z. B. 2023"></label></div>

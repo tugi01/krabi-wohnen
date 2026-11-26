@@ -7,7 +7,7 @@ const CITIES = {
              note:'Thailand (Küsten-Provinzen und Chiang Mai, ohne Bangkok): alle Mietinserate von DotProperty in 20 Provinzen, dazu BahtSold und Meezub für Krabi und Pattaya. Fläche und Baujahr stammen aus den Suchfiltern des Portals (in Stufen); genaue Angaben, Pool und alle Fotos werden beim Öffnen eines Inserats nachgeladen.' },
   krabi:   { name:'Krabi', long:'Krabi / Ao Nang', key:'krabiwohnen.v1', center:[8.045,98.83], fb:'Ao Nang Krabi',
              note:'Alle Inserate in Mueang Krabi bis 25 km um Ao Nang.' },
-  pattaya: { name:'Pattaya', long:'Pattaya & Umgebung', key:'krabiwohnen.pattaya.v1', center:[12.93,100.89], fb:'Pattaya',
+  pattaya: { name:'Pattaya', long:'Pattaya & Umgebung (Si Racha bis Ban Chang)', key:'krabiwohnen.pattaya.v1', center:[12.93,100.89], fb:'Pattaya',
              note:'Pattaya hat über 16.000 Inserate. Geladen werden nur die passenden: ab 50 m², bis 60.000 ฿ und Baujahr der letzten 10 Jahre.' },
 };
 let CITY = CITIES[localStorage.getItem('krabiwohnen.city')] ? localStorage.getItem('krabiwohnen.city') : 'thailand';
@@ -17,13 +17,16 @@ const LAYERS = { Strand:true, Moschee:true, 'Muay Thai':true, '7-Eleven':true, M
 const POICOL = { Strand:['#1b8cb2','🏖'], Moschee:['#2f7d4b','🕌'], 'Muay Thai':['#7d54a4','🥊'], Markt:['#d9480f','🍜'], '7-Eleven':['#ffffff','<svg class="ico711" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="6" fill="#fff"/><rect x="5" y="9" width="22" height="4" fill="#f58220"/><rect x="5" y="15" width="22" height="4" fill="#00843d"/><rect x="5" y="21" width="22" height="4" fill="#ee2737"/><path d="M10 5h13l-7 23h-5l6-18h-7z" fill="#00843d" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>'], Einkauf:['#ad841a','🛒'], Krankenhaus:['#c0392b','🏥'] };
 const TXTICON = c => c==='7-Eleven' ? '7-11' : POICOL[c][1];
 const DISTCATS = ['Strand','Moschee','Muay Thai','7-Eleven','Markt','Einkauf','Krankenhaus'];
+// Thailand: nichts vorfiltern (alles stellt man selbst ein); Krabi/Pattaya: Wunschkriterien als Start
+const DEF_OF = c => c==='thailand' ? {...DEFAULTS, old:true, unknown:true, sizeUnknown:true, size:0, price:150000} : DEFAULTS;
+const LAY_OF = c => c==='thailand' ? {...LAYERS, '7-Eleven':false, Markt:false} : LAYERS;
 let state = load(CITY);
 let DATA = null, KLIMA = null, view = 'list', map = null, layer = null, poiLayers = {};
 
 function load(city){
   try { const s = JSON.parse(localStorage.getItem(KEY_OF(city)) || '{}');
-    return { filters:{...DEFAULTS, ...(s.filters||{})}, layers:{...LAYERS, ...(s.layers||{})}, favs:Array.isArray(s.favs)?s.favs:[], own:Array.isArray(s.own)?s.own:[] }; }
-  catch { return { filters:{...DEFAULTS}, layers:{...LAYERS}, favs:[], own:[] }; }
+    return { filters:{...DEF_OF(city), ...(s.filters||{})}, layers:{...LAY_OF(city), ...(s.layers||{})}, favs:Array.isArray(s.favs)?s.favs:[], own:Array.isArray(s.own)?s.own:[], thView:s.thView, region:s.region }; }
+  catch { return { filters:{...DEF_OF(city)}, layers:{...LAY_OF(city)}, favs:[], own:[] }; }
 }
 function save(){ try { localStorage.setItem(KEY_OF(CITY), JSON.stringify(state)); } catch {} }
 // Alle Inserate = Portal-Daten + eigene (z. B. von Facebook), eigene nur auf diesem Gerät gespeichert
@@ -40,6 +43,13 @@ function parseAvail(s){
   const d = t.match(/\b(\d{1,2})(?:st|nd|rd|th)?\b(?!\d)/);
   return new Date(+y[1], m!=null?MONTHS[m]:0, d && +d[1] <= 31 && +d[1] !== +y[1] ? +d[1] : 1);
 }
+function deDate(s){   // „Nov 9, 2026“ / „September 1st 2027“ -> 09.11.2026 (sonst Originaltext)
+  if(!s) return null; const d = parseAvail(s); if(!d) return s;
+  if(+d === 0) return 'sofort';
+  return d.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric'});
+}
+function availLater(l){ const d = parseAvail(l.available); if(!d || +d === 0 || !DATA) return null;
+  return (d - new Date(DATA.generated)) / 864e5 > 20 ? d : null; }
 function ageInfo(l, now){
   const cutoff = new Date(now.getFullYear()-(state.filters.maxAge||5), now.getMonth(), 1);
   const built = l.built ? new Date(+l.built.slice(0,4), +l.built.slice(5,7)-1, 1) : null;
@@ -60,8 +70,45 @@ const imgSrc = (u, w=640) => /^https:\/\/(cdn|img)\.fazwaz\.com\//.test(u)
   ? `https://krabi-wohnen-img.tugrulc.workers.dev/?w=${w}&u=${encodeURIComponent(u.replace('/576x384/','/0x0/'))}` : u;
 const fmt = n => n==null ? '–' : n.toLocaleString('de-DE');
 const eur = thb => DATA?.fx?.rate ? Math.round(thb / DATA.fx.rate) : null;
-const isNew = l => DATA && !l.own && l.first_seen && (new Date(DATA.generated) - new Date(l.first_seen)) / 864e5 <= 7 && DATA.listings.some(x => x.first_seen !== l.first_seen);
-const isFav = id => state.favs.includes(id);
+const isNew = l => { if(!DATA || l.own) return false; const now = new Date(DATA.generated);
+  if(l.posted) return (now - new Date(l.posted)) / 864e5 <= 7;
+  return !!l.first_seen && (now - new Date(l.first_seen)) / 864e5 <= 7 && (now - new Date(FIRST_RUN)) / 864e5 > 10; };
+const FIRST_RUN = '2026-11-24';   // erster Abruf: davor „erstmals gefunden“ ≠ „neu eingestellt“
+// Merkliste gilt für alle Gegenden; gespeichert wird eine Kopie, damit gemerkte Inserate überall sichtbar bleiben
+const FKEY = 'krabiwohnen.favs.global';
+let FAVS = (() => { try { return JSON.parse(localStorage.getItem(FKEY) || '{}'); } catch { return {}; } })();
+const saveFavs = () => { try { localStorage.setItem(FKEY, JSON.stringify(FAVS)); } catch {} syncFavTab(); };
+const isFav = id => id in FAVS || state.favs.includes(id);
+function markCoarse(list){
+  const g = new Map();
+  for(const l of list){ if(l.lat==null) continue; const k = (+l.lat).toFixed(5)+','+(+l.lng).toFixed(5); (g.get(k) || g.set(k, []).get(k)).push(l); }
+  for(const arr of g.values()){
+    if(arr.length < 3) continue;
+    const names = new Set(arr.map(l => (l.title||'').toLowerCase().replace(/[^a-z0-9ก-๙ ]/g,'').split(' ').filter(w=>w.length>3).slice(0,2).join(' ')));
+    if(names.size >= Math.max(2, arr.length/3)) for(const l of arr){ l.approx = true; l.coarse = true; }
+  }
+  return list;
+}
+function favSnap(l){ const keep = ['id','url','title','price','lat','lng','beds','baths','size','sizeh','sz','built','by','built_src','images','source','first_seen','posted','pool','approx','prov','furniture','available','dist','seller','type','area','description','own','th'];
+  const o = {}; for(const k of keep) if(l[k] !== undefined) o[k] = k==='images' ? (l.images||[]).slice(0,6) : l[k]; o.city = CITY; o.saved = new Date().toISOString().slice(0,10); return o; }
+function toggleFav(id){
+  const l = getListing(id); if(!l) return;
+  if(isFav(id)){ delete FAVS[id]; for(const c of Object.keys(CITIES)){ const st = c===CITY ? state : load(c); if(st.favs.includes(id)){ st.favs = st.favs.filter(x=>x!==id); localStorage.setItem(KEY_OF(c), JSON.stringify(st)); } } }
+  else FAVS[id] = favSnap(l);
+  saveFavs();
+}
+function getListing(id){ return allListings().find(x=>x.id===id) || (FAVS[id] ? {...FAVS[id]} : null); }
+function migrateFavs(){   // alte Merklisten (je Stadt) übernehmen, sobald das Inserat geladen ist
+  let ch = false; for(const id of state.favs){ if(!FAVS[id]){ const l = allListings().find(x=>x.id===id); if(l){ FAVS[id] = favSnap(l); ch = true; } } }
+  if(ch) saveFavs();
+}
+function favRows(){
+  const here = new Map(allListings().map(l=>[l.id,l]));
+  const ids = new Set([...Object.keys(FAVS), ...state.favs]);
+  return [...ids].map(id => here.get(id) || (FAVS[id] && {...FAVS[id], elsewhere: FAVS[id].city !== CITY})).filter(Boolean);
+}
+function syncFavTab(){ const t = $('#tabFav'); if(t){ const n = new Set([...Object.keys(FAVS), ...state.favs]).size; t.textContent = n ? `★ Merken (${n})` : '★ Merken'; } }
+function favEmpty(){ return '<p class="empty">Noch nichts gemerkt – tippe ☆ auf einem Inserat. Die Merkliste gilt für alle Gegenden.</p>'; }
 // Seit wann online: DotProperty nennt das Einstelldatum; sonst „bei uns seit“ (erstmals von der App gefunden)
 function onlineInfo(l){
   const d = l.posted || l.first_seen; if(!d || l.own) return null;
@@ -78,9 +125,10 @@ function filtered(onlyFav=false){
   if(!DATA) return {rows:[], hidden:{}};
   const f = state.filters, now = new Date(DATA.generated), soonLimit = new Date(now); soonLimit.setMonth(soonLimit.getMonth()+2);
   const hidden = {old:0, unknown:0, pool:0, size:0, sizeMax:0, price:0, beach:0, soon:0};
-  const rows = [];
-  for(const l of allListings()){
-    if(onlyFav){ if(isFav(l.id)) rows.push(l); continue; }
+  const rows = onlyFav ? favRows() : [];
+  for(const l of onlyFav ? [] : allListings()){
+    if(onlyFav) continue;
+    if(l.own){ rows.push(l); continue; }          // eigene Inserate immer zeigen
     const a = ageInfo(l, now);
     if(a.recent===false && !f.old){ hidden.old++; continue; }
     if(a.recent===null && !f.unknown){ hidden.unknown++; continue; }
@@ -126,20 +174,24 @@ function card(l){
       <button class="cnav prev" data-nav="-1" aria-label="Vorheriges Foto">‹</button><button class="cnav next" data-nav="1" aria-label="Nächstes Foto">›</button>`:''}</div>` : `<div class="noimg">🏠</div>`;
   const e = eur(l.price);
   const d = l.dist || {};
-  const distTxt = ['Strand','Moschee','Muay Thai','7-Eleven'].filter(k=>d[k]).map(k=>`${TXTICON(k)} ${String(d[k].km).replace('.',',')} km${d[k].min!=null?` · ${d[k].min} min`:''}`).join('   ');
+  // Entfernungen: bei Sortierung nach Markt/Einkauf/Krankenhaus diese Kategorie mit zeigen; bei grober Lage nur „ca.“
+  const extra = {market:'Markt'}[state.filters.sort];
+  const cats = ['Strand','Moschee','Muay Thai','7-Eleven', ...(extra && !['Strand','Moschee','Muay Thai','7-Eleven'].includes(extra) ? [extra] : [])];
+  const distTxt = cats.filter(k=>d[k]).map(k=>`${TXTICON(k)} ${l.approx?'ca. ':''}${String(d[k].km).replace('.',',')} km${d[k].min!=null && !l.approx?` · ${d[k].min} min`:''}`).join('   ');
   return `<article class="card" data-id="${esc(l.id)}" tabindex="0" aria-label="${esc(l.title)}">
     ${img}
-    <div class="badges">${l.seller==='Eigentümer'?'<span class="badge owner">Eigentümer</span>':''}${l.approx&&!l.own?'<span class="badge approx">Lage ≈</span>':''}${l.own?'<span class="badge own">Eigenes · Facebook</span>':''}${isNew(l)?'<span class="badge new">NEU</span>':''}${l.price_before && l.price_before>l.price?'<span class="badge drop">Preis ↓</span>':''}</div>
+    <div class="badges">${l.seller==='Eigentümer'?'<span class="badge owner">Eigentümer</span>':''}${l.approx&&!l.own&&l.lat!=null?'<span class="badge approx">Lage ≈</span>':''}${l.own?'<span class="badge own">Eigenes · Facebook</span>':''}${isNew(l)?'<span class="badge new" title="in den letzten 7 Tagen eingestellt">NEU eingestellt</span>':''}${l.price_before && l.price_before>l.price?'<span class="badge drop">Preis ↓</span>':''}</div>
     <button class="fav" data-fav="${esc(l.id)}" aria-label="Merken" aria-pressed="${isFav(l.id)}">${isFav(l.id)?'★':'☆'}</button>
     <div class="body">
       <div class="price">${fmt(l.price)} ฿ <small>/ Monat${e?` · ≈ ${fmt(e)} €`:''}</small></div>
       <div class="title">${esc(l.title)}</div>
       ${(o => o ? `<div class="online ${o.days<=7?'fresh':''}" title="${o.posted?'Einstelldatum beim Anbieter':'Datum, an dem die App das Inserat zuerst gefunden hat'}">🕒 ${esc(o.label)} (${esc(o.ago)})</div>` : '')(onlineInfo(l))}
       <div class="facts">
-        ${sizeTxt(l)?`<span class="tag">${sizeTxt(l)}</span>`:''}${l.th && l.prov && !l.full?`<span class="tag area">📍 ${esc(PROVNAME(l.prov))}</span>`:''}${l.area && !['Pattaya','Krabi'].includes(l.area)?`<span class="tag area">📍 ${esc(l.area.split(' / ')[0])}</span>`:''}
+        ${l.elsewhere?`<span class="tag area">${esc(CITIES[l.city]?.name||l.city)}</span>`:''}${sizeTxt(l)?`<span class="tag">${sizeTxt(l)}</span>`:''}${l.th && l.prov && !l.full?`<span class="tag area">📍 ${esc(PROVNAME(l.prov))}</span>`:''}${l.area && !['Pattaya','Krabi'].includes(l.area)?`<span class="tag area">📍 ${esc(l.area.split(' / ')[0])}</span>`:''}
         ${l.beds!=null?`<span class="tag grey">${l.beds} SZ</span>`:''}
         <span class="tag ${a.cls==='ok'?'':a.cls==='old'?'warn':'grey'}">${esc(a.label)}</span>
         ${l.pool?`<span class="tag">${l.pool==='privat'?'Privatpool':'Pool'}</span>`:''}
+        ${(d => d ? `<span class="tag avail">frei ab ${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}</span>` : '')(availLater(l))}
         ${/fully/i.test(l.furniture||'')?'<span class="tag grey">möbliert</span>':''}
       </div>
       ${distTxt?`<div class="dist">${esc(distTxt)}${l.th && !l.full?' <small>(geschätzt)</small>':''}</div>`:'<div class="dist">Lage im Inserat nicht verortet</div>'}
@@ -148,8 +200,14 @@ function card(l){
 
 function thPicker(){
   const provs = TH.idx?.provinces || [];
-  return `<div class="thpick"><p class="empty">Wähle eine Gegend – oder zoome auf der <b>Karte</b> hinein.</p>
+  return `<div class="thpick"><p class="intro"><b>Mietwohnungen und -häuser in Thailand</b> – mit Preis in Euro und dem Weg zu Strand, Moschee, Muay Thai, 7-Eleven und Markt.</p><p class="empty">Wähle eine Gegend – oder zoome auf der <b>Karte</b> hinein. Die Zahl nennt alle Inserate der Provinz (vor deinen Filtern).</p>
     <div class="provs">${provs.map(p=>`<button type="button" data-prov="${esc(p.key)}">${esc(p.name)} <small>${fmt(p.n)}</small></button>`).join('')}</div></div>`;
+}
+function regionBar(){   // über der Liste: welche Gegend gezeigt wird + zurück zur Übersicht
+  if(!DATA?.th || !TH.bounds) return '';
+  const r = state.region, inView = TH.listingsIn(TH.bounds).length;
+  return `<div class="regionbar"><span>📍 <b>${esc(r?.name || 'Kartenausschnitt')}</b> <small>${r?.n && r.n > inView ? `– Umkreis um das Zentrum, ${fmt(inView)} von ${fmt(r.n)} Inseraten der Provinz. Auf der Karte verschieben zeigt mehr.` : ''}</small></span>
+    <button type="button" class="linkbtn" data-overview>✕ Alle Gegenden</button></div>`;
 }
 function render(){
   if(!DATA) return;
@@ -161,6 +219,7 @@ function render(){
       $('#list').innerHTML = thPicker(); return;
     }
   }
+  setTimeout(() => { const l = $('#list'); if(DATA?.th && !onlyFav && view!=='map' && view!=='info' && !l.querySelector('.regionbar')) l.insertAdjacentHTML('afterbegin', regionBar()); }, 0);
   const {rows, hidden} = filtered(onlyFav);
   const parts = [];
   if(hidden.old) parts.push(`${hidden.old} älter als ${state.filters.maxAge} J.`);
@@ -173,13 +232,19 @@ function render(){
   if(hidden.price) parts.push(`${hidden.price} zu teuer`);
   if(hidden.beach) parts.push(`${hidden.beach} zu weit vom Strand`);
   if(hidden.soon) parts.push(`${hidden.soon} erst später frei`);
-  $('#summary').textContent = onlyFav ? `${rows.length} gemerkte Inserate` :
-    `${rows.length} von ${DATA.th ? fmt(allListings().length) + ' im Ausschnitt' : DATA.count + state.own.length + ' Inseraten'}` + (parts.length ? ` · ausgeblendet: ${parts.join(', ')}` : '');
+  $('#summary').textContent = onlyFav ? (rows.length===1 ? '1 gemerktes Inserat' : `${rows.length} gemerkte Inserate`) + ' · aus allen Gegenden' :
+    `${fmt(rows.length)} von ${DATA.th ? fmt(allListings().length) + ' im Ausschnitt' : fmt(DATA.count + state.own.length) + ' Inseraten'}` + (parts.length ? ` · ausgeblendet: ${parts.join(', ')}` : '');
   listRows = rows; shown = 0;
-  $('#list').innerHTML = rows.length ? '' :
-    `<p class="empty">${onlyFav?'Noch nichts gemerkt – tippe ☆ auf einem Inserat.':'Keine Inserate passen zu den Filtern.'}</p>`;
+  const hidN = Object.values(hidden).reduce((a,b)=>a+(b||0),0);
+  $('#list').innerHTML = rows.length ? '' : onlyFav ? favEmpty() :
+    `<div class="emptybox"><p class="empty">Keine Treffer${hidN?` – ${fmt(hidN)} Inserate sind durch deine Filter ausgeblendet`:''}.</p>
+      ${hidN?`<div class="emptyacts">${hidden.unknown?`<button type="button" class="primary" data-relax="unknown">Auch ohne Baujahr zeigen (${fmt(hidden.unknown)})</button>`:''}
+      ${hidden.old?`<button type="button" class="ghost" data-relax="old">Auch ältere zeigen (${fmt(hidden.old)})</button>`:''}
+      <button type="button" class="ghost" data-relax="all">Alle Filter aus</button></div>`:''}</div>`;
   if(rows.length && view!=='map' && view!=='info') moreCards();
-  const active = Object.keys(DEFAULTS).filter(k => k!=='sort' && state.filters[k]!==DEFAULTS[k]).length;
+  if(rows.length && !onlyFav && hidden.unknown > rows.length) $('#list').insertAdjacentHTML('afterbegin',
+    `<div class="hidehint">${fmt(hidden.unknown)} weitere Inserate nennen kein Baujahr. <button type="button" class="linkbtn" data-relax="unknown">Auch zeigen</button></div>`);
+  const active = Object.keys(DEFAULTS).filter(k => k!=='sort' && state.filters[k]!==DEF_OF(CITY)[k]).length;
   $('#filterCount').textContent = active || '';
   if(view==='map') drawMap(rows);
   if(view==='info') renderInfo();
@@ -220,7 +285,9 @@ let thTimer = 0, thBubbles = null, canvasR = null;
 function thBoundsOf(m){ const b = m.getBounds(); return [b.getSouth(), b.getWest(), b.getNorth(), b.getEast()]; }
 async function thMoved(){
   if(!DATA?.th || !map || $('#viewMap').hidden) return;     // versteckte Karte hat keine Größe
-  const q = thBoundsOf(map); TH.bounds = q;
+  const q = thBoundsOf(map);
+  if(TH.bounds && state.region && (Math.abs(q[0]-TH.bounds[0]) > 0.02 || Math.abs(q[1]-TH.bounds[1]) > 0.02) && !map._fromGoTo) state.region = null;
+  map._fromGoTo = false; TH.bounds = q;
   state.thView = {c:[map.getCenter().lat, map.getCenter().lng], z:map.getZoom()}; save();
   const n = TH.countIn(q);
   if(n <= TH.LOAD_LIMIT){ await TH.ensureTiles(q); }
@@ -261,7 +328,7 @@ function drawMap(rows){
         L.marker([g.lat,g.lng], {icon:L.divIcon({className:'', html:`<div class="bubble" style="width:${r*2}px;height:${r*2}px">${g.n>=1000?Math.round(g.n/100)/10+'k':g.n}</div>`, iconSize:[r*2,r*2], iconAnchor:[r,r]}), title:g.name||''})
           .on('click', () => map.setView([g.lat,g.lng], Math.max(map.getZoom()+2, 10))).addTo(thBubbles);
       }
-      $('#mapHint') && ($('#mapHint').textContent = `${fmt(n)} Inserate hier – zum Anzeigen hineinzoomen`);
+      $('#mapHint') && ($('#mapHint').textContent = `${fmt(n)} Inserate hier (Zahlen vor deinen Filtern) – zum Anzeigen hineinzoomen oder eine Blase antippen`);
       return;
     }
 
@@ -294,7 +361,12 @@ function drawMap(rows){
     m.addTo(layer); pts.push([l.lat,l.lng]);
   }
   const noPos = rows.filter(l => l.lat==null || l.lng==null).length;
-  const hint = $('#mapHint'); if(hint) hint.textContent = `${fmt(rows.length - noPos)} Inserate auf ${fmt(groups.size)} Punkten${noPos?` · ${noPos} ohne Kartenpunkt (nur in der Liste)`:''}`;
+  const hint = $('#mapHint');
+  if(hint){
+    const raw = DATA.th ? TH.listingsIn(TH.bounds || thBoundsOf(map)).length : DATA.listings.length;
+    if(!rows.length && raw && view!=='fav') hint.innerHTML = `Alle ${fmt(raw)} Inserate hier sind durch deine Filter ausgeblendet. <button type="button" class="linkbtn" data-relax="all">Filter aus</button>`;
+    else hint.textContent = `${fmt(rows.length - noPos)} Inserate auf ${fmt(groups.size)} Punkten${noPos?` · ${noPos} ohne Kartenpunkt (nur in der Liste)`:''}${raw > rows.length && view!=='fav' ? ` · ${fmt(raw - rows.length)} durch Filter ausgeblendet` : ''}`;
+  }
   drawHighlight();
   setTimeout(()=>{ map.invalidateSize(); if(pts.length && !DATA.th && !hiId){
     // Ausreißer (falsche Koordinaten beim Anbieter) nicht in den Zoom einbeziehen
@@ -305,7 +377,7 @@ function drawMap(rows){
 function mapShown(){   // Karte wurde sichtbar (Thailand: Größe neu messen, ggf. gewählte Gegend anfahren)
   if(!map || !DATA?.th) return;
   setTimeout(() => { map.invalidateSize(); const p = map._thPending; map._thPending = null;
-    if(p) map.setView(p.c, p.z); else thMoved(); }, 60);
+    if(p){ map._fromGoTo = true; map.setView(p.c, p.z); } else thMoved(); }, 60);
 }
 
 function syncLayers(){
@@ -370,16 +442,16 @@ async function shareData(data){
   catch { prompt('Link kopieren:', data.url); }
 }
 function shareListing(id){
-  const l = allListings().find(x=>x.id===id); if(!l) return;
+  const l = getListing(id); if(!l) return;
   const e = eur(l.price), a = ageInfo(l, new Date(DATA.generated)), d = l.dist || {};
   const bits = [`${fmt(l.price)} ฿/Monat${e?` (≈ ${fmt(e)} €)`:''}`, l.size?`${fmt(l.size)} m²`:null, l.beds!=null?`${l.beds} SZ`:null, a.label, l.pool?(l.pool==='privat'?'Privatpool':'Pool'):null].filter(Boolean).join(' · ');
   const near = ['Strand','Moschee','Muay Thai'].filter(k=>d[k]).map(k=>`${k} ${String(d[k].km).replace('.',',')} km`).join(', ');
-  shareData({ title: l.title, text: `🏠 ${l.title}\n${bits}${near?`\n${near}`:''}`, url: l.url });
+  shareData({ title: l.title, text: `🏠 ${l.title}\n${bits}${near?`\n${near}`:''}\nIn der App: ${APP_URL}${linkOf(l)}`, url: l.url });
 }
 function shareApp(){ shareData({ title:'Thailand Wohnen', text:'🏝 Thailand Wohnen – Mietwohnungen in ganz Thailand auf einer Karte, täglich aktualisiert', url: APP_URL }); }
 
 function openDetail(id){
-  const l = allListings().find(x=>x.id===id); if(!l) return;
+  const l = getListing(id); if(!l) return;
   const a = ageInfo(l, new Date(DATA.generated)), e = eur(l.price), d = l.dist || {};
   const gal = (l.images||[]).map(u=>`<img loading="lazy" src="${esc(imgSrc(u,828))}" alt="">`).join('');
   const rows = [
@@ -388,8 +460,8 @@ function openDetail(id){
     ['Zimmer', `${l.beds??'–'} SZ · ${l.baths??'–'} Bad`],
     ['Gebäude', `${a.label}${l.built_src?` (Quelle: ${l.built_src})`:''}`],
     ['Typ', l.type||'–'], ['Möbliert', ({'Fully Furnished':'voll möbliert','Partly Furnished':'teilmöbliert','Unfurnished':'unmöbliert'})[l.furniture]||l.furniture||'–'], ['Pool', l.pool?(l.pool==='privat'?'privater Pool':'Gemeinschaftspool'):'kein Pool angegeben'],
-    ['Frei ab', l.available||'nicht angegeben'], ['Haustiere', l.pets||'–'],
-    ...(l.area ? [['Gegend', l.area]] : []), ['Anbieter', l.seller||'–'], ['Online seit', l.posted ? `${onlineInfo(l).date} (${onlineInfo(l).ago}, laut Anbieter)` : 'Anbieter nennt kein Einstelldatum'], ['Aktualisiert', l.updated||'–'], ['Bei uns seit', l.first_seen ? new Date(l.first_seen).toLocaleDateString('de-DE') : '–'], ['Quelle', (l.source||'–') + (l.also?.length ? ` (auch bei ${l.also.map(a=>a.source).join(', ')})` : '')],
+    ['Frei ab', l.available ? deDate(l.available) : 'nicht angegeben'], ['Haustiere', l.pets||'–'],
+    ...(l.area ? [['Gegend', l.area]] : []), ['Anbieter', l.seller||'–'], ['Online seit', l.posted ? `${onlineInfo(l).date} (${onlineInfo(l).ago}, laut Anbieter)` : 'Anbieter nennt kein Einstelldatum'], ['Aktualisiert', l.updated ? deDate(l.updated) : '–'], ['Bei uns seit', l.first_seen ? new Date(l.first_seen).toLocaleDateString('de-DE') : '–'], ['Quelle', (l.source||'–') + (l.also?.length ? ` (auch bei ${l.also.map(a=>a.source + (a.price ? ` für ${fmt(a.price)} ฿` : '')).join(', ')})` : '')],
     ...(l.approx && !l.own ? [['Lage', 'nur ungefähr (Ortsteil) – genaue Adresse beim Anbieter erfragen']] : []),
     ...(l.th && !l.full ? [['Provinz', PROVNAME(l.prov)]] : []),
     ...(l.gone ? [['Status', 'Beim Anbieter nicht mehr online – wird beim nächsten Lauf entfernt']] : []),
@@ -397,38 +469,42 @@ function openDetail(id){
   const dist = DISTCATS.filter(k=>d[k]).map(k=>{
     const poi = d[k].lat!=null ? {lat:d[k].lat, lng:d[k].lng} : l.lat!=null ? (DATA.pois||[]).filter(p=>p.cat===k && p.name===d[k].name)
       .sort((a,b)=>Math.hypot(a.lat-l.lat,a.lng-l.lng)-Math.hypot(b.lat-l.lat,b.lng-l.lng))[0] : null;
-    return [`${TXTICON(k)==='7-11'?'🏪':TXTICON(k)} ${k}`, `${String(d[k].km).replace('.',',')} km${d[k].min!=null?`, ca. ${d[k].min} min`:''}${d[k].road?'':' (geschätzt)'} – ${d[k].name}`,
+    return [`${TXTICON(k)==='7-11'?'🏪':TXTICON(k)} ${k}`, `${l.approx?'ca. ':''}${String(d[k].km).replace('.',',')} km${d[k].min!=null && !l.approx?`, ca. ${d[k].min} min`:''}${l.approx?' (Lage nur ungefähr)':d[k].road?'':' (geschätzt)'} – ${d[k].name}`,
       poi ? gmRoute(l, poi) : null];
   });
   const nav = l.lat!=null ? gmPlace(l.lat, l.lng) : null;
-  $('#detail').innerHTML = `<div class="grab"></div><button class="close" aria-label="Schließen">✕</button>
+  const back = lastGroup ? `<button class="close back" aria-label="Zurück zur Liste">‹ ${lastGroup.length}</button>` : `<button class="close" aria-label="Schließen">✕</button>`;
+  $('#detail').innerHTML = `<div class="grab"></div>${back}
     ${gal?`<div class="gallery">${gal}</div>`:''}
     <h2 id="dTitle">${esc(l.title)}</h2>
     <dl>${[...rows, ...dist].map(([k,v,u])=>`<dt>${esc(k)}</dt><dd>${esc(v)}${u?` <a class="rlink" href="${esc(u)}" target="_blank" rel="noopener" aria-label="Route vom Objekt zu ${esc(k)} in Google Maps">Route ↗</a>`:''}</dd>`).join('')}</dl>
-    ${l.description?`<p class="desc">${esc(l.description)}</p>`:''}
-    <p class="note">${l.own?'Von dir eingetragen – Entfernungen sind Schätzungen (Luftlinie × 1,3). ':''}Angaben aus dem Inserat, nicht vom Vermieter bestätigt. Vor jeder Zahlung besichtigen und Vertrag prüfen. Entfernungen: Straßen-km und Fahrzeit (Auto-Profil, Roller ähnlich) ab dem Kartenpunkt des Inserats zum nächstgelegenen Ort; Strände nur, wenn ohne Boot erreichbar.</p>
+    ${l.description?`<p class="desc">${esc(l.description.replace(/\s*([•●▪✔✅🔹🔸]|(?<=[.!?])\s+(?=[A-ZÄÖÜ]))\s*/gu, (m, b) => b && b.trim() ? '\n' + b + ' ' : '\n').replace(/\n{3,}/g,'\n\n').trim())}</p>`:''}
+    <p class="note">${l.own ? 'Von dir eingetragen. Entfernungen sind Schätzungen (Luftlinie × 1,3) ab dem Ort, den du auf der Karte gesetzt hast.'
+      : `Angaben aus dem Inserat, nicht vom Vermieter bestätigt. Vor jeder Zahlung besichtigen und Vertrag prüfen. ${l.th && !l.full || l.approx ? 'Entfernungen sind Schätzungen (Luftlinie × 1,3)' : 'Entfernungen: Straßen-km und Fahrzeit (Auto-Profil, Roller ähnlich)'} ab dem Kartenpunkt des Inserats zum nächstgelegenen Ort; Strände nur, wenn ohne Boot erreichbar.`}</p>
     <div class="actions">
       <a class="primary" href="${esc(l.url)}" target="_blank" rel="noopener">Inserat ↗</a>
-      ${(l.also||[]).slice(0,1).map(a=>`<a class="ghost" href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.source)} ↗</a>`).join('')}
+      ${(l.also||[]).slice(0,1).map(a=>`<a class="ghost" href="${esc(a.url)}" target="_blank" rel="noopener">${esc((a.source||'').split(' ')[0])}${a.price?` ${fmt(a.price)} ฿`:''} ↗</a>`).join('')}
       ${l.lat!=null?`<button class="ghost" type="button" data-showmap="${esc(l.id)}">🗺 Auf Karte</button>`:''}
       ${nav?`<a class="ghost" href="${esc(nav)}" target="_blank" rel="noopener">${l.approx?'Ungefähre Lage':'📍 Maps'}</a>`:''}
       <button class="ghost" data-share="${esc(l.id)}" aria-label="Teilen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M6 11H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-1"/></svg></button>
       <button class="ghost" data-fav="${esc(l.id)}">${isFav(l.id)?'★':'☆'}</button>
     </div>
     ${l.own?`<div class="sheetActions"><button class="ghost" data-ownedit="${esc(l.id)}">Bearbeiten</button><button class="ghost" data-ownpos="${esc(l.id)}">Ort auf Karte setzen</button><button class="ghost danger" data-owndel="${esc(l.id)}">Löschen</button></div>`:''}`;
-  if($('#detail').hidden) openSheet('#detail');
+  if($('#detail').hidden) openSheet('#detail', linkOf(l)); else { try { history.replaceState({sheet:1}, '', location.pathname + linkOf(l)); } catch {} }
   if(l.th && !l.full && !l.detailLoaded && !l.detailTried && !l.gone){
     $('#detail h2').insertAdjacentHTML('afterend', '<p class="loading">Lade Details vom Anbieter …</p>');
     TH.loadDetail(l).then(() => { if(!$('#detail').hidden && $('#detail [data-fav]')?.dataset.fav === l.id) openDetail(l.id); });
   }
 }
 
+let lastGroup = null, curGroup = null;
 function openGroup(g){
+  curGroup = g;
   const sorted = [...g].sort((a,b)=>(a.price||1e9)-(b.price||1e9));
   const approx = g.every(x=>x.approx);
   $('#detail').innerHTML = `<div class="grab"></div><button class="close" aria-label="Schließen">✕</button>
     <h2 id="dTitle">${g.length} Inserate an diesem Punkt</h2>
-    <p class="muted">${approx ? 'Die Anbieter nennen nur den Ortsteil – die genaue Lage steht im Inserat.' : 'Meist mehrere Wohnungen im selben Gebäude bzw. derselben Anlage.'}</p>
+    <p class="muted">${approx ? 'Verschiedene Objekte: Die Anbieter nennen nur einen ungefähren Ort (Ortsteil). Die genaue Lage steht im Inserat – Entfernungen sind deshalb nur grob.' : 'Mehrere Wohnungen im selben Gebäude bzw. derselben Anlage.'}</p>
     <ul class="glist">${sorted.map(l=>`<li><button type="button" data-open="${esc(l.id)}"><b>${fmt(l.price)} ฿</b><span>${esc([sizeTxt(l), l.beds!=null?l.beds+' SZ':null].filter(Boolean).join(' · '))}</span><small>${esc(l.title)}</small></button></li>`).join('')}</ul>`;
   if($('#detail').hidden) openSheet('#detail');
 }
@@ -453,8 +529,17 @@ function showOnMap(id){
   toast(l.approx ? 'Markiert – Lage nur ungefähr (Ortsteil)' : 'Objekt auf der Karte markiert');
 }
 let lastFocus = null;
-function openSheet(sel){ lastFocus = document.activeElement; $('#scrim').hidden=false; $(sel).hidden=false; $(sel).querySelector('button,input,a')?.focus({preventScroll:true}); }
-function closeSheets(){ $('#scrim').hidden=true; $('#filters').hidden=true; $('#detail').hidden=true; $('#own').hidden=true; lastFocus?.focus?.({preventScroll:true}); }
+function openSheet(sel, hash){
+  lastFocus = document.activeElement; $('#scrim').hidden=false; $(sel).hidden=false; $(sel).querySelector('button,input,a')?.focus({preventScroll:true});
+  const url = location.pathname + location.search + (hash || '');
+  try { history.state?.sheet ? history.replaceState({sheet:1}, '', url) : history.pushState({sheet:1}, '', url); } catch {}
+}
+// vom Nutzer geschlossen (✕, Hintergrund, Esc, Abbrechen): Verlaufseintrag mit zurücknehmen
+function userClose(){ if(history.state?.sheet) history.back(); else closeSheets(); }
+window.addEventListener('popstate', () => { closeSheets(); if(location.hash && !/#i=/.test(location.hash)) {} });
+const linkOf = l => `#i=${encodeURIComponent(l.id)}&c=${CITY}${l.lat!=null?`&ll=${(+l.lat).toFixed(5)},${(+l.lng).toFixed(5)}`:''}`;
+function closeSheets(){ if(/#i=/.test(location.hash)) { try { history.replaceState(history.state, '', location.pathname + location.search); } catch {} }
+  $('#scrim').hidden=true; $('#filters').hidden=true; $('#detail').hidden=true; $('#own').hidden=true; lastFocus?.focus?.({preventScroll:true}); }
 
 let setFilterUi = () => {};
 function bindFilters(){
@@ -486,11 +571,11 @@ function bindFilters(){
   $('#sortbar').onclick = e => { const b = e.target.closest('[data-sort]'); if(!b) return;
     let v = b.dataset.sort; if(v==='price') v = state.filters.sort==='price' ? 'priceDesc' : 'price';
     upd('sort', v); };
-  $('#fReset').onclick = () => { Object.assign(state.filters, DEFAULTS); save(); set(); render(); };
-  $('#fClose').onclick = closeSheets;
+  $('#fReset').onclick = () => { Object.assign(state.filters, DEF_OF(CITY)); save(); set(); render(); };
+  $('#fClose').onclick = userClose;
   $('#filterBtn').onclick = () => openSheet('#filters');
-  $('#scrim').onclick = closeSheets;
-  document.addEventListener('keydown', e => { if(e.key==='Escape') closeSheets(); });
+  $('#scrim').onclick = () => { lastGroup = null; userClose(); };
+  document.addEventListener('keydown', e => { if(e.key==='Escape'){ lastGroup = null; userClose(); } });
   set();
 }
 
@@ -521,9 +606,14 @@ function bindUi(){
     if(sb){ e.stopPropagation(); shareListing(sb.dataset.share); return; }
     if(e.target.closest('#shareApp')){ shareApp(); return; }
     const sm = e.target.closest('[data-showmap]'); if(sm){ showOnMap(sm.dataset.showmap); return; }
-    const go = e.target.closest('[data-open]'); if(go){ openDetail(go.dataset.open); return; }
+    const rx = e.target.closest('[data-relax]'); if(rx){ const k = rx.dataset.relax, f = state.filters;
+      if(k==='unknown'){ f.unknown = true; f.sizeUnknown = true; } else if(k==='old') f.old = true;
+      else Object.assign(f, {...DEF_OF('thailand'), sort:f.sort});
+      save(); setFilterUi(); render(); toast('Filter gelockert'); return; }
+    const go = e.target.closest('[data-open]'); if(go){ lastGroup = curGroup; openDetail(go.dataset.open); return; }
     const pv = e.target.closest('[data-prov]');
-    if(pv && DATA?.th){ const p = (TH.idx.provinces||[]).find(x=>x.key===pv.dataset.prov); if(p){ goTo(p.lat, p.lng, p.key); } return; }
+    if(pv && DATA?.th){ const p = (TH.idx.provinces||[]).find(x=>x.key===pv.dataset.prov); if(p){ state.region = {key:p.key, name:p.name, n:p.n}; save(); goTo(p.lat, p.lng, p.key); } return; }
+    if(e.target.closest('[data-overview]')){ TH.bounds = null; state.region = null; state.thView = null; save(); if(map){ map.setView(CITIES.thailand.center, 6); } render(); window.scrollTo({top:0}); return; }
     const cb = e.target.closest('[data-city]');
     if(cb){ switchCity(cb.dataset.city); return; }
     if(e.target.closest('#fbSearch')){ openFacebook(); return; }
@@ -535,20 +625,20 @@ function bindUi(){
     if(lb){ const c = lb.dataset.layer; state.layers[c] = !state.layers[c]; save(); syncLayers(); return; }
     const fb = e.target.closest('[data-fav]');
     if(fb){ e.stopPropagation(); const id = fb.dataset.fav;
-      state.favs = isFav(id) ? state.favs.filter(x=>x!==id) : [...state.favs, id]; save(); render();
+      toggleFav(id); render();
       if(!$('#detail').hidden) openDetail(id); return; }
-    if(e.target.closest('#detail .close')) { closeSheets(); return; }
+    if(e.target.closest('#detail .close')) { if(lastGroup){ const g = lastGroup; lastGroup = null; openGroup(g); return; } userClose(); return; }
     const c = e.target.closest('.card'); if(c) openDetail(c.dataset.id);
   });
   $('#ownForm').addEventListener('submit', saveOwnForm);
   $('#ownPaste').onclick = async () => { try { const t = await navigator.clipboard.readText(); if(t){ $('#wUrl').value = t.trim(); } } catch { toast('Einfügen nicht erlaubt – bitte lange tippen und „Einfügen“ wählen'); } };
-  $('#ownCancel').onclick = closeSheets;
+  $('#ownCancel').onclick = userClose;
   document.addEventListener('keydown', e => { const c = e.target.closest?.('.card'); if(c && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); openDetail(c.dataset.id); } });
 }
 
 function syncCityUi(){
   document.querySelectorAll('[data-city]').forEach(b => { const on = b.dataset.city===CITY; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
-  document.title = `${CITIES[CITY].name} – Thailand Wohnen`;
+  document.title = CITY==='thailand' ? 'Thailand Wohnen – Küsten & Chiang Mai' : `${CITIES[CITY].long} – Thailand Wohnen`;
 }
 async function loadCity(city){
   CITY = city; localStorage.setItem('krabiwohnen.city', city);
@@ -567,14 +657,14 @@ async function loadCity(city){
     } else {
       const r = await fetch(`data/${city}/listings.json`, {cache:'no-cache'});
       if(!r.ok) throw new Error(r.status);
-      const d = await r.json(); if(city !== CITY) return; DATA = d;
+      const d = await r.json(); if(city !== CITY) return; DATA = d; markCoarse(DATA.listings);
     }
   }catch(err){
     $('#stand').textContent = 'Daten konnten nicht geladen werden (offline?).'; $('#list').innerHTML = ''; return;
   }
   const g = new Date(DATA.generated);
-  $('#stand').textContent = `Stand ${g.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})} ${g.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})} · ${DATA.count} Inserate · 1 € = ${(Math.round(DATA.fx.rate*10)/10).toLocaleString('de-DE')} ฿`;
-  setFilterUi(); render();
+  $('#stand').innerHTML = `<b>${esc(CITIES[CITY].long)}</b> · ${fmt(DATA.count)} Inserate · Stand ${g.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})} ${g.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})} · <span class="fx">1&nbsp;€&nbsp;=&nbsp;${(Math.round(DATA.fx.rate*10)/10).toLocaleString('de-DE')}&nbsp;฿</span>`;
+  migrateFavs(); syncFavTab(); setFilterUi(); render();
   setTimeout(() => localStorage.removeItem('krabiwohnen.booting'), 4000);
 }
 // Gegend wählen (Thailand-Modus): größte Inserats-Dichte um den Provinz-Mittelpunkt
@@ -586,11 +676,13 @@ async function goTo(lat, lng, prov){
   state.thView = {c:[lat,lng], z}; save();
   $('#summary').textContent = 'Lade …';
   await TH.ensureTiles(TH.bounds);
-  if(map && !$('#viewMap').hidden) map.setView([lat,lng], z);
+  if(map && !$('#viewMap').hidden){ map._fromGoTo = true; map.setView([lat,lng], z); }
   else { if(map) map._thPending = {c:[lat,lng], z}; render(); }
   window.scrollTo({top:0});
 }
-function switchCity(city){ if(city===CITY || !CITIES[city]) return; closeSheets(); window.scrollTo({top:0}); loadCity(city); }
+function switchCity(city){
+  if(city===CITY && city==='thailand'){ TH.bounds = null; state.region = null; state.thView = null; save(); if(map) map.setView(CITIES.thailand.center, 6); render(); window.scrollTo({top:0}); return; }
+  if(city===CITY || !CITIES[city]) return; closeSheets(); window.scrollTo({top:0}); loadCity(city); }
 
 // ---- Facebook Marketplace (nur Weiterleitung; Facebook erlaubt kein automatisches Auslesen) ----
 function openFacebook(){
@@ -647,6 +739,13 @@ function setOwnPos(id, ll){
   if(!o) return; o.lat = +ll.lat.toFixed(6); o.lng = +ll.lng.toFixed(6); save(); render(); toast('Ort gespeichert – Entfernungen berechnet');
 }
 
+// Link zu einem Inserat (#i=<id>&c=<gegend>&ll=lat,lng) beim Start öffnen
+async function openFromHash(){
+  const h = new URLSearchParams(location.hash.slice(1)); const id = h.get('i'); if(!id) return;
+  const c = h.get('c'); if(c && CITIES[c] && c !== CITY) await loadCity(c);
+  if(DATA?.th && h.get('ll')){ const [la, ln] = h.get('ll').split(',').map(Number); TH.bounds = TH.around(la, ln, 3); await TH.ensureTiles(TH.bounds); render(); }
+  if(getListing(id)) openDetail(id); else toast('Dieses Inserat ist nicht mehr online');
+}
 async function init(){
   // „Thailand“ erst zeigen, wenn die Landesdaten veröffentlicht sind
   const thOk = await fetch('data/th-status.json', {cache:'no-cache'}).then(r => r.json()).then(j => !!j.ready).catch(() => false);
@@ -656,7 +755,9 @@ async function init(){
   bindUi();
   bindFilters();
   fetch('data/klima.json', {cache:'no-cache'}).then(x=>x.json()).then(k=>{ KLIMA=k; if(view==='info') renderInfo(); }).catch(()=>{});
+  const hc = new URLSearchParams(location.hash.slice(1)).get('c'); if(hc && CITIES[hc]) CITY = hc;
   await loadCity(CITY);
+  openFromHash();
 }
 if('serviceWorker' in navigator){
   const hadCtrl = !!navigator.serviceWorker.controller; let reloaded = false;

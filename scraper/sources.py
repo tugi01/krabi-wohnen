@@ -311,4 +311,41 @@ def dedupe(listings):
             dup.setdefault("also", []).append({"source": l.get("source"), "url": l.get("url")})
         else:
             keep.append(l)
-    return keep
+    return link_projects(keep)
+
+
+def _project(l):
+    t = (l.get("title") or "").lower()
+    return re.split(r"\s[–-]\s", t)[0].strip()
+
+
+UNIT = re.compile(r"\b(\d{2,4}/\d{1,3})\b")
+
+
+def link_projects(listings):
+    """1) Inserate ohne Kartenpunkt übernehmen die Lage derselben Anlage aus einer anderen Quelle.
+    2) Dieselbe Wohnung (gleiche Wohnungsnummer wie „758/3“ in derselben Anlage) bei zwei Quellen:
+       nur einmal zeigen (günstigere zuerst), die andere als „auch bei … für … ฿“."""
+    by_proj = {}
+    for l in listings:
+        if l.get("lat") is not None:
+            by_proj.setdefault(_project(l), l)
+    for l in listings:
+        if l.get("lat") is None:
+            ref = by_proj.get(_project(l))
+            if ref and _project(l) and len(_project(l)) >= 6:
+                l["lat"], l["lng"] = ref["lat"], ref["lng"]
+                l.pop("approx", None)
+                if ref.get("dist") and not l.get("dist"):
+                    l["dist"] = ref["dist"]
+    out, seen = [], {}
+    for l in sorted(listings, key=lambda x: x.get("price") or 1e12):
+        m = UNIT.search(l.get("title") or "")
+        key = (_project(l), m.group(1)) if m else None
+        if key and key in seen and src_of(seen[key]) != src_of(l):
+            seen[key].setdefault("also", []).append({"source": l.get("source"), "url": l.get("url"), "price": l.get("price")})
+            continue
+        if key:
+            seen[key] = l
+        out.append(l)
+    return out
