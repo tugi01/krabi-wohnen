@@ -43,6 +43,13 @@ function parseAvail(s){
   const d = t.match(/\b(\d{1,2})(?:st|nd|rd|th)?\b(?!\d)/);
   return new Date(+y[1], m!=null?MONTHS[m]:0, d && +d[1] <= 31 && +d[1] !== +y[1] ? +d[1] : 1);
 }
+// Anbieter-Angaben (englisch) auf Deutsch
+const DE = {'house':'Haus','villa':'Villa','condo':'Eigentumswohnung (Condo)','apartment':'Wohnung','townhouse':'Reihenhaus','penthouse':'Penthouse',
+  'serviced apartment':'Serviced Apartment','shophouse':'Geschäftshaus mit Wohnung','fully furnished':'voll möbliert','partly furnished':'teilmöbliert',
+  'partially furnished':'teilmöbliert','unfurnished':'unmöbliert','negotiable':'verhandelbar','not allowed':'nicht erlaubt','cats only':'nur Katzen',
+  'dogs only':'nur Hunde','all kind of pets allowed':'alle Haustiere erlaubt','allowed':'erlaubt','yes':'ja','no':'nein',
+  'cats and dogs (small only)':'Katzen und kleine Hunde','small pets only':'nur kleine Haustiere','pets allowed':'Haustiere erlaubt'};
+const deTxt = v => v == null || v === '' ? null : (DE[String(v).trim().toLowerCase()] || v);
 function deDate(s){   // „Nov 9, 2026“ / „September 1st 2027“ -> 09.11.2026 (sonst Originaltext)
   if(!s) return null; const d = parseAvail(s); if(!d) return s;
   if(+d === 0) return 'sofort';
@@ -79,6 +86,20 @@ const FKEY = 'krabiwohnen.favs.global';
 let FAVS = (() => { try { return JSON.parse(localStorage.getItem(FKEY) || '{}'); } catch { return {}; } })();
 const saveFavs = () => { try { localStorage.setItem(FKEY, JSON.stringify(FAVS)); } catch {} syncFavTab(); };
 const isFav = id => id in FAVS || state.favs.includes(id);
+// Zahl der Einschränkungen gegenüber „nichts gefiltert“ (auch die Vorauswahl ab Werk zählt mit)
+const activeCount = () => { const N = DEF_OF('thailand'); return Object.keys(DEFAULTS).filter(k => k!=='sort' && state.filters[k]!==N[k]).length; };
+// verdächtige Preise im Hintergrund an der Inseratseite prüfen (über den Detail-Dienst, höchstens 6 auf einmal)
+let verifying = 0, verifyTimer = null;
+function verifyPrices(rows){
+  const todo = rows.filter(l => pCheck(l) && !l.detailTried && /dotproperty\.co\.th\/en\/ads\//.test(l.url||'')).slice(0, 6 - verifying);
+  for(const l of todo){ verifying++; TH.loadDetail(l).finally(() => { verifying--; clearTimeout(verifyTimer); verifyTimer = setTimeout(() => { if($('#detail').hidden) render(); }, 400); }); }
+}
+// Preis wirkt unplausibel (z. B. 290 m² Villa für 6.500 ฿): markieren, bis die Inseratseite geprüft ist
+const pCheck = l => !l.own && !l.price_list && !l.detailLoaded && l.price && (l.size || l.sizeh) >= 80 && l.price / (l.size || l.sizeh) < 35;
+// Grundstücke, Büros, Lagerhallen, Läden sind kein Wohnraum (gleiche Regel wie im Abruf; wirkt sofort auch auf ältere Daten)
+const NOT_HOME_URL = /\/ads\/(?:studio-|\d+-bedroom-)?(?:warehouse|office|retail-space|land|hotel|whole-building|restaurant|factory)-for-(?:rent|sale)/;
+const NOT_HOME_TITLE = /^(?!.*\b(?:houses?|villas?|condos?|apartments?|bedrooms?|beds?|br|homes?|townhouses?|studios?)\b).*\b(?:land|plot|rai|warehouse|factory|office|retail|showroom|restaurant)\b/i;
+const isHome = l => !(NOT_HOME_URL.test(l.url||'') || (!/dotproperty/.test(l.url||'') && NOT_HOME_TITLE.test(l.title||'')));
 function markCoarse(list){
   const g = new Map();
   for(const l of list){ if(l.lat==null) continue; const k = (+l.lat).toFixed(5)+','+(+l.lng).toFixed(5); (g.get(k) || g.set(k, []).get(k)).push(l); }
@@ -163,6 +184,8 @@ function filtered(onlyFav=false){
     size:(a,b)=>(sizeOf(b)||0)-(sizeOf(a)||0),
   }[state.filters.sort] || ((a,b)=>a.price-b.price);
   rows.sort(by);
+  if(state.filters.sort === 'price'){ const ok = rows.filter(l => !pCheck(l)), chk = rows.filter(pCheck); rows.length = 0; rows.push(...ok, ...chk); }
+  verifyPrices(rows);
   return {rows, hidden};
 }
 
@@ -180,7 +203,7 @@ function card(l){
   const distTxt = cats.filter(k=>d[k]).map(k=>`${TXTICON(k)} ${l.approx?'ca. ':''}${String(d[k].km).replace('.',',')} km${d[k].min!=null && !l.approx?` · ${d[k].min} min`:''}`).join('   ');
   return `<article class="card" data-id="${esc(l.id)}" tabindex="0" aria-label="${esc(l.title)}">
     ${img}
-    <div class="badges">${l.seller==='Eigentümer'?'<span class="badge owner">Eigentümer</span>':''}${l.approx&&!l.own&&l.lat!=null?'<span class="badge approx">Lage ≈</span>':''}${l.own?'<span class="badge own">Eigenes · Facebook</span>':''}${isNew(l)?'<span class="badge new" title="in den letzten 7 Tagen eingestellt">NEU eingestellt</span>':''}${l.price_before && l.price_before>l.price?'<span class="badge drop">Preis ↓</span>':''}</div>
+    <div class="badges">${l.seller==='Eigentümer'?'<span class="badge owner">Eigentümer</span>':''}${l.approx&&!l.own&&l.lat!=null?'<span class="badge approx" title="Lage nur ungefähr: der Anbieter nennt nur den Ortsteil">Lage ≈</span>':''}${l.own?`<span class="badge own">Eigenes${/facebook\.com|fb\.me/i.test(l.url||'')?' · Facebook':''}</span>`:''}${isNew(l)?'<span class="badge new" title="in den letzten 7 Tagen eingestellt">NEU eingestellt</span>':''}${l.price_before && l.price_before>l.price?'<span class="badge drop">Preis ↓</span>':''}${pCheck(l)?'<span class="badge warnb" title="Ungewöhnlich günstig für die Fläche – Preis beim Anbieter prüfen">Preis prüfen</span>':''}</div>
     <button class="fav" data-fav="${esc(l.id)}" aria-label="Merken" aria-pressed="${isFav(l.id)}">${isFav(l.id)?'★':'☆'}</button>
     <div class="body">
       <div class="price">${fmt(l.price)} ฿ <small>/ Monat${e?` · ≈ ${fmt(e)} €`:''}</small></div>
@@ -188,9 +211,10 @@ function card(l){
       ${(o => o ? `<div class="online ${o.days<=7?'fresh':''}" title="${o.posted?'Einstelldatum beim Anbieter':'Datum, an dem die App das Inserat zuerst gefunden hat'}">🕒 ${esc(o.label)} (${esc(o.ago)})</div>` : '')(onlineInfo(l))}
       <div class="facts">
         ${l.elsewhere?`<span class="tag area">${esc(CITIES[l.city]?.name||l.city)}</span>`:''}${sizeTxt(l)?`<span class="tag">${sizeTxt(l)}</span>`:''}${l.th && l.prov && !l.full?`<span class="tag area">📍 ${esc(PROVNAME(l.prov))}</span>`:''}${l.area && !['Pattaya','Krabi'].includes(l.area)?`<span class="tag area">📍 ${esc(l.area.split(' / ')[0])}</span>`:''}
-        ${l.beds!=null?`<span class="tag grey">${l.beds} SZ</span>`:''}
+        ${l.beds!=null?`<span class="tag grey" title="Schlafzimmer">${l.beds===0?'Studio':l.beds+' Schlafz.'}</span>`:''}
         <span class="tag ${a.cls==='ok'?'':a.cls==='old'?'warn':'grey'}">${esc(a.label)}</span>
         ${l.pool?`<span class="tag">${l.pool==='privat'?'Privatpool':'Pool'}</span>`:''}
+        ${/for sale|sale\s*(?:&|and|\/)\s*rent|rent\s*(?:&|and|\/)\s*sale/i.test(l.title||'') && !l.own ? '<span class="tag grey" title="Laut Titel auch zum Kauf – angezeigt wird die Monatsmiete">auch zu kaufen</span>' : ''}
         ${(d => d ? `<span class="tag avail">frei ab ${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}</span>` : '')(availLater(l))}
         ${/fully/i.test(l.furniture||'')?'<span class="tag grey">möbliert</span>':''}
       </div>
@@ -200,14 +224,15 @@ function card(l){
 
 function thPicker(){
   const provs = TH.idx?.provinces || [];
-  return `<div class="thpick"><p class="intro"><b>Mietwohnungen und -häuser in Thailand</b> – mit Preis in Euro und dem Weg zu Strand, Moschee, Muay Thai, 7-Eleven und Markt.</p><p class="empty">Wähle eine Gegend – oder zoome auf der <b>Karte</b> hinein. Die Zahl nennt alle Inserate der Provinz (vor deinen Filtern).</p>
+  return `<div class="thpick"><p class="intro"><b>Mietwohnungen und -häuser in Thailand</b> – mit Preis in Euro und dem Weg zu Strand, Moschee, Muay Thai, 7-Eleven und Markt.</p><div class="quick"><button type="button" class="primary" data-city="krabi">Krabi / Ao Nang ›</button><button type="button" class="primary" data-city="pattaya">Pattaya & Umgebung ›</button></div><p class="muted small">Diese zwei Gegenden sind am ausführlichsten (Straßen-km, Fahrzeit, mehr Fotos).</p><p class="empty">Oder wähle eine Gegend – oder zoome auf der <b>Karte</b> hinein. Die Zahl nennt alle Inserate der Provinz (vor deinen Filtern).</p>
     <div class="provs">${provs.map(p=>`<button type="button" data-prov="${esc(p.key)}">${esc(p.name)} <small>${fmt(p.n)}</small></button>`).join('')}</div></div>`;
 }
 function regionBar(){   // über der Liste: welche Gegend gezeigt wird + zurück zur Übersicht
   if(!DATA?.th || !TH.bounds) return '';
   const r = state.region, inView = TH.listingsIn(TH.bounds).length;
   return `<div class="regionbar"><span>📍 <b>${esc(r?.name || 'Kartenausschnitt')}</b> <small>${r?.n && r.n > inView ? `– Umkreis um das Zentrum, ${fmt(inView)} von ${fmt(r.n)} Inseraten der Provinz. Auf der Karte verschieben zeigt mehr.` : ''}</small></span>
-    <button type="button" class="linkbtn" data-overview>✕ Alle Gegenden</button></div>`;
+    <button type="button" class="linkbtn" data-overview>✕ Alle Gegenden</button>
+    ${({krabi:'krabi', chonburi:'pattaya'})[r?.key] ? `<button type="button" class="linkbtn" data-city="${({krabi:'krabi', chonburi:'pattaya'})[r.key]}">Ausführlich mit Straßen-km: ${r.key==='krabi'?'Krabi':'Pattaya'} ›</button>` : ''}</div>`;
 }
 function render(){
   if(!DATA) return;
@@ -242,10 +267,12 @@ function render(){
       ${hidden.old?`<button type="button" class="ghost" data-relax="old">Auch ältere zeigen (${fmt(hidden.old)})</button>`:''}
       <button type="button" class="ghost" data-relax="all">Alle Filter aus</button></div>`:''}</div>`;
   if(rows.length && view!=='map' && view!=='info') moreCards();
-  if(rows.length && !onlyFav && hidden.unknown > rows.length) $('#list').insertAdjacentHTML('afterbegin',
-    `<div class="hidehint">${fmt(hidden.unknown)} weitere Inserate nennen kein Baujahr. <button type="button" class="linkbtn" data-relax="unknown">Auch zeigen</button></div>`);
-  const active = Object.keys(DEFAULTS).filter(k => k!=='sort' && state.filters[k]!==DEF_OF(CITY)[k]).length;
+  if(rows.length && !onlyFav && hidN) $('#list').insertAdjacentHTML('afterbegin',
+    `<div class="hidehint"><span>Filter aktiv (${activeCount()}): ${fmt(hidN)} von ${fmt(rows.length + hidN)} Inseraten ausgeblendet${hidden.unknown ? ` – ${fmt(hidden.unknown)} davon nennen kein Baujahr` : ''}.</span>
+      <span>${hidden.unknown?`<button type="button" class="linkbtn" data-relax="unknown">Ohne Baujahr auch zeigen</button> · `:''}<button type="button" class="linkbtn" data-relax="all">Alle ${fmt(rows.length + hidN)} zeigen</button></span></div>`);
+  const active = activeCount();
   $('#filterCount').textContent = active || '';
+  const fc = $('#fClose'); if(fc && !onlyFav) fc.textContent = rows.length ? `${fmt(rows.length)} ${rows.length===1?'Inserat':'Inserate'} zeigen` : 'Keine Treffer – Filter lockern';
   if(view==='map') drawMap(rows);
   if(view==='info') renderInfo();
   const sub = document.getElementById('oldSub'); if(sub) sub.textContent = `Baujahr vor ${new Date(DATA.generated).getFullYear()-state.filters.maxAge} und nicht kernsaniert`;
@@ -258,7 +285,7 @@ function moreCards(){
   const next = listRows.slice(shown, shown + PAGE); shown += next.length;
   list.insertAdjacentHTML('beforeend', next.map(card).join(''));
   if(shown < listRows.length){
-    list.insertAdjacentHTML('beforeend', `<button class="more" type="button">Weitere ${Math.min(PAGE, listRows.length-shown)} von noch ${listRows.length-shown} anzeigen</button>`);
+    list.insertAdjacentHTML('beforeend', `<button class="more" type="button">${listRows.length-shown <= PAGE ? `Letzte ${listRows.length-shown} anzeigen` : `Weitere ${PAGE} anzeigen (noch ${fmt(listRows.length-shown)})`}</button>`);
     const btn = list.querySelector('.more'); btn.onclick = moreCards;
     if('IntersectionObserver' in window){
       moreObs?.disconnect();
@@ -309,6 +336,7 @@ function drawMap(rows){
     layer = L.layerGroup().addTo(map);
     const zcls = () => map.getContainer().classList.toggle('far', map.getZoom() < 13);
     map.on('zoomend', zcls); zcls();
+    let zt = null; map.on('zoomend', () => { if(!DATA?.th && (view==='map')){ clearTimeout(zt); zt = setTimeout(render, 120); } });
     if(DATA.th){ thBubbles = L.layerGroup().addTo(map); canvasR = L.canvas({padding:0.3});
       map.on('moveend', () => { clearTimeout(thTimer); thTimer = setTimeout(thMoved, 250); });
       setTimeout(thMoved, 60); }
@@ -323,10 +351,22 @@ function drawMap(rows){
       // Übersicht: Zahl der Inserate pro Provinz (herausgezoomt) bzw. pro Kachel
       const groups = map.getZoom() < 9 ? (TH.idx?.provinces||[]).map(p=>({lat:p.lat,lng:p.lng,n:p.n,name:p.name})) :
         TH.tilesIn(q).map(t=>({lat:(t.b[0]+t.b[2])/2, lng:(t.b[1]+t.b[3])/2, n:t.n}));
-      for(const g of groups){ if(!g.n || !g.lat) continue;
-        const r = Math.round(16 + Math.min(26, Math.sqrt(g.n)/3));
+      // Blasen, die sich überdecken würden, zusammenlegen (Mittelpunkt nach Anzahl gewichtet)
+      const zz = map.getZoom(), R = n => zz <= 6 ? Math.round(12 + Math.min(9, Math.sqrt(n)/9)) : Math.round(16 + Math.min(26, Math.sqrt(n)/3));
+      let gl = groups.filter(g => g.n && g.lat).map(g => ({...g, p: map.latLngToLayerPoint([g.lat, g.lng])}));
+      for(let again = true; again;){ again = false;
+        outer: for(let i = 0; i < gl.length; i++) for(let j = i+1; j < gl.length; j++){
+          const a = gl[i], b = gl[j];
+          if(a.p.distanceTo(b.p) < (R(a.n) + R(b.n)) * 0.92){
+            const n = a.n + b.n, big = a.n >= b.n ? a : b, lat = big.lat, lng = big.lng;
+            gl[i] = {lat, lng, n, name:[a.name, b.name].filter(Boolean).join(' + '), p: map.latLngToLayerPoint([lat, lng])}; gl.splice(j, 1); again = true; break outer;
+          }
+        }
+      }
+      for(const g of gl){
+        const r = R(g.n);
         L.marker([g.lat,g.lng], {icon:L.divIcon({className:'', html:`<div class="bubble" style="width:${r*2}px;height:${r*2}px">${g.n>=1000?Math.round(g.n/100)/10+'k':g.n}</div>`, iconSize:[r*2,r*2], iconAnchor:[r,r]}), title:g.name||''})
-          .on('click', () => map.setView([g.lat,g.lng], Math.max(map.getZoom()+2, 10))).addTo(thBubbles);
+          .on('click', () => map.setView([g.lat,g.lng], Math.max(map.getZoom()+2, g.name?.includes(' + ') ? map.getZoom()+2 : 10))).addTo(thBubbles);
       }
       $('#mapHint') && ($('#mapHint').textContent = `${fmt(n)} Inserate hier (Zahlen vor deinen Filtern) – zum Anzeigen hineinzoomen oder eine Blase antippen`);
       return;
@@ -344,20 +384,35 @@ function drawMap(rows){
     }
   }
   // Inserate am selben Punkt (gleiches Gebäude / nur Ortsteil bekannt) zu einem Pin bündeln – sonst verdecken sie sich
-  const groups = new Map();
+  const exact = new Map();
   for(const l of rows){
     if(l.lat==null || l.lng==null) continue;
     const key = l.lat.toFixed(4)+','+l.lng.toFixed(4);
-    (groups.get(key) || groups.set(key, []).get(key)).push(l);
+    (exact.get(key) || exact.set(key, []).get(key)).push(l);
   }
+  // Preisschilder, die sich bei dieser Zoomstufe überdecken würden, zu einem Schild zusammenfassen
+  const z = map.getZoom(), kf = p => p==null ? '?' : p>=1000 ? Math.round(p/1000)+'k' : String(p);
+  const wOf = g => (g.length > 1 ? `${g.length}× ab ${kf(Math.min(...g.map(x=>x.price||1e9)))} ฿` : `${kf(g[0].price)} ฿`).length * 7.5 + 22;
+  // ein Durchgang: größere Gruppen zuerst platzieren, überdeckende kleinere hineinlegen (Raster für schnelle Nachbarsuche)
+  const src = [...exact.values()].sort((a,b) => b.length - a.length), placed = [], grid = new Map(), CW = 140, CH = 30;
+  for(const g of src){
+    const p = map.project([g[0].lat, g[0].lng], z), cx = Math.floor(p.x/CW), cy = Math.floor(p.y/CH);
+    let hit = null;
+    if(z < 18) for(let dx = -1; dx <= 1 && !hit; dx++) for(let dy = -1; dy <= 1 && !hit; dy++)
+      for(const c of grid.get((cx+dx)+':'+(cy+dy)) || []) if(Math.abs(c.p.x - p.x) < (c.w + wOf(g))/2 + 2 && Math.abs(c.p.y - p.y) < 28){ hit = c; break; }
+    if(hit){ hit.push(...g); hit.spots++; hit.w = wOf(hit); }
+    else { const a = [...g]; a.spots = 1; a.p = p; a.w = wOf(a); placed.push(a); const k = cx+':'+cy; (grid.get(k) || grid.set(k, []).get(k)).push(a); }
+  }
+  const groups = new Map(placed.map((g, i) => [i, g]));
   const kfmt = p => p==null ? '?' : p>=1000 ? Math.round(p/1000)+'k' : p;
   for(const g of groups.values()){
     const l = g[0], many = g.length > 1, min = Math.min(...g.map(x=>x.price||1e9));
     const fav = g.some(x=>isFav(x.id)), approx = g.every(x=>x.approx);
     const html = many ? `<span class="pin grp ${fav?'pfav':''} ${approx?'approx':''}"><b>${g.length}×</b> ab ${kfmt(min<1e9?min:null)} ฿</span>`
                       : `<span class="pin ${fav?'pfav':''} ${approx?'approx':''}">${approx?'≈':''}${kfmt(l.price)} ฿</span>`;
-    const m = L.marker([l.lat,l.lng], {icon:L.divIcon({className:'', html, iconSize:[0,0]}), zIndexOffset: many ? 200 : 0});
-    m.on('click', ev => { if(pickFor){ setOwnPos(pickFor, ev.latlng); return; } many ? openGroup(g) : openDetail(l.id); });
+    const m = L.marker([l.lat,l.lng], {icon:L.divIcon({className:'', html, iconSize:[0,0]}), zIndexOffset: many ? 1200 : 1000});
+    m.on('click', ev => { if(pickFor){ setOwnPos(pickFor, ev.latlng); return; }
+      many ? openGroup(g) : openDetail(l.id); });
     m.addTo(layer); pts.push([l.lat,l.lng]);
   }
   const noPos = rows.filter(l => l.lat==null || l.lng==null).length;
@@ -368,7 +423,8 @@ function drawMap(rows){
     else hint.textContent = `${fmt(rows.length - noPos)} Inserate auf ${fmt(groups.size)} Punkten${noPos?` · ${noPos} ohne Kartenpunkt (nur in der Liste)`:''}${raw > rows.length && view!=='fav' ? ` · ${fmt(raw - rows.length)} durch Filter ausgeblendet` : ''}`;
   }
   drawHighlight();
-  setTimeout(()=>{ map.invalidateSize(); if(pts.length && !DATA.th && !hiId){
+  const doFit = map._fitCity !== CITY + (view==='fav'?':fav':''); map._fitCity = CITY + (view==='fav'?':fav':'');
+  setTimeout(()=>{ map.invalidateSize(); if(pts.length && !DATA.th && !hiId && doFit){
     // Ausreißer (falsche Koordinaten beim Anbieter) nicht in den Zoom einbeziehen
     const med = i => [...pts].map(p=>p[i]).sort((a,b)=>a-b)[pts.length>>1], c = [med(0), med(1)];
     const core = pts.filter(p => haversine(p, c) < 60);
@@ -377,13 +433,13 @@ function drawMap(rows){
 function mapShown(){   // Karte wurde sichtbar (Thailand: Größe neu messen, ggf. gewählte Gegend anfahren)
   if(!map || !DATA?.th) return;
   setTimeout(() => { map.invalidateSize(); const p = map._thPending; map._thPending = null;
-    if(p){ map._fromGoTo = true; map.setView(p.c, p.z); } else thMoved(); }, 60);
+    if(p){ map._fromGoTo = true; map.setView(p.c, p.z); } else if(!TH.bounds && !map._thOv){ map._thOv = 1; thOverview(); } else thMoved(); }, 60);
 }
 
 function syncLayers(){
   const box = document.querySelector('.layerchips'); if(!box) return;
   const cnt = c => DATA.pois.filter(p=>p.cat===c).length;
-  box.innerHTML = Object.keys(POICOL).map(c=>`<button class="chip ${state.layers[c]?'on':''}" data-layer="${esc(c)}" aria-pressed="${!!state.layers[c]}" aria-label="${esc(c)} ein/aus" title="${esc(c)}">${POICOL[c][1]} <span class="lbl">${esc(c)}</span> <small>${cnt(c)}</small></button>`).join('');
+  box.innerHTML = Object.keys(POICOL).map(c=>`<button class="chip ${state.layers[c]?'on':''}" data-layer="${esc(c)}" aria-pressed="${!!state.layers[c]}" aria-label="${esc(c)} ein/aus" title="${esc(c)}">${POICOL[c][1]} <span class="lbl">${esc(c)}</span>${DATA.th ? '' : ` <small>${cnt(c)}</small>`}</button>`).join('');
   for(const [c,g] of Object.entries(poiLayers)) state.layers[c] ? map.addLayer(g) : map.removeLayer(g);
 }
 
@@ -407,7 +463,7 @@ function renderInfo(){
   const mon = ['J','F','M','A','M','J','J','A','S','O','N','D'];
   const k = KLIMA.places[ci.home].rain_days_month, h = KLIMA.places[ci.compare].rain_days_month;
   const cname = ci.compare.replace(/ \(.*\)$/,'').replace('Ao Nang/','');
-  const bars = mon.map((m,i)=>`<div class="bar"><div class="pair"><i style="height:${k[i]*2.6}px;background:#0e7a69" title="${esc(name)} ${k[i]}"></i><i style="height:${h[i]*2.6}px;background:#c9822b" title="${esc(cname)} ${h[i]}"></i></div>${m}</div>`).join('');
+  const bars = mon.map((m,i)=>`<div class="bar"><div class="pair"><i style="height:${k[i]*2.6}px;background:#0e7a69" title="${esc(name)} ${k[i]}"></i><i style="height:${h[i]*2.6}px;background:#c9822b" title="${esc(cname)} ${h[i]}"></i></div><small class="bv" style="color:#0e7a69">${k[i]}</small>${m}</div>`).join('');
   const notes = {'Ao Nang/Krabi (TH)':'Strände, viele Moscheen, Muay Thai','Pattaya (TH)':'Großstadt, viel Auswahl, Moscheen & Gyms','Hua Hin (TH)':'am trockensten, wenige Moscheen','Langkawi (MY)':'muslimisch, kaum Muay Thai','Lombok/Kuta (ID)':'muslimisch, Regen Nov–März','Da Nang (VN)':'kaum Moscheen'};
   const rows = Object.entries(KLIMA.places).sort((a,b)=>a[1].rain_days_year-b[1].rain_days_year)
     .map(([n,v])=>`<tr class="${n===ci.home?'win':''}"><td>${esc(n)}${notes[n]?`<small class="tnote">${esc(notes[n])}</small>`:''}</td><td>${v.rain_days_year}</td><td>${fmt(v.mm_year)}</td><td>${String(v.tmax_avg).replace('.',',')}</td></tr>`).join('');
@@ -431,9 +487,9 @@ function renderInfo(){
 function gmPlace(lat, lng){ return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`; }
 function gmRoute(from, to){ return `https://www.google.com/maps/dir/?api=1&origin=${from.lat},${from.lng}&destination=${to.lat},${to.lng}&travelmode=two-wheeler`; }
 const APP_URL = 'https://tugi01.github.io/krabi-wohnen/';
-function toast(msg){
+function toast(msg, ms = 2200){
   let el = $('#toast'); if(!el){ el = document.createElement('div'); el.id='toast'; el.className='toast'; el.setAttribute('role','status'); document.body.appendChild(el); }
-  el.textContent = msg; el.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(()=>el.classList.remove('show'), 2200);
+  el.textContent = msg; el.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(()=>el.classList.remove('show'), ms);
 }
 async function shareData(data){
   if(navigator.share){ try { await navigator.share(data); return; } catch(err){ if(err && err.name==='AbortError') return; } }
@@ -444,7 +500,7 @@ async function shareData(data){
 function shareListing(id){
   const l = getListing(id); if(!l) return;
   const e = eur(l.price), a = ageInfo(l, new Date(DATA.generated)), d = l.dist || {};
-  const bits = [`${fmt(l.price)} ฿/Monat${e?` (≈ ${fmt(e)} €)`:''}`, l.size?`${fmt(l.size)} m²`:null, l.beds!=null?`${l.beds} SZ`:null, a.label, l.pool?(l.pool==='privat'?'Privatpool':'Pool'):null].filter(Boolean).join(' · ');
+  const bits = [`${fmt(l.price)} ฿/Monat${e?` (≈ ${fmt(e)} €)`:''}`, l.size?`${fmt(l.size)} m²`:null, l.beds!=null?`${l.beds} Schlafzimmer`:null, a.label, l.pool?(l.pool==='privat'?'Privatpool':'Pool'):null].filter(Boolean).join(' · ');
   const near = ['Strand','Moschee','Muay Thai'].filter(k=>d[k]).map(k=>`${k} ${String(d[k].km).replace('.',',')} km`).join(', ');
   shareData({ title: l.title, text: `🏠 ${l.title}\n${bits}${near?`\n${near}`:''}\nIn der App: ${APP_URL}${linkOf(l)}`, url: l.url });
 }
@@ -457,10 +513,12 @@ function openDetail(id){
   const rows = [
     ['Miete', `${fmt(l.price)} ฿ / Monat${e?` (≈ ${fmt(e)} €)`:''}${l.price_before?` · vorher ${fmt(l.price_before)} ฿`:''}`],
     ['Fläche', sizeTxt(l)?`${sizeTxt(l)}${l.price&&sizeOf(l)?` · ca. ${fmt(Math.round(l.price/sizeOf(l)))} ฿/m²`:''}`:'–'],
-    ['Zimmer', `${l.beds??'–'} SZ · ${l.baths??'–'} Bad`],
+    ['Zimmer', `${l.beds??'–'} Schlafzimmer · ${l.baths??'–'} Bad`],
     ['Gebäude', `${a.label}${l.built_src?` (Quelle: ${l.built_src})`:''}`],
-    ['Typ', l.type||'–'], ['Möbliert', ({'Fully Furnished':'voll möbliert','Partly Furnished':'teilmöbliert','Unfurnished':'unmöbliert'})[l.furniture]||l.furniture||'–'], ['Pool', l.pool?(l.pool==='privat'?'privater Pool':'Gemeinschaftspool'):'kein Pool angegeben'],
-    ['Frei ab', l.available ? deDate(l.available) : 'nicht angegeben'], ['Haustiere', l.pets||'–'],
+    ['Typ', deTxt(l.type)||'–'], ['Möbliert', deTxt(l.furniture)||'–'], ['Pool', l.pool?(l.pool==='privat'?'privater Pool':'Gemeinschaftspool'):'kein Pool angegeben'],
+    ...(l.price_list && l.price_list !== l.price ? [['Preis-Hinweis', `Die Suchliste des Anbieters nannte ${fmt(l.price_list)} ฿ – auf der Inseratseite stehen ${fmt(l.price)} ฿.`]] : []),
+    ...(pCheck(l) ? [['Preis-Hinweis', 'Ungewöhnlich günstig für die Fläche – bitte beim Anbieter prüfen.']] : []),
+    ['Frei ab', l.available ? deDate(l.available) : 'nicht angegeben'], ['Haustiere', deTxt(l.pets)||'–'],
     ...(l.area ? [['Gegend', l.area]] : []), ['Anbieter', l.seller||'–'], ['Online seit', l.posted ? `${onlineInfo(l).date} (${onlineInfo(l).ago}, laut Anbieter)` : 'Anbieter nennt kein Einstelldatum'], ['Aktualisiert', l.updated ? deDate(l.updated) : '–'], ['Bei uns seit', l.first_seen ? new Date(l.first_seen).toLocaleDateString('de-DE') : '–'], ['Quelle', (l.source||'–') + (l.also?.length ? ` (auch bei ${l.also.map(a=>a.source + (a.price ? ` für ${fmt(a.price)} ฿` : '')).join(', ')})` : '')],
     ...(l.approx && !l.own ? [['Lage', 'nur ungefähr (Ortsteil) – genaue Adresse beim Anbieter erfragen']] : []),
     ...(l.th && !l.full ? [['Provinz', PROVNAME(l.prov)]] : []),
@@ -482,7 +540,7 @@ function openDetail(id){
     <p class="note">${l.own ? 'Von dir eingetragen. Entfernungen sind Schätzungen (Luftlinie × 1,3) ab dem Ort, den du auf der Karte gesetzt hast.'
       : `Angaben aus dem Inserat, nicht vom Vermieter bestätigt. Vor jeder Zahlung besichtigen und Vertrag prüfen. ${l.th && !l.full || l.approx ? 'Entfernungen sind Schätzungen (Luftlinie × 1,3)' : 'Entfernungen: Straßen-km und Fahrzeit (Auto-Profil, Roller ähnlich)'} ab dem Kartenpunkt des Inserats zum nächstgelegenen Ort; Strände nur, wenn ohne Boot erreichbar.`}</p>
     <div class="actions">
-      <a class="primary" href="${esc(l.url)}" target="_blank" rel="noopener">Inserat ↗</a>
+      ${l.url ? `<a class="primary" href="${esc(l.url)}" target="_blank" rel="noopener">Inserat ↗</a>` : ''}
       ${(l.also||[]).slice(0,1).map(a=>`<a class="ghost" href="${esc(a.url)}" target="_blank" rel="noopener">${esc((a.source||'').split(' ')[0])}${a.price?` ${fmt(a.price)} ฿`:''} ↗</a>`).join('')}
       ${l.lat!=null?`<button class="ghost" type="button" data-showmap="${esc(l.id)}">🗺 Auf Karte</button>`:''}
       ${nav?`<a class="ghost" href="${esc(nav)}" target="_blank" rel="noopener">${l.approx?'Ungefähre Lage':'📍 Maps'}</a>`:''}
@@ -503,9 +561,10 @@ function openGroup(g){
   const sorted = [...g].sort((a,b)=>(a.price||1e9)-(b.price||1e9));
   const approx = g.every(x=>x.approx);
   $('#detail').innerHTML = `<div class="grab"></div><button class="close" aria-label="Schließen">✕</button>
-    <h2 id="dTitle">${g.length} Inserate an diesem Punkt</h2>
-    <p class="muted">${approx ? 'Verschiedene Objekte: Die Anbieter nennen nur einen ungefähren Ort (Ortsteil). Die genaue Lage steht im Inserat – Entfernungen sind deshalb nur grob.' : 'Mehrere Wohnungen im selben Gebäude bzw. derselben Anlage.'}</p>
-    <ul class="glist">${sorted.map(l=>`<li><button type="button" data-open="${esc(l.id)}"><b>${fmt(l.price)} ฿</b><span>${esc([sizeTxt(l), l.beds!=null?l.beds+' SZ':null].filter(Boolean).join(' · '))}</span><small>${esc(l.title)}</small></button></li>`).join('')}</ul>`;
+ <h2 id="dTitle">${g.length} Inserate ${g.spots > 1 ? 'in diesem Bereich' : 'an diesem Punkt'}</h2>
+    ${g.spots > 1 ? `<p class="muted">An ${g.spots} nahe beieinander liegenden Orten – zusammengefasst, damit sich die Preisschilder nicht überdecken. <button type="button" class="linkbtn" data-zoomgrp>Auf der Karte hineinzoomen</button></p>` : ''}
+    <p class="muted">${g.spots > 1 ? '' : approx ? 'Verschiedene Objekte: Die Anbieter nennen nur einen ungefähren Ort (Ortsteil). Die genaue Lage steht im Inserat – Entfernungen sind deshalb nur grob.' : 'Mehrere Wohnungen im selben Gebäude bzw. derselben Anlage.'}</p>
+    <ul class="glist">${sorted.map(l=>`<li><button type="button" data-open="${esc(l.id)}"><b>${fmt(l.price)} ฿</b><span>${esc([sizeTxt(l), l.beds!=null?l.beds+' Schlafz.':null].filter(Boolean).join(' · '))}</span><small>${esc(l.title)}</small></button></li>`).join('')}</ul>`;
   if($('#detail').hidden) openSheet('#detail');
 }
 let hiLayer = null, hiId = null;
@@ -515,9 +574,9 @@ function drawHighlight(){
   hiLayer.clearLayers();
   const l = hiId && allListings().find(x=>x.id===hiId);
   if(!l || l.lat==null) return;
-  L.marker([l.lat,l.lng], {icon:L.divIcon({className:'', html:'<div class="hiring"><i></i></div>', iconSize:[64,64], iconAnchor:[32,32]}), interactive:false, zIndexOffset:900}).addTo(hiLayer);
+  L.marker([l.lat,l.lng], {icon:L.divIcon({className:'', html:'<div class="hiring"><i></i></div>', iconSize:[64,64], iconAnchor:[32,32]}), interactive:false, zIndexOffset:2900}).addTo(hiLayer);
   const k = l.price>=1000 ? Math.round(l.price/1000)+'k' : l.price;
-  L.marker([l.lat,l.lng], {icon:L.divIcon({className:'', html:`<span class="pin hipin">★ ${k} ฿</span>`, iconSize:[0,0]}), zIndexOffset:1000})
+  L.marker([l.lat,l.lng], {icon:L.divIcon({className:'', html:`<span class="pin hipin">★ ${k} ฿</span>`, iconSize:[0,0]}), zIndexOffset:3000})
     .on('click', () => openDetail(l.id)).addTo(hiLayer);
 }
 function showOnMap(id){
@@ -536,7 +595,12 @@ function openSheet(sel, hash){
 }
 // vom Nutzer geschlossen (✕, Hintergrund, Esc, Abbrechen): Verlaufseintrag mit zurücknehmen
 function userClose(){ if(history.state?.sheet) history.back(); else closeSheets(); }
-window.addEventListener('popstate', () => { closeSheets(); if(location.hash && !/#i=/.test(location.hash)) {} });
+window.addEventListener('popstate', e => {
+  const open = !$('#detail').hidden || !$('#filters').hidden || !$('#own').hidden;
+  if(open){ closeSheets(); return; }
+  if(e.state?.nav) navApply(e.state);
+  else navApply({v:'list', c:CITY, r:null});
+});
 const linkOf = l => `#i=${encodeURIComponent(l.id)}&c=${CITY}${l.lat!=null?`&ll=${(+l.lat).toFixed(5)},${(+l.lng).toFixed(5)}`:''}`;
 function closeSheets(){ if(/#i=/.test(location.hash)) { try { history.replaceState(history.state, '', location.pathname + location.search); } catch {} }
   $('#scrim').hidden=true; $('#filters').hidden=true; $('#detail').hidden=true; $('#own').hidden=true; lastFocus?.focus?.({preventScroll:true}); }
@@ -593,12 +657,7 @@ function bindGalleries(){
 }
 
 function bindUi(){
-  document.querySelectorAll('.seg button').forEach(b => b.onclick = () => {
-    view = b.dataset.view;
-    document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-selected', x===b));
-    $('#viewList').hidden = view==='map' || view==='info'; $('#viewMap').hidden = view!=='map'; $('#viewInfo').hidden = view!=='info';
-    render(); if(view==='map') mapShown();
-  });
+  document.querySelectorAll('.seg button').forEach(b => b.onclick = () => { if(b.dataset.view !== view){ setTab(b.dataset.view); navPush(); } });
   document.addEventListener('click', e => {
     const nb = e.target.closest('[data-nav]');
     if(nb){ e.stopPropagation(); const g = nb.closest('.media').querySelector('[data-gal]'); wakeImgs(g); g.scrollBy({left: g.clientWidth * +nb.dataset.nav, behavior:'smooth'}); return; }
@@ -610,10 +669,11 @@ function bindUi(){
       if(k==='unknown'){ f.unknown = true; f.sizeUnknown = true; } else if(k==='old') f.old = true;
       else Object.assign(f, {...DEF_OF('thailand'), sort:f.sort});
       save(); setFilterUi(); render(); toast('Filter gelockert'); return; }
+    if(e.target.closest('[data-zoomgrp]') && curGroup){ const g = curGroup; userClose(); setTimeout(() => map.fitBounds(L.latLngBounds(g.map(x=>[x.lat,x.lng])), {padding:[60,60], maxZoom:17}), 150); return; }
     const go = e.target.closest('[data-open]'); if(go){ lastGroup = curGroup; openDetail(go.dataset.open); return; }
     const pv = e.target.closest('[data-prov]');
-    if(pv && DATA?.th){ const p = (TH.idx.provinces||[]).find(x=>x.key===pv.dataset.prov); if(p){ state.region = {key:p.key, name:p.name, n:p.n}; save(); goTo(p.lat, p.lng, p.key); } return; }
-    if(e.target.closest('[data-overview]')){ TH.bounds = null; state.region = null; state.thView = null; save(); if(map){ map.setView(CITIES.thailand.center, 6); } render(); window.scrollTo({top:0}); return; }
+    if(pv && DATA?.th){ const p = (TH.idx.provinces||[]).find(x=>x.key===pv.dataset.prov); if(p){ state.region = {key:p.key, name:p.name, n:p.n}; save(); goTo(p.lat, p.lng, p.key); navPush(); } return; }
+    if(e.target.closest('[data-overview]')){ TH.bounds = null; state.region = null; state.thView = null; save(); if(map){ thOverview(); } render(); window.scrollTo({top:0}); navPush(); return; }
     const cb = e.target.closest('[data-city]');
     if(cb){ switchCity(cb.dataset.city); return; }
     if(e.target.closest('#fbSearch')){ openFacebook(); return; }
@@ -633,6 +693,8 @@ function bindUi(){
   $('#ownForm').addEventListener('submit', saveOwnForm);
   $('#ownPaste').onclick = async () => { try { const t = await navigator.clipboard.readText(); if(t){ $('#wUrl').value = t.trim(); } } catch { toast('Einfügen nicht erlaubt – bitte lange tippen und „Einfügen“ wählen'); } };
   $('#ownCancel').onclick = userClose;
+  $('#wPrice').addEventListener('invalid', e => { e.preventDefault(); $('#wPrice').classList.add('bad'); toast('Bitte die Monatsmiete in ฿ eintragen'); $('#wPrice').focus(); });
+  $('#wPrice').addEventListener('input', () => $('#wPrice').classList.remove('bad'));
   document.addEventListener('keydown', e => { const c = e.target.closest?.('.card'); if(c && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); openDetail(c.dataset.id); } });
 }
 
@@ -657,7 +719,7 @@ async function loadCity(city){
     } else {
       const r = await fetch(`data/${city}/listings.json`, {cache:'no-cache'});
       if(!r.ok) throw new Error(r.status);
-      const d = await r.json(); if(city !== CITY) return; DATA = d; markCoarse(DATA.listings);
+      const d = await r.json(); if(city !== CITY) return; DATA = d; DATA.listings = DATA.listings.filter(isHome); if(!DATA.th) DATA.count = DATA.listings.length; markCoarse(DATA.listings);
     }
   }catch(err){
     $('#stand').textContent = 'Daten konnten nicht geladen werden (offline?).'; $('#list').innerHTML = ''; return;
@@ -680,16 +742,41 @@ async function goTo(lat, lng, prov){
   else { if(map) map._thPending = {c:[lat,lng], z}; render(); }
   window.scrollTo({top:0});
 }
+// ---- Zurück-Geste: Reiter, Gegend und Provinz stehen im Browser-Verlauf ----
+function thOverview(){
+  const pv = (TH.idx?.provinces||[]).filter(p => p.lat); if(!map) return;
+  if(pv.length) map.fitBounds(pv.map(p => [p.lat, p.lng]), {padding:[40,40]}); else map.setView(CITIES.thailand.center, 6);
+}
+function setTab(v){
+  view = v; try { localStorage.setItem('krabiwohnen.view', v); } catch {}
+  document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-selected', x.dataset.view===v));
+  $('#viewList').hidden = v==='map' || v==='info'; $('#viewMap').hidden = v!=='map'; $('#viewInfo').hidden = v!=='info';
+  render(); if(v==='map') mapShown();
+}
+const navNow = () => ({nav:1, v:view, c:CITY, r:state.region?.key || null});
+function navPush(){ const n = navNow(), h = history.state;
+  if(h && h.nav && h.v===n.v && h.c===n.c && h.r===n.r) return;
+  try { history.pushState(n, '', location.pathname + location.search); } catch {} }
+async function navApply(n){
+  if(n.c && n.c !== CITY && CITIES[n.c]){ closeSheets(); await loadCity(n.c); }
+  if(DATA?.th){
+    if(!n.r && TH.bounds){ TH.bounds = null; state.region = null; save(); if(map) thOverview(); }
+    else if(n.r && state.region?.key !== n.r){ const p = (TH.idx?.provinces||[]).find(x=>x.key===n.r); if(p){ state.region = {key:p.key, name:p.name, n:p.n}; save(); goTo(p.lat, p.lng, p.key); } }
+  }
+  if(n.v && n.v !== view) setTab(n.v); else render();
+}
 function switchCity(city){
-  if(city===CITY && city==='thailand'){ TH.bounds = null; state.region = null; state.thView = null; save(); if(map) map.setView(CITIES.thailand.center, 6); render(); window.scrollTo({top:0}); return; }
-  if(city===CITY || !CITIES[city]) return; closeSheets(); window.scrollTo({top:0}); loadCity(city); }
+  if(city===CITY && city==='thailand'){ TH.bounds = null; state.region = null; state.thView = null; save(); if(map) thOverview(); render(); window.scrollTo({top:0}); return; }
+  if(city===CITY || !CITIES[city]) return; closeSheets(); window.scrollTo({top:0}); loadCity(city).then(navPush); }
 
 // ---- Facebook Marketplace (nur Weiterleitung; Facebook erlaubt kein automatisches Auslesen) ----
 function openFacebook(){
   const f = state.filters, c = CITIES[CITY];
-  const q = encodeURIComponent(`${c.fb} house condo for rent`);
-  const max = f.price < 150000 ? `&maxPrice=${f.price}` : '';
-  window.open(`https://www.facebook.com/marketplace/search/?query=${q}&minPrice=5000${max}&exact=false`, '_blank', 'noopener');
+  // Ort kann Facebook nur aus dem Konto übernehmen – ohne Anmeldung landet man sonst z. B. in „San Francisco“.
+  // Deshalb Ort im Suchtext und ein klarer Hinweis; keine Preisgrenzen (Facebook rechnet in der Kontowährung).
+  const q = encodeURIComponent(`${c.fb} for rent`);
+  toast(`Facebook: bitte anmelden und oben als Ort „${c.fbPlace || c.name}“ wählen`, 6000);
+  setTimeout(() => window.open(`https://www.facebook.com/marketplace/search/?query=${q}&exact=false`, '_blank', 'noopener'), 900);
 }
 
 // ---- Eigene Inserate (z. B. von Facebook) – nur lokal gespeichert ----
@@ -757,6 +844,9 @@ async function init(){
   fetch('data/klima.json', {cache:'no-cache'}).then(x=>x.json()).then(k=>{ KLIMA=k; if(view==='info') renderInfo(); }).catch(()=>{});
   const hc = new URLSearchParams(location.hash.slice(1)).get('c'); if(hc && CITIES[hc]) CITY = hc;
   await loadCity(CITY);
+  const sv = (() => { try { return localStorage.getItem('krabiwohnen.view'); } catch { return null; } })();
+  if(sv && sv !== 'list' && ['map','info','fav'].includes(sv) && !location.hash) setTab(sv);
+  try { history.replaceState(navNow(), '', location.pathname + location.search + location.hash); } catch {}
   openFromHash();
 }
 if('serviceWorker' in navigator){

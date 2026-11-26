@@ -209,6 +209,22 @@ body.picking #map{cursor:crosshair;outline:3px solid var(--accent)}
 .regionbar small{color:var(--muted)}
 .detail .close.back{width:auto;padding:0 12px;font-weight:700}
 #stand .fx{white-space:nowrap}
-@media (max-width:340px){ #shareApp{display:none} }
+@media (max-width:340px){ #shareApp{padding:4px 6px;min-width:0} #shareApp .lbl{display:none} .cityseg button{padding-left:8px;padding-right:8px} }
 .thpick .intro{margin:4px 0 6px;font-size:.95rem}
 .tag.avail{background:#e8f0fb;color:#2b5a9e}@media (prefers-color-scheme:dark){.tag.avail{background:#1d2b40;color:#9cc2f5}}
+
+/* Runde 2 */
+.badge.warnb{background:#fde8e4;color:#a2361f}
+@media (prefers-color-scheme:dark){.badge.warnb{background:#4a2018;color:#ffb4a3}}
+.req{color:#c0392b}
+input.bad{outline:2px solid #c0392b;outline-offset:1px}
+.hidehint,.regionbar,.emptybox,.thpick{grid-column:1/-1}
+.hidehint{flex-direction:row}
+#detail .actions{flex-wrap:wrap}
+@media (max-width:359px){ #detail .actions > *{flex:1 1 28%;min-width:0;padding-left:6px;padding-right:6px} #detail .actions{gap:6px} }
+.bars .bar .bv{display:block;font-size:.6rem;line-height:1.1;white-space:nowrap}
+.bars .bar .bv b{font-weight:700}
+.ext.fb small{font-weight:400;opacity:.8}
+.thpick .quick{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 2px}.thpick .quick button{flex:1 1 140px;min-height:44px;border-radius:14px;font:inherit;font-weight:700;border:0;background:var(--accent);color:#fff}.muted.small{font-size:.8rem}
+@media (max-width:340px){ .cityseg button{padding:7px 7px;font-size:.8rem;letter-spacing:-.01em} #filterBtn{padding-left:10px;padding-right:10px} }
+@media (max-width:340px){ .cityseg button{padding:7px 5px;font-size:.76rem} .cityseg{gap:0} }

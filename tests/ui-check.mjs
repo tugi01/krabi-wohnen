@@ -148,8 +148,8 @@ for (const [name, engine] of [['chromium', chromium], ['webkit', webkit]]) {
     await page.waitForSelector('.card');
     const pCount = await page.$eval('#stand', e => e.textContent);
     const pMap = await (async () => { await page.click('#tabMap'); await page.waitForSelector('.pin'); await page.waitForTimeout(1200);
-      return page.evaluate(() => [document.querySelectorAll('.pin').length, [...document.querySelectorAll('.poi')].filter(x => x.querySelector('.ico711')).length]); })();
-    ok(/Inserate/.test(pCount) && pMap[0] > 20 && pMap[1] > 100, `${name}: Pattaya geladen (${pCount.split('·')[1]?.trim()}, ${pMap[0]} Pins, ${pMap[1]} 7-Eleven)`);
+      return page.evaluate(() => [[...document.querySelectorAll('.pin')].reduce((s, e) => s + (+(e.querySelector('b')?.textContent.replace('×','')) || 1), 0), [...document.querySelectorAll('.poi')].filter(x => x.querySelector('.ico711')).length]); })();
+    ok(/Inserate/.test(pCount) && pMap[0] > 20 && pMap[1] > 100, `${name}: Pattaya geladen (${pCount.split('·')[1]?.trim()}, ${pMap[0]} Inserate auf Pins, ${pMap[1]} 7-Eleven)`);
     await page.screenshot({ path: `${out}/kw-${name}-pattaya-map.png` });
     await page.click('#tabInfo'); await page.waitForSelector('.bars .bar');
     ok(await page.$eval('#info h2', e => /Pattaya/.test(e.textContent)), `${name}: Infos zeigen Pattaya`);
@@ -173,7 +173,7 @@ for (const [name, engine] of [['chromium', chromium], ['webkit', webkit]]) {
     await page.mouse.click(mb[0], mb[1]); await page.waitForTimeout(500);
     await page.click('#tabList'); await page.waitForTimeout(300);
     const ownCard = await page.$$eval('.card', cs => cs.filter(c => c.innerText.includes('Testhaus Facebook')).map(c => c.innerText));
-    ok(ownCard.length === 1 && /Eigenes/.test(ownCard[0]) && /km/.test(ownCard[0]), `${name}: Eigenes Inserat mit Ort und Entfernungen sichtbar`);
+    ok(ownCard.length === 1 && /Eigenes/.test(ownCard[0]) && /km/.test(ownCard[0]), `${name}: Eigenes Inserat mit Ort und Entfernungen sichtbar ${ownCard.length} ${(ownCard[0]||"").replace(/\s+/g," ").slice(0,160)}`);
     // Facebook-Knopf öffnet Marketplace-Suche
     const [fb] = await Promise.all([page.context().waitForEvent('page'), page.click('#fbSearch')]);
     await fb.waitForURL(/facebook\.com/, {timeout: 15000}).catch(() => {});

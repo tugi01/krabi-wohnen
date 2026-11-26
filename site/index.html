@@ -49,7 +49,7 @@
       <button data-sort="market">Nähe Nachtmarkt</button>
     </div>
     <div class="extbar">
-      <button id="fbSearch" class="ext fb" type="button"><b>f</b> Auf Facebook Marketplace suchen ↗</button>
+      <button id="fbSearch" class="ext fb" type="button"><b>f</b> Auf Facebook Marketplace suchen ↗ <small>(Anmeldung nötig)</small></button>
       <button id="ownAdd" class="ext" type="button">＋ Eigenes Inserat</button>
     </div>
     <p id="summary" class="summary"></p>
@@ -106,7 +106,7 @@
     <input type="hidden" id="wId">
     <label>Link zum Inserat<div class="pastewrap"><input id="wUrl" type="url" inputmode="url" placeholder="https://www.facebook.com/marketplace/item/…"><button type="button" id="ownPaste" class="ghost">Einfügen</button></div></label>
     <label>Titel<input id="wTitle" type="text" placeholder="z. B. Haus 2 SZ in Nong Thale" maxlength="120"></label>
-    <div class="two"><label>Miete ฿ / Monat<input id="wPrice" type="number" inputmode="numeric" min="0" step="1" required></label>
+    <div class="two"><label>Miete ฿ / Monat <span class="req">*</span><input id="wPrice" type="number" inputmode="numeric" min="0" step="1" required></label>
       <label>Wohnfläche m²<input id="wSize" type="number" inputmode="numeric" min="0"></label></div>
     <div class="two"><label>Schlafzimmer<input id="wBeds" type="number" inputmode="numeric" min="0" max="10"></label>
       <label>Baujahr<input id="wBuilt" type="number" inputmode="numeric" min="1950" max="2035" placeholder="z. B. 2023"></label></div>

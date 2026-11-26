@@ -377,8 +377,18 @@ HOTEL = re.compile(r"\bhotel\b(?! zone)|\bhostel\b|guest ?house|\b\d{2,}\s*(?:ro
                    r"business for (?:sale|lease|rent)|(?<!bed)\brooms for rent", re.I)
 
 
+# Kein Wohnraum: Objektart steht bei DotProperty im Link (…/ads/office-for-rent-…), sonst im Titel
+NOT_HOME_URL = re.compile(r"/ads/(?:studio-|\d+-bedroom-)?(?:warehouse|office|retail-space|land|hotel|whole-building|restaurant|factory)-for-(?:rent|sale)")
+NOT_HOME_TITLE = re.compile(r"^(?!.*\b(?:house|villa|condo|apartment|bedroom|bed|br|home|townhouse|studio)\b).*"
+                            r"\b(?:land|plot|rai|warehouse|factory|office|retail|showroom|restaurant)\b", re.I)
+
+
 def keep_home(l):
-    """Nur Wohnungen/Häuser zum Wohnen: Miete 3.000–300.000 ฿, höchstens 10 Schlafzimmer, keine Hotels/Betriebe."""
+    """Nur Wohnungen/Häuser zum Wohnen: Miete 3.000–300.000 ฿, höchstens 10 Schlafzimmer, keine Hotels/Betriebe,
+    keine Grundstücke, Lagerhallen, Büros oder Läden."""
+    u = l.get("url") or ""
+    if NOT_HOME_URL.search(u) or ("dotproperty" not in u and NOT_HOME_TITLE.search(l.get("title") or "")):
+        return False
     p = l.get("price")
     if p and not (3000 <= p <= 300000):
         return False
@@ -449,7 +459,10 @@ def scrape_dotproperty(cache: dict, now: datetime, budget):
                 time.sleep(0.6)
         det = dict(cached["detail"])
         rec = {**r, **{k: v for k, v in det.items() if v not in (None, [], "")}}
-        rec["price"] = r["price"] or det.get("price")
+        # Die Inseratseite gilt: die Suchliste nennt manchmal einen alten/falschen Preis (z. B. 6.500 statt 146.000)
+        rec["price"] = det.get("price") if det.get("price") and 3000 <= det["price"] <= 300000 else r["price"]
+        if r["price"] and rec["price"] != r["price"]:
+            rec["price_list"] = r["price"]
         rec["source"] = "DotProperty / FazWaz"
         rec["id"] = "dp-" + (det.get("listing_id") or re.sub(r"\W+", "", r["url"][-24:]))
         out.append(rec)

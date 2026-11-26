@@ -455,7 +455,12 @@ def from_city(l, prov):
          "prov": prov, "pool": l.get("pool"), "full": 1, "first": l.get("first_seen")}
     if l.get("approx"):
         r["approx"] = 1
-    return {k: v for k, v in r.items() if v not in (None, "", [])}
+    r["posted"] = l.get("posted")
+    # Straßen-km/-min wie in der Krabi/Pattaya-Ansicht, damit beide Ansichten dasselbe zeigen
+    dr = {c: [v.get("km"), v.get("min"), v.get("name")] for c, v in (l.get("dist") or {}).items() if v.get("road")}
+    if dr:
+        r["dr"] = dr
+    return {k: v for k, v in r.items() if v not in (None, "", [], {})}
 
 
 def cmd_build(a):
@@ -524,7 +529,7 @@ def cmd_build(a):
                 extra += 1
     # Plausibilität (Tagespreise, Hotels, ganze Wohnhäuser)
     n0 = len(items)
-    items = [it for it in items if scrape.keep_home({"price": it.get("price"), "beds": it.get("beds"),
+    items = [it for it in items if scrape.keep_home({"price": it.get("price"), "beds": it.get("beds"), "url": it.get("url"),
                                                       "size": it.get("size") or it.get("sizeh"), "title": it.get("title")})]
     log(f"+{extra} aus Krabi/Pattaya-Quellen, {n0 - len(items)} aussortiert (Hotel/Tagespreis/Wohnhaus) -> {len(items)}")
     # Provinzmittelpunkte; Inserate ohne Lage -> Mittelpunkt (ungefähr)

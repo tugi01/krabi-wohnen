@@ -63,7 +63,7 @@ async function detail(url, ctx) {
   const u = url.searchParams.get('u') || '';
   if (u.length >= 400 || !AD_URL.test(u)) return json({ ok: false, error: 'bad url' }, 400);
   const cache = caches.default;
-  const key = new Request(`https://detail-cache.local/v1/${encodeURIComponent(u)}`);
+  const key = new Request(`https://detail-cache.local/v2/${encodeURIComponent(u)}`);
   const hit = await cache.match(key);
   if (hit) return withMaxAge(hit, 86400);
   let r;
@@ -136,6 +136,7 @@ function parseDetail(page) {
     if (!j || j['@type'] !== 'RealEstateListing') continue;
     const me = j.mainEntity || {};
     d.size = (me.floorSize || {}).value ?? null;
+    { const pr = parseFloat((me.offers || j.offers || {}).price); if (pr > 0) d.price = Math.round(pr); }
     d.amenities = (Array.isArray(me.amenityFeature) ? me.amenityFeature : [])
       .filter(a => a && a.value).map(a => a.name ?? null);
     let imgs = me.image || [];

@@ -25,11 +25,13 @@ const TH = {
       images:x.img ? [x.img] : [], source:x.src==='DotProperty' ? 'DotProperty / FazWaz' : x.src, first_seen:x.first,
       posted:x.posted, pool:x.pool || null, approx:!!x.approx, prov:x.prov, full:!!x.full, th:true };
     if(x.d){ l.dist = {}; for(const [c,v] of Object.entries(x.d)) l.dist[c] = {km:v[0], min:null, name:v[1], lat:v[2], lng:v[3], road:false}; }
+    if(x.dr){ l.dist = l.dist || {}; for(const [c,v] of Object.entries(x.dr)) l.dist[c] = {...(l.dist[c]||{}), km:v[0], min:v[1], name:v[2], road:true}; }
     const det = TH.detail.get(l.url); if(det) TH.merge(l, det);
     return l;
   },
   merge(l, d){
     if(!d || !d.ok) return l;
+    if(d.price && d.price >= 3000 && d.price <= 300000 && d.price !== l.price){ l.price_list = l.price; l.price = d.price; }
     if(d.size) l.size = d.size; if(d.built){ l.built = d.built; l.built_src = d.built_src; }
     if(d.pool !== undefined && d.pool !== null) l.pool = d.pool;
     if(d.furniture) l.furniture = d.furniture; if(d.images?.length) l.images = d.images;
@@ -41,7 +43,7 @@ const TH = {
     const need = TH.tilesIn(q).filter(t => !TH.tiles.has(t.id) && !TH.loadingT.has(t.id));
     await Promise.all(need.map(async t => {
       TH.loadingT.add(t.id);
-      try { const j = await (await fetch(`data/th/t/${t.id}.json`)).json(); TH.tiles.set(t.id, {at:Date.now(), b:t.b, listings:markCoarse(j.listings.map(TH.norm))}); }
+      try { const j = await (await fetch(`data/th/t/${t.id}.json`)).json(); TH.tiles.set(t.id, {at:Date.now(), b:t.b, listings:markCoarse(j.listings.filter(isHome).map(TH.norm))}); }
       catch {} finally { TH.loadingT.delete(t.id); }
     }));
     // Speicher begrenzen: älteste Kacheln außerhalb des Ausschnitts verwerfen
@@ -87,7 +89,7 @@ const TH = {
 
   async loadDetail(l){
     l.detailTried = true;
-    if(l.full || l.detailLoaded || !/dotproperty\.co\.th\/en\/ads\//.test(l.url||'')) return null;
+    if((l.full && !pCheck(l)) || l.detailLoaded || !/dotproperty\.co\.th\/en\/ads\//.test(l.url||'')) return null;
     if(TH.detail.has(l.url)) return TH.merge(l, TH.detail.get(l.url));
     try {
       const r = await fetch(`https://krabi-wohnen-img.tugrulc.workers.dev/detail?u=${encodeURIComponent(l.url)}`);
