@@ -23,12 +23,14 @@ for (const [name, eng] of [['webkit', pw.webkit], ['chromium', pw.chromium]]) {
   const after = await p.evaluate(id => isFav(id), fid); ok(after !== before, `${name}: Merken funktioniert trotz Effekt (${before} → ${after})`);
   const h = await p.evaluate(() => window.__vib + window.__sw);
   ok(h >= 1, `${name}: Bestätigung beim Merken (Vibration ${await p.evaluate(() => window.__vib)}, iPhone-Schalter ${await p.evaluate(() => window.__sw)})`);
-  await p.waitForTimeout(1000);
-  ok(await p.evaluate(() => document.querySelectorAll('#tapfx .tapfx-box').length) === 0, `${name}: Effekt räumt sich nach < 1 s auf`);
+  await p.waitForTimeout(450);
+  ok(await p.evaluate(() => document.querySelectorAll('#tapfx .tapfx-box').length) === 0, `${name}: Effekt ist nach 0,5 s weg`);
   // gewöhnlicher Tipp (Karte öffnen) -> Welle ja, Vibration nein
   const h0 = await p.evaluate(() => window.__vib + window.__sw);
   const body = await (await p.$('.card .body')).boundingBox();
-  await p.touchscreen.tap(body.x + body.width / 2, body.y + 20); await p.waitForTimeout(500);
+  await p.touchscreen.tap(body.x + body.width / 2, body.y + 20); await p.waitForSelector('#detail:not([hidden])'); await p.waitForTimeout(180);
+  ok(await p.evaluate(() => document.querySelectorAll('#tapfx .tapfx-box').length) === 0, `${name}: Inserat geöffnet – kein Nachleuchten (nach 0,18 s weg)`);
+  await p.waitForTimeout(300);
   ok(await p.evaluate(() => window.__vib + window.__sw) === h0 && !(await p.$eval('#detail', d => d.hidden)), `${name}: Inserat öffnen – keine Vibration, Inserat geht auf`);
   await p.goBack(); await p.waitForTimeout(400);
   // abschaltbar

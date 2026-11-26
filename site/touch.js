@@ -47,15 +47,20 @@ const TAP = (() => {
     // Welle: Radius bis zur entferntesten Ecke
     const lx = Math.max(0, Math.min(r.width, x - r.left)), ly = Math.max(0, Math.min(r.height, y - r.top));
     const R = Math.hypot(Math.max(lx, r.width - lx), Math.max(ly, r.height - ly));
-    for(const d of [0, 110]){
+    for(const d of [0, 70]){
       const w = document.createElement('span'); w.className = 'tapfx-wave';
       Object.assign(w.style, { left: lx - R + 'px', top: ly - R + 'px', width: 2 * R + 'px', height: 2 * R + 'px', animationDelay: d + 'ms' });
       box.appendChild(w);
     }
     const ring = document.createElement('span'); ring.className = 'tapfx-ring'; box.appendChild(ring);
     layer.appendChild(box);
-    setTimeout(() => box.remove(), 900);
+    setTimeout(() => box.remove(), 520);
   }
+
+  // Öffnet sich ein Inserat, Blatt oder das Vollbild, verschwindet der Effekt sofort (sonst leuchtet die alte Seite nach)
+  const clear = () => { if(layer) for(const b of layer.children){ b.classList.add('out'); setTimeout(() => b.remove(), 130); } };
+  new MutationObserver(ms => { if(ms.some(m => !m.target.hidden)) clear(); })
+    .observe(document.body, { subtree: true, attributes: true, attributeFilter: ['hidden'] });
 
   document.addEventListener('pointerdown', e => {
     if(e.button > 0) return;
