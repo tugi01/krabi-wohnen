@@ -5,8 +5,8 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
 const b = await webkit.launch(); const p = await (await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true})).newPage();
 const errs = []; p.on('pageerror', e => errs.push(e.message));
 await p.goto(URL); await p.waitForTimeout(2500);
-ok(await p.$('[data-city="thailand"]'), 'Knopf „Thailand“ sichtbar');
-await p.click('[data-city="thailand"]'); await p.waitForTimeout(2000);
+ok(await p.evaluate(() => CITY === 'thailand'), 'Start in Thailand');
+await p.evaluate(() => switchCity('thailand')); await p.waitForTimeout(2000);
 const picks = await p.$$eval('.provs button', x => x.map(e => e.textContent.trim()));
 ok(picks.length >= 15, `Gegend-Auswahl: ${picks.length} Provinzen – ${picks.slice(0,5).join(' | ')}`);
 await p.click('.provs button[data-prov="phuket"]'); await p.waitForSelector('.card', {timeout: 20000}).catch(()=>{});

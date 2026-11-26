@@ -130,21 +130,21 @@ for (const [name, engine] of [['chromium', chromium], ['webkit', webkit]]) {
     ok(await page.$eval('#oSize', e => e.textContent) === '50 m²' && await page.$eval('#oSizeMax', e => e.textContent) === 'unbegrenzt', `${name}: Zurücksetzen stellt 50 m² / unbegrenzt wieder ein`);
     await page.click('#fClose');
     // Liste in Portionen (Speicherschutz iPhone)
-    await page.click('[data-city="pattaya"]'); await page.waitForFunction(() => document.querySelector('[data-city="pattaya"]').classList.contains('on') && document.querySelector('.card'));
+    await page.evaluate(() => switchCity('pattaya')); await page.waitForFunction(() => CITY === 'pattaya' && document.querySelector('.card'));
     await page.click('#tabList'); await page.waitForTimeout(500);
     const pg = await page.evaluate(() => ({cards: document.querySelectorAll('#list .card').length, imgs: document.querySelectorAll('#list img[src]').length, more: !!document.querySelector('#list .more'), total: +document.querySelector('#summary').textContent.match(/^(\d+)/)[1]}));
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight)); await page.waitForTimeout(800);
     const pg2 = await page.$$eval('#list .card', cs => cs.length);
     ok(pg.cards <= 31 && pg.imgs <= 31 && pg.more && pg2 > pg.cards && pg.total > 100, `${name}: Pattaya-Liste lädt portionsweise (${pg.cards} Karten/${pg.imgs} Fotos sofort, nach Scrollen ${pg2}, gesamt ${pg.total})`);
-    await page.click('[data-city="krabi"]'); await page.waitForFunction(() => document.querySelector('[data-city="krabi"]').classList.contains('on') && document.querySelector('.card'));
+    await page.evaluate(() => switchCity('krabi')); await page.waitForFunction(() => CITY === 'krabi' && document.querySelector('.card'));
     await page.waitForTimeout(4500);
     // Absturzschutz: unfertiger Pattaya-Start -> Krabi
     await page.evaluate(() => { localStorage.setItem('krabiwohnen.city','pattaya'); localStorage.setItem('krabiwohnen.booting','pattaya'); });
     await page.reload(); await page.waitForSelector('.card'); await page.waitForTimeout(1200);
-    ok(await page.$eval('[data-city="krabi"]', b => b.classList.contains('on')), `${name}: nach Absturz startet die App sicher in Krabi`);
+    ok(await page.evaluate(() => CITY === 'krabi'), `${name}: nach Absturz startet die App sicher in Krabi`);
     // Stadtwechsel Krabi -> Pattaya -> Krabi
-    await page.click('[data-city="pattaya"]');
-    await page.waitForFunction(() => /Stand/.test(document.querySelector('#stand').textContent) && document.querySelector('[data-city="pattaya"]').classList.contains('on'));
+    await page.evaluate(() => switchCity('pattaya'));
+    await page.waitForFunction(() => /Stand/.test(document.querySelector('#stand').textContent) && CITY === 'pattaya');
     await page.waitForSelector('.card');
     const pCount = await page.$eval('#stand', e => e.textContent);
     const pMap = await (async () => { await page.click('#tabMap'); await page.waitForSelector('.pin'); await page.waitForTimeout(1200);
@@ -157,10 +157,10 @@ for (const [name, engine] of [['chromium', chromium], ['webkit', webkit]]) {
     await page.screenshot({ path: `${out}/kw-${name}-pattaya-list.png` });
     const favG = await page.evaluate(() => Object.keys(JSON.parse(localStorage.getItem('krabiwohnen.favs.global')||'{}')).length);
     const tabP = await page.$eval('#tabFav', e => e.textContent);
-    await page.click('[data-city="krabi"]'); await page.waitForTimeout(1500);
+    await page.evaluate(() => switchCity('krabi')); await page.waitForTimeout(1500);
     ok(favG >= 1 && /\(\d+\)/.test(tabP), `${name}: Merkliste gilt für alle Gegenden (${favG} gemerkt, in Pattaya „${tabP}“)`);
     await page.reload({ waitUntil: 'networkidle' }); await page.waitForSelector('.card');
-    ok(await page.$eval('[data-city="krabi"]', b => b.classList.contains('on')), `${name}: Stadt bleibt nach Neuladen gewählt`);
+    ok(await page.evaluate(() => CITY === 'krabi'), `${name}: Stadt bleibt nach Neuladen gewählt`);
     // Eigenes Inserat (z. B. von Facebook) anlegen und auf Karte setzen
     await page.click('#tabList');
     await page.click('#ownAdd'); await page.waitForSelector('#own:not([hidden])');

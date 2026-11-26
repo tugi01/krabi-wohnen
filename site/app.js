@@ -222,10 +222,12 @@ function card(l){
     </div></article>`;
 }
 
+const PROV_HINT = {'surat-thani':'Koh Samui, Koh Phangan', chonburi:'Pattaya, Si Racha', 'prachuap-khiri-khan':'Hua Hin', 'phang-nga':'Khao Lak',
+  trat:'Koh Chang', songkhla:'Hat Yai', krabi:'Ao Nang, Koh Lanta', phetchaburi:'Cha-am', rayong:'Ban Chang, Koh Samet', phuket:'Patong, Rawai'};
 function thPicker(){
   const provs = TH.idx?.provinces || [];
   return `<div class="thpick"><p class="intro"><b>Mietwohnungen und -häuser in Thailand</b> – mit Preis in Euro und dem Weg zu Strand, Moschee, Muay Thai, 7-Eleven und Markt.</p><div class="quick"><button type="button" class="primary" data-city="krabi">Krabi / Ao Nang ›</button><button type="button" class="primary" data-city="pattaya">Pattaya & Umgebung ›</button></div><p class="muted small">Diese zwei Gegenden sind am ausführlichsten (Straßen-km, Fahrzeit, mehr Fotos).</p><p class="empty">Oder wähle eine Gegend – oder zoome auf der <b>Karte</b> hinein. Die Zahl nennt alle Inserate der Provinz (vor deinen Filtern).</p>
-    <div class="provs">${provs.map(p=>`<button type="button" data-prov="${esc(p.key)}">${esc(p.name)} <small>${fmt(p.n)}</small></button>`).join('')}</div></div>`;
+    <div class="provs">${provs.map(p=>`<button type="button" data-prov="${esc(p.key)}">${esc(p.name)}${PROV_HINT[p.key]?` <em>${PROV_HINT[p.key]}</em>`:''} <small>${fmt(p.n)}</small></button>`).join('')}</div></div>`;
 }
 function regionBar(){   // über der Liste: welche Gegend gezeigt wird + zurück zur Übersicht
   if(!DATA?.th || !TH.bounds) return '';
@@ -244,6 +246,7 @@ function render(){
       $('#list').innerHTML = thPicker(); return;
     }
   }
+  setTimeout(renderPlaces, 0);
   setTimeout(() => { const l = $('#list'); if(DATA?.th && !onlyFav && view!=='map' && view!=='info' && !l.querySelector('.regionbar')) l.insertAdjacentHTML('afterbegin', regionBar()); }, 0);
   const {rows, hidden} = filtered(onlyFav);
   const parts = [];
@@ -294,6 +297,26 @@ function moreCards(){
     }
   }
   bindGalleries();
+  watchPhotoCards();
+}
+// Thailand-Inserate haben in der Liste zunächst nur 1 Foto. Sichtbare Karten laden die weiteren Fotos
+// (und Fläche/Baujahr) beim Detail-Dienst nach – dann kann man wie gewohnt wischen.
+let photoObs = null, photoBusy = 0; const photoQ = [];
+function photoPump(){
+  while(photoBusy < 3 && photoQ.length){
+    const l = photoQ.shift(); if(l.detailTried) continue; photoBusy++;
+    TH.loadDetail(l).finally(() => { photoBusy--; refreshCard(l); photoPump(); });
+  }
+}
+function refreshCard(l){
+  const el = document.querySelector(`.card[data-id="${CSS.escape(l.id)}"]`); if(!el || (l.images||[]).length < 2) return;
+  const x = document.createElement('div'); x.innerHTML = card(l); el.replaceWith(x.firstElementChild); bindGalleries();
+}
+function watchPhotoCards(){
+  if(!DATA?.th || !('IntersectionObserver' in window)) return;
+  photoObs ||= new IntersectionObserver(es => { for(const e of es){ if(!e.isIntersecting) continue; photoObs.unobserve(e.target);
+    const l = getListing(e.target.dataset.id); if(l && !l.detailTried && (l.images||[]).length < 2){ photoQ.push(l); photoPump(); } } }, {rootMargin:'300px 0px'});
+  document.querySelectorAll('#list .card:not([data-pw])').forEach(c => { c.dataset.pw = 1; photoObs.observe(c); });
 }
 
 function buildPoiLayers(){
@@ -596,14 +619,14 @@ function openSheet(sel, hash){
 // vom Nutzer geschlossen (✕, Hintergrund, Esc, Abbrechen): Verlaufseintrag mit zurücknehmen
 function userClose(){ if(history.state?.sheet) history.back(); else closeSheets(); }
 window.addEventListener('popstate', e => {
-  const open = !$('#detail').hidden || !$('#filters').hidden || !$('#own').hidden;
+  const open = !$('#detail').hidden || !$('#filters').hidden || !$('#own').hidden || !$('#places').hidden;
   if(open){ closeSheets(); return; }
   if(e.state?.nav) navApply(e.state);
   else navApply({v:'list', c:CITY, r:null});
 });
 const linkOf = l => `#i=${encodeURIComponent(l.id)}&c=${CITY}${l.lat!=null?`&ll=${(+l.lat).toFixed(5)},${(+l.lng).toFixed(5)}`:''}`;
 function closeSheets(){ if(/#i=/.test(location.hash)) { try { history.replaceState(history.state, '', location.pathname + location.search); } catch {} }
-  $('#scrim').hidden=true; $('#filters').hidden=true; $('#detail').hidden=true; $('#own').hidden=true; lastFocus?.focus?.({preventScroll:true}); }
+  $('#scrim').hidden=true; $('#filters').hidden=true; $('#detail').hidden=true; $('#own').hidden=true; $('#places').hidden=true; lastFocus?.focus?.({preventScroll:true}); }
 
 let setFilterUi = () => {};
 function bindFilters(){
@@ -670,6 +693,15 @@ function bindUi(){
       else Object.assign(f, {...DEF_OF('thailand'), sort:f.sort});
       save(); setFilterUi(); render(); toast('Filter gelockert'); return; }
     if(e.target.closest('[data-zoomgrp]') && curGroup){ const g = curGroup; userClose(); setTimeout(() => map.fitBounds(L.latLngBounds(g.map(x=>[x.lat,x.lng])), {padding:[60,60], maxZoom:17}), 150); return; }
+    const pl = e.target.closest('[data-pl]');
+    if(pl){ const k = pl.dataset.pl;
+      if(k === '__add'){ renderPlaceSheet(); $('#plHits').innerHTML = ''; openSheet('#places'); return; }
+      if(k === '__all'){ switchCity('thailand'); if(CITY === 'thailand'){ TH.bounds = null; state.region = null; state.thView = null; save(); thOverview(); render(); navPush(); } renderPlaces(); return; }
+      openPlace(PLACES[+k]); return; }
+    const pa = e.target.closest('[data-pladd]');
+    if(pa){ const p = JSON.parse(pa.dataset.pladd); if(!PLACES.some(x => x.name === p.name)){ PLACES.push(p); savePlaces(); toast(`„${p.name}“ oben hinzugefügt`); } return; }
+    const pd = e.target.closest('[data-pldel]');
+    if(pd){ PLACES.splice(+pd.dataset.pldel, 1); savePlaces(); return; }
     const go = e.target.closest('[data-open]'); if(go){ lastGroup = curGroup; openDetail(go.dataset.open); return; }
     const pv = e.target.closest('[data-prov]');
     if(pv && DATA?.th){ const p = (TH.idx.provinces||[]).find(x=>x.key===pv.dataset.prov); if(p){ state.region = {key:p.key, name:p.name, n:p.n}; save(); goTo(p.lat, p.lng, p.key); navPush(); } return; }
@@ -693,6 +725,8 @@ function bindUi(){
   $('#ownForm').addEventListener('submit', saveOwnForm);
   $('#ownPaste').onclick = async () => { try { const t = await navigator.clipboard.readText(); if(t){ $('#wUrl').value = t.trim(); } } catch { toast('Einfügen nicht erlaubt – bitte lange tippen und „Einfügen“ wählen'); } };
   $('#ownCancel').onclick = userClose;
+  $('#plClose').onclick = userClose;
+  $('#plForm').onsubmit = e => { e.preventDefault(); searchPlace($('#plInput').value); };
   $('#wPrice').addEventListener('invalid', e => { e.preventDefault(); $('#wPrice').classList.add('bad'); toast('Bitte die Monatsmiete in ฿ eintragen'); $('#wPrice').focus(); });
   $('#wPrice').addEventListener('input', () => $('#wPrice').classList.remove('bad'));
   document.addEventListener('keydown', e => { const c = e.target.closest?.('.card'); if(c && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); openDetail(c.dataset.id); } });
@@ -725,7 +759,9 @@ async function loadCity(city){
     $('#stand').textContent = 'Daten konnten nicht geladen werden (offline?).'; $('#list').innerHTML = ''; return;
   }
   const g = new Date(DATA.generated);
-  $('#stand').innerHTML = `<b>${esc(CITIES[CITY].long)}</b> · ${fmt(DATA.count)} Inserate · Stand ${g.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})} ${g.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})} · <span class="fx">1&nbsp;€&nbsp;=&nbsp;${(Math.round(DATA.fx.rate*10)/10).toLocaleString('de-DE')}&nbsp;฿</span>`;
+  $('#appTitle').textContent = CITY==='thailand' ? 'Thailand Wohnen' : CITIES[CITY].name==='Krabi' ? 'Krabi / Ao Nang' : 'Pattaya & Umgebung';
+  renderPlaces();
+  $('#stand').innerHTML = `${CITY==='thailand' ? 'Küsten & Chiang Mai · ' : CITY==='pattaya' ? 'Si Racha bis Ban Chang · ' : ''}${fmt(DATA.count)} Inserate · Stand ${g.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})} ${g.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})} · <span class="fx">1&nbsp;€&nbsp;=&nbsp;${(Math.round(DATA.fx.rate*10)/10).toLocaleString('de-DE')}&nbsp;฿</span>`;
   migrateFavs(); syncFavTab(); setFilterUi(); render();
   setTimeout(() => localStorage.removeItem('krabiwohnen.booting'), 4000);
 }
@@ -741,6 +777,51 @@ async function goTo(lat, lng, prov){
   if(map && !$('#viewMap').hidden){ map._fromGoTo = true; map.setView([lat,lng], z); }
   else { if(map) map._thPending = {c:[lat,lng], z}; render(); }
   window.scrollTo({top:0});
+}
+// ---- Meine Orte: selbst gewählte Orte als Knöpfe oben (lokal gespeichert) ----
+const TOWNS = [['Koh Samui',9.512,100.013],['Koh Phangan',9.731,100.028],['Hua Hin',12.568,99.958],['Cha-am',12.80,99.97],['Pranburi',12.39,99.91],
+  ['Khao Lak',8.637,98.248],['Ao Nang',8.032,98.823],['Krabi Stadt',8.086,98.906],['Koh Lanta',7.62,99.04],['Phuket Stadt',7.884,98.391],['Patong',7.896,98.297],
+  ['Rawai',7.778,98.326],['Kata/Karon',7.83,98.30],['Jomtien',12.88,100.88],['Si Racha',13.174,100.93],['Ban Chang',12.73,101.06],['Rayong',12.68,101.27],
+  ['Koh Chang',12.06,102.33],['Chiang Mai',18.788,98.986],['Trang',7.557,99.611],['Hat Yai',7.008,100.475],['Songkhla',7.19,100.6],['Chumphon',10.49,99.18],
+  ['Nakhon Si Thammarat',8.43,99.96],['Satun',6.62,100.07]];
+const PKEY = 'krabiwohnen.places.v1';
+const DEF_PLACES = [{name:'Krabi', city:'krabi'}, {name:'Pattaya', city:'pattaya'}];
+let PLACES = (() => { try { const p = JSON.parse(localStorage.getItem(PKEY)); return Array.isArray(p) ? p : DEF_PLACES; } catch { return DEF_PLACES; } })();
+const savePlaces = () => { try { localStorage.setItem(PKEY, JSON.stringify(PLACES)); } catch {} renderPlaces(); renderPlaceSheet(); };
+const placeOn = p => p.city ? CITY === p.city : CITY === 'thailand' && state.region?.key === 'pl:' + p.name;
+function renderPlaces(){
+  const bar = $('#placebar'); if(!bar) return;
+  const all = CITY === 'thailand' && !state.region;
+  bar.innerHTML = `<button type="button" class="pl ${all?'on':''}" data-pl="__all">Ganz Thailand</button>` +
+    PLACES.map((p, i) => `<button type="button" class="pl ${placeOn(p)?'on':''}" data-pl="${i}">${esc(p.name)}</button>`).join('') +
+    `<button type="button" class="pl add" data-pl="__add" aria-label="Ort hinzufügen oder entfernen">＋ Ort</button>`;
+  bar.querySelector('.on')?.scrollIntoView({block:'nearest', inline:'nearest'});
+}
+async function openPlace(p){
+  if(p.city){ if(CITY !== p.city){ closeSheets(); window.scrollTo({top:0}); await loadCity(p.city); navPush(); } renderPlaces(); return; }
+  if(CITY !== 'thailand') await loadCity('thailand');
+  if(!TH.idx) await new Promise(r => setTimeout(r, 300));
+  state.region = {key:'pl:' + p.name, name:p.name, lat:p.lat, lng:p.lng}; save();
+  await goTo(p.lat, p.lng); navPush(); renderPlaces();
+}
+function renderPlaceSheet(){
+  const mine = $('#plMine'); if(!mine) return;
+  mine.innerHTML = PLACES.length ? PLACES.map((p, i) => `<span class="plchip">${esc(p.name)}<button type="button" data-pldel="${i}" aria-label="${esc(p.name)} entfernen">✕</button></span>`).join('')
+    : '<p class="muted">Noch keine Orte gewählt.</p>';
+  const have = new Set(PLACES.map(p => p.name));
+  $('#plSugg').innerHTML = [...(have.has('Krabi') ? [] : [['Krabi', null, null, 'krabi']]), ...(have.has('Pattaya') ? [] : [['Pattaya', null, null, 'pattaya']]), ...TOWNS.filter(t => !have.has(t[0]))]
+    .map(t => `<button type="button" class="pl" data-pladd='${esc(JSON.stringify(t[3] ? {name:t[0], city:t[3]} : {name:t[0], lat:t[1], lng:t[2]}))}'>＋ ${esc(t[0])}</button>`).join('');
+}
+async function searchPlace(q){
+  const hits = $('#plHits'); q = q.trim(); if(!q) return;
+  const local = TOWNS.filter(t => t[0].toLowerCase().includes(q.toLowerCase()));
+  hits.innerHTML = '<p class="muted">Suche …</p>';
+  let web = [];
+  try { const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=th&accept-language=de&q=${encodeURIComponent(q)}`);
+    web = (await r.json()).map(x => [x.display_name.split(',').slice(0,2).join(',').trim(), +x.lat, +x.lon]); } catch {}
+  const list = [...local, ...web.filter(w => !local.some(l => Math.abs(l[1]-w[1]) < .05 && Math.abs(l[2]-w[2]) < .05))].slice(0, 6);
+  hits.innerHTML = list.length ? list.map(t => `<button type="button" class="pl" data-pladd='${esc(JSON.stringify({name:t[0].split(',')[0], lat:t[1], lng:t[2]}))}'>＋ ${esc(t[0])}</button>`).join('')
+    : '<p class="muted">Nichts gefunden – anders schreiben, z. B. „Samui“.</p>';
 }
 // ---- Zurück-Geste: Reiter, Gegend und Provinz stehen im Browser-Verlauf ----
 function thOverview(){
@@ -761,6 +842,7 @@ async function navApply(n){
   if(n.c && n.c !== CITY && CITIES[n.c]){ closeSheets(); await loadCity(n.c); }
   if(DATA?.th){
     if(!n.r && TH.bounds){ TH.bounds = null; state.region = null; save(); if(map) thOverview(); }
+    else if(n.r && n.r.startsWith('pl:') && state.region?.key !== n.r){ const p = PLACES.find(x => 'pl:' + x.name === n.r); if(p){ state.region = {key:n.r, name:p.name}; save(); goTo(p.lat, p.lng); } }
     else if(n.r && state.region?.key !== n.r){ const p = (TH.idx?.provinces||[]).find(x=>x.key===n.r); if(p){ state.region = {key:p.key, name:p.name, n:p.n}; save(); goTo(p.lat, p.lng, p.key); } }
   }
   if(n.v && n.v !== view) setTab(n.v); else render();

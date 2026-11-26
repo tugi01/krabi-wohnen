@@ -8,7 +8,7 @@ for (const [name, bt] of [['webkit', webkit], ['chromium', chromium]]) {
   const errs = []; p.on('pageerror', e => errs.push(e.message));
   await p.goto('http://127.0.0.1:8765/'); await p.waitForTimeout(1500);
   // --- Pattaya: Sammel-Pins
-  await p.click('[data-city="pattaya"]'); await p.waitForFunction(() => document.querySelector('[data-city="pattaya"]').classList.contains('on') && document.querySelector('.card'));
+  await p.evaluate(() => switchCity('pattaya')); await p.waitForFunction(() => CITY === 'pattaya' && document.querySelector('.card'));
   await p.click('#filterBtn'); await p.waitForTimeout(600); await p.$eval('#fReset', e => e.click()); await p.$eval('#fOld', e => e.click()); await p.$eval('#fUnknown', e => e.click());
   await p.$eval('#fSize', e => { e.value = 0; e.dispatchEvent(new Event('input', {bubbles:true})); });
   await p.$eval('#fPrice', e => { e.value = 150000; e.dispatchEvent(new Event('input', {bubbles:true})); });
@@ -31,7 +31,7 @@ for (const [name, bt] of [['webkit', webkit], ['chromium', chromium]]) {
   ok(hi.ring && hi.pin && hi.vis && hi.z === 16, `${name}: „Auf Karte“ markiert Objekt (Ring ${hi.ring}, Pin ${hi.pin}, Zoom ${hi.z})`);
   await p.screenshot({path: `${OUT}/hi-${name}.png`});
   // --- Thailand-Modus
-  await p.click('#tabList'); await p.click('[data-city="thailand"]'); await p.waitForTimeout(1500);
+  await p.click('#tabList'); await p.evaluate(() => switchCity('thailand')); await p.waitForTimeout(1500);
   const picker = await p.$$eval('.provs button', x => x.length);
   ok(picker > 0, `${name}: Thailand ohne Ausschnitt zeigt Gegend-Auswahl (${picker} Provinzen)`);
   await p.click('.provs button[data-prov="rayong"]'); await p.waitForSelector('.card', {timeout: 15000}).catch(()=>{});

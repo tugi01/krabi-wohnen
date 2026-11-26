@@ -230,6 +230,7 @@ def crawl_query(prov, query, p_from, p_to, sink, stats):
     fails = 0
     got = 0
     retried = set()
+    seen_ids = set()
     while p_to is None or p <= p_to:
         url = BASE + prov + "?" + "&".join(x for x in (query, f"page={p}" if p > 1 else "") if x)
         try:
@@ -262,16 +263,27 @@ def crawl_query(prov, query, p_from, p_to, sink, stats):
             if expected_end and p <= expected_end and (p_to is None or p <= p_to):
                 log(f"UNVOLLSTÄNDIG: {prov} {query} endet bei Seite {p} von {expected_end}")
                 return None
+            if p_to is None and p not in retried:   # auch hinter dem angeblichen Ende einmal nachsehen
+                retried.add(p)
+                time.sleep(15)
+                continue
             break
         if p > 334:
             log("Warnung: über Seite 334 (Portal-Grenze)", prov, query)
             break
+        fresh = [it for it in items if it["id"] not in seen_ids]
+        seen_ids.update(it["id"] for it in items)
         got += len(items)
         sink(items)
-        if expected_end and p >= expected_end:
+        if p_to is None and expected_end and p >= expected_end and not fresh:
+            break                         # nur noch Wiederholungen: wirklich am Ende
+        if p_to is None and expected_end and p >= expected_end + 2 and len(items) < 30:
             break
         p += 1
         time.sleep(DELAY)
+    if total is not None and got > total:
+        log(f"Hinweis: {prov} {query} – Portal nannte {total}, gefunden {got}")
+        total = got
     return total if total is not None else 0
 
 
@@ -417,10 +429,10 @@ def nearest(items, pois):
     """Nächster Ort je Kategorie (Luftlinie × 1,3 als Straßen-Schätzung). Raster 0,1° für Tempo."""
     grid = {}
     for p in pois:
-        if p.get("cat") == "Strand" and p.get("boat"):
-            continue
-        grid.setdefault((p["cat"], int(p["lat"] * 10), int(p["lng"] * 10)), []).append(p)
-    cats = sorted({p["cat"] for p in pois})
+        # Inselstrände (nur per Boot vom Festland) als eigene Kategorie – für Inserate AUF der Insel zählen sie
+        cat = "Inselstrand" if p.get("cat") == "Strand" and p.get("boat") else p["cat"]
+        grid.setdefault((cat, int(p["lat"] * 10), int(p["lng"] * 10)), []).append(p)
+    cats = sorted({p["cat"] for p in pois} | ({"Inselstrand"} if any(p.get("boat") for p in pois) else set()))
     for it in items:
         if it.get("lat") is None:
             continue
@@ -443,6 +455,11 @@ def nearest(items, pois):
                     break
             if best:
                 d[cat] = [round(best[0], 1), best[1]["name"], round(best[1]["lat"], 5), round(best[1]["lng"], 5)]
+        # Inserat liegt selbst auf einer Fähr-Insel (Samui, Phangan, Lanta, Chang …): Inselstrand ganz nah,
+        # Festlandstrand weit weg -> der Inselstrand ist der Strand vor Ort
+        isl = d.pop("Inselstrand", None)
+        if isl and isl[0] < 6 and (not d.get("Strand") or (d["Strand"][0] > 15 and d["Strand"][0] > 5 * isl[0])):
+            d["Strand"] = isl
         if d:
             it["d"] = d
 

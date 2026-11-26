@@ -228,3 +228,29 @@ input.bad{outline:2px solid #c0392b;outline-offset:1px}
 .thpick .quick{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 2px}.thpick .quick button{flex:1 1 140px;min-height:44px;border-radius:14px;font:inherit;font-weight:700;border:0;background:var(--accent);color:#fff}.muted.small{font-size:.8rem}
 @media (max-width:340px){ .cityseg button{padding:7px 7px;font-size:.8rem;letter-spacing:-.01em} #filterBtn{padding-left:10px;padding-right:10px} }
 @media (max-width:340px){ .cityseg button{padding:7px 5px;font-size:.76rem} .cityseg{gap:0} }
+
+/* Kopfzeile ohne Stadt-Reiter */
+.titlerow{display:flex;align-items:center;gap:6px;min-width:0}
+.titlerow h1{font-size:1.3rem;margin:0;letter-spacing:-.02em;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.backth{flex:0 0 auto;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--accent);font-size:1.5rem;line-height:1;font-weight:700;display:grid;place-items:center;padding:0 0 3px;box-shadow:var(--shadow);cursor:pointer}
+.backth[hidden]{display:none}
+@media (max-width:360px){ .titlerow h1{font-size:1.12rem} }
+
+/* Meine Orte */
+.placebar{position:sticky;top:var(--toph,58px);z-index:490;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 16px 8px;
+  -webkit-overflow-scrolling:touch;scroll-padding:16px;mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 calc(100% - 18px),transparent)}
+.placebar::-webkit-scrollbar{display:none}
+.pl{flex:0 0 auto;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:inherit;font:inherit;font-weight:650;font-size:.9rem;
+  box-shadow:var(--shadow);cursor:pointer;white-space:nowrap;transition:background .2s,color .2s,transform .15s}
+.pl:active{transform:scale(.96)}
+.pl.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.pl.add{color:var(--accent);border-style:dashed;box-shadow:none;background:transparent}
+.plmine{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
+.plchip{display:inline-flex;align-items:center;gap:4px;padding:4px 4px 4px 12px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-weight:650}
+.plchip button{width:28px;height:28px;border-radius:50%;border:0;background:transparent;color:var(--muted);font-size:.9rem;cursor:pointer}
+.plform{display:flex;gap:8px;margin:4px 0 10px}.plform input{flex:1;min-width:0;min-height:44px;border-radius:12px;border:1px solid var(--line);padding:0 12px;font:inherit;background:var(--card);color:inherit}
+.plform button{min-height:44px;border-radius:12px;padding:0 14px;font:inherit;font-weight:700}
+.plhits,.plsugg{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+#places h3{font-size:.95rem;margin:14px 0 8px}
+.placebar{position:static;padding-top:10px;padding-bottom:2px}
+.provs button em{font-style:normal;font-weight:500;color:var(--muted);font-size:.8em}

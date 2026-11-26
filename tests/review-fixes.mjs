@@ -9,13 +9,13 @@ for (const [name, bt] of [['webkit', webkit], ['chromium', chromium]]) {
   const ctx = await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true});
   const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
   await p.goto(URL); await p.waitForTimeout(2000);
-  const hasTh = !!(await p.$('[data-city="thailand"]'));
+  const hasTh = await p.evaluate(() => !!CITIES.thailand);
   // B13 Kopfzeile + Titel
   const st = await p.evaluate(() => { const fx = document.querySelector('#stand .fx'); const r = fx?.getClientRects(); return {lines: r ? r.length : 0, title: document.title, text: document.querySelector('#stand').textContent}; });
   ok(st.lines === 1 && !/Thailand – Thailand/.test(st.title), `${name}: B13 Wechselkurs in einer Zeile, Titel „${st.title}“`);
   if(hasTh){
     // B1 Thailand ohne Vorfilter + B5 Gegend-Leiste + Rückweg
-    await p.click('[data-city="thailand"]'); await p.waitForTimeout(1200);
+    await p.evaluate(() => switchCity('thailand')); await p.waitForTimeout(1200);
     const prov = await p.$eval('.provs button', e => e.dataset.prov);
     await p.click(`.provs button[data-prov="${prov}"]`); await p.waitForSelector('.card', {timeout: 20000});
     const sum = await p.$eval('#summary', e => e.textContent);
@@ -25,14 +25,14 @@ for (const [name, bt] of [['webkit', webkit], ['chromium', chromium]]) {
     await p.$eval('[data-overview]', e => e.click()); await p.waitForTimeout(600);
     ok(await p.$$eval('.provs button', x => x.length) > 3, `${name}: B5 „Alle Gegenden“ führt zurück zur Übersicht`);
     await p.click(`.provs button[data-prov="${prov}"]`); await p.waitForSelector('.card');
-    await p.click('[data-city="thailand"]'); await p.waitForTimeout(600);
+    await p.evaluate(() => switchCity('thailand')); await p.waitForTimeout(600);
     ok(await p.$$eval('.provs button', x => x.length) > 3, `${name}: B5 erneuter Tipp auf „Thailand“ = Übersicht`);
     // B23 Thailand-Karte: 7-Eleven/Markt standardmäßig aus
     const lay = await p.evaluate(() => [state.layers['7-Eleven'], state.layers.Markt]);
     ok(lay[0] === false && lay[1] === false, `${name}: B23 Thailand-Karte ohne 7-Eleven/Markt-Flut (einschaltbar)`);
   }
   // B1 Krabi: leere Liste hat Ausweg
-  await p.click('[data-city="krabi"]'); await p.waitForSelector('.card');
+  await p.evaluate(() => switchCity('krabi')); await p.waitForSelector('.card');
   await p.click('#filterBtn'); await p.waitForTimeout(500);
   await p.$eval('#fSize', e => { e.value = 200; e.dispatchEvent(new Event('input', {bubbles:true})); });
   await p.$eval('#fPrice', e => { e.value = 10000; e.dispatchEvent(new Event('input', {bubbles:true})); });
@@ -73,13 +73,13 @@ for (const [name, bt] of [['webkit', webkit], ['chromium', chromium]]) {
   await p2.close();
   // B7 Merkliste über Gegenden
   await p.$eval('.card .fav', e => e.click()); await p.waitForTimeout(300);
-  await p.click('[data-city="pattaya"]'); await p.waitForSelector('.card');
+  await p.evaluate(() => switchCity('pattaya')); await p.waitForSelector('.card');
   await p.click('#tabFav'); await p.waitForTimeout(500);
   const fs = await p.$eval('#summary', e => e.textContent); const tab = await p.$eval('#tabFav', e => e.textContent);
   ok(/^1 gemerktes Inserat/.test(fs) && /\(1\)/.test(tab) && await p.$$eval('.card', x => x.length) === 1, `${name}: B7 Merkliste in anderer Gegend sichtbar – „${fs}“, Reiter „${tab}“`);
   await p.$eval('.card .fav', e => e.click()); await p.waitForTimeout(300);
   // B10 Datumsformat
-  await p.click('#tabList'); await p.click('[data-city="krabi"]'); await p.waitForSelector('.card');
+  await p.click('#tabList'); await p.evaluate(() => switchCity('krabi')); await p.waitForSelector('.card');
   const dates = await p.evaluate(() => DATA.listings.filter(l => l.updated || l.available).slice(0, 40).map(l => [deDate(l.updated), deDate(l.available)]));
   ok(dates.flat().filter(Boolean).every(d => /^\d\d\.\d\d\.\d{4}$|^sofort$/.test(d) || !/[A-Za-z]{3,} \d/.test(d)), `${name}: B10 Daten deutsch (${dates.flat().filter(Boolean).slice(0,4).join(', ')})`);
   // B9 Grob-Punkte
@@ -105,6 +105,6 @@ for (const [name, bt] of [['webkit', webkit], ['chromium', chromium]]) {
 // B14 320 px
 { const b = await webkit.launch(); const p = await (await b.newContext({viewport:{width:320,height:640},isMobile:true,hasTouch:true})).newPage();
   await p.goto(URL); await p.waitForTimeout(1500);
-  const ov = await p.evaluate(() => { const a = document.querySelector('[data-city="pattaya"]').getBoundingClientRect(); const s = document.querySelector('#shareApp').getBoundingClientRect(); return s.width === 0 || s.left >= a.right; });
+  const ov = await p.evaluate(() => { const a = document.querySelector('#appTitle').getBoundingClientRect(); const s = document.querySelector('#shareApp').getBoundingClientRect(); return s.width === 0 || s.left >= a.right; });
   ok(ov, 'webkit: B14 bei 320 px überdeckt nichts „Pattaya“'); await b.close(); }
 console.log(fails ? `${fails} FEHLER` : 'ALLES GRÜN');

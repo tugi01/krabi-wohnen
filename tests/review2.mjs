@@ -8,6 +8,28 @@ const b = await webkit.launch();
 const ctx = await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true});
 const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
 await p.goto('about:blank'); await p.goto(URL); await p.waitForTimeout(2000);
+// Kopfzeile ohne Stadt-Reiter
+ok(!(await p.$('.cityseg')) && await p.$eval('#appTitle', e => e.textContent) === 'Thailand Wohnen', 'Kopfzeile: „Thailand Wohnen“ ohne alte Reiter');
+const pls = await p.$$eval('#placebar .pl', x => x.map(e => e.textContent));
+ok(pls.join('|') === 'Ganz Thailand|Krabi|Pattaya|＋ Ort', `Meine Orte: ${pls.join(' | ')}`);
+await p.click('[data-pl="__add"]'); await p.waitForSelector('#places:not([hidden])');
+await p.click('#plSugg [data-pladd*="Koh Samui"]'); await p.waitForTimeout(300);
+await p.click('#plMine [data-pldel="0"]'); await p.waitForTimeout(200);
+await p.screenshot({path: `${OUT}/r2-places.png`});
+await p.$eval('#plClose', e => e.click()); await p.waitForTimeout(400);
+const pls2 = await p.$$eval('#placebar .pl', x => x.map(e => e.textContent));
+ok(pls2.join('|') === 'Ganz Thailand|Pattaya|Koh Samui|＋ Ort', `Ort hinzugefügt/entfernt: ${pls2.join(' | ')}`);
+await p.click('#placebar .pl:has-text("Koh Samui")'); await p.waitForSelector('.card', {timeout:20000}); await p.waitForTimeout(800);
+const sam = await p.evaluate(() => ({on: document.querySelector('#placebar .pl.on')?.textContent, rb: document.querySelector('.regionbar')?.textContent.replace(/\s+/g,' ').slice(0,60), n: document.querySelectorAll('.card').length, lat: TH.listingsIn(TH.bounds).slice(0,20).every(l => l.lat > 9.2 && l.lat < 9.9)}));
+ok(sam.on === 'Koh Samui' && sam.n > 3 && sam.lat, `Koh Samui: ${sam.n} Karten, Leiste „${sam.rb}“`);
+await p.screenshot({path: `${OUT}/r2-samui.png`});
+await p.reload(); await p.waitForTimeout(2000);
+ok((await p.$$eval('#placebar .pl', x => x.map(e => e.textContent))).includes('Koh Samui'), 'Orte bleiben nach Neuladen');
+await p.click('[data-pl="__all"]'); await p.waitForTimeout(1000);
+await p.click('[data-pl="__add"]'); await p.waitForSelector('#places:not([hidden])');
+for(const want of ['Krabi']) await p.click(`#plSugg [data-pladd*='"${want}"']`);
+await p.$eval('#plClose', e => e.click()); await p.waitForTimeout(300);
+await p.evaluate(() => { PLACES = [{name:'Krabi', city:'krabi'}, {name:'Pattaya', city:'pattaya'}, ...PLACES.filter(x => !x.city)]; savePlaces(); });
 // Start: Schnellwahl Krabi/Pattaya
 ok(await p.$$eval('.thpick .quick button', x => x.length) === 2, 'Start: Schnellwahl „Krabi / Ao Nang“ und „Pattaya“');
 // B7 Zurück: Provinz -> Übersicht, Gegend -> vorige Gegend, Tab -> voriger Tab
@@ -23,7 +45,13 @@ await p.goBack(); await p.waitForTimeout(600);
 ok(await p.evaluate(() => view) === 'list' && await p.evaluate(() => CITY) === 'krabi', 'B7 Zurück von „Karte“ → „Liste“');
 await p.goBack(); await p.waitForTimeout(1200);
 ok(await p.evaluate(() => CITY) === 'thailand' && p.url().startsWith(URL), 'B7 Zurück von „Krabi“ → „Thailand“, App bleibt offen');
-await p.click('[data-city="krabi"]'); await p.waitForSelector('.card');
+await p.click('#placebar .pl:has-text("Pattaya")'); await p.waitForSelector('.card');
+ok(await p.$eval('#appTitle', e => e.textContent) === 'Pattaya & Umgebung' && await p.$eval('#placebar .pl.on', e => e.textContent) === 'Pattaya', 'Pattaya: Titel + Knopf markiert');
+await p.screenshot({path: `${OUT}/r2-head-pattaya.png`, clip:{x:0,y:0,width:390,height:160}});
+await p.click('[data-pl="__all"]'); await p.waitForTimeout(1200);
+ok(await p.evaluate(() => CITY) === 'thailand', '„Ganz Thailand“ führt zurück');
+await p.screenshot({path: `${OUT}/r2-head-th.png`, clip:{x:0,y:0,width:390,height:140}});
+await p.evaluate(() => switchCity('krabi')); await p.waitForSelector('.card');
 // B5 Vorauswahl sichtbar
 const fc = await p.$eval('#filterCount', e => e.textContent);
 const hint = await p.$eval('.hidehint', e => e.textContent.replace(/\s+/g,' ')).catch(() => '');
@@ -47,7 +75,7 @@ const zi = await p.evaluate(() => { const pin = document.querySelector('.leaflet
 ok(!zi || zi[0] > zi[1], `B8 Orts-Symbole liegen unter den Preisschildern ${zi}`);
 await p.screenshot({path: `${OUT}/r2-map-krabi.png`});
 // Thailand-Übersicht: Blasen überlappen nicht, Chiang Mai sichtbar
-await p.click('[data-city="thailand"]'); await p.waitForTimeout(1500); await p.evaluate(() => thOverview()); await p.waitForTimeout(2000);
+await p.evaluate(() => switchCity('thailand')); await p.waitForTimeout(1500); await p.evaluate(() => thOverview()); await p.waitForTimeout(2000);
 const bub = await p.evaluate(() => { const r = [...document.querySelectorAll('.bubble')].map(e => e.getBoundingClientRect()); const m = document.querySelector('#map').getBoundingClientRect();
   let n = 0; for(let i=0;i<r.length;i++) for(let j=i+1;j<r.length;j++){ const a=r[i], c=r[j]; const d = Math.hypot((a.left+a.right-c.left-c.right)/2, (a.top+a.bottom-c.top-c.bottom)/2); if(d < (a.width + c.width)/2 - 2) n++; }
   return {n: r.length, over: n, clipped: r.filter(x => x.top < m.top - 2 || x.bottom > m.bottom + 2).length}; });
@@ -58,7 +86,7 @@ await p.click('#tabFav'); await p.waitForTimeout(300); await p.reload(); await p
 ok(await p.evaluate(() => view) === 'fav', 'B14 Reiter „Merken“ bleibt nach Neuladen');
 await p.click('#tabList'); await p.waitForTimeout(300);
 // B10/B11 Eigenes Inserat
-await p.click('[data-city="krabi"]'); await p.waitForSelector('.card');
+await p.evaluate(() => switchCity('krabi')); await p.waitForSelector('.card');
 await p.$eval('#ownAdd', e => e.click()); await p.waitForSelector('#own:not([hidden])');
 await p.$eval('#ownForm button[type=submit]', e => e.click()); await p.waitForTimeout(400);
 const tt = await p.$eval('#toast', e => e.textContent).catch(() => '');
@@ -81,7 +109,7 @@ ok(errs.length === 0, 'keine JS-Fehler ' + errs.join(' | '));
 await b.close();
 // B9 320 px: Detailleiste passt
 { const b2 = await webkit.launch(); const q = await (await b2.newContext({viewport:{width:320,height:640},isMobile:true,hasTouch:true})).newPage();
-  await q.goto(URL); await q.waitForTimeout(1500); await q.click('[data-city="krabi"]'); await q.waitForSelector('.card');
+  await q.goto(URL); await q.waitForTimeout(1500); await q.evaluate(() => switchCity('krabi')); await q.waitForSelector('.card');
   await q.click('.card .body'); await q.waitForSelector('#detail:not([hidden])'); await q.waitForTimeout(500);
   const r = await q.$$eval('#detail .actions > *', x => Math.max(...x.map(e => e.getBoundingClientRect().right)));
   const sh = await q.$eval('#shareApp', e => e.getBoundingClientRect().width);

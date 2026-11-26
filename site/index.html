@@ -19,15 +19,23 @@
 <body>
 <header class="top">
   <div class="brand">
-    <div class="cityseg" role="group" aria-label="Stadt wählen">
-      <button data-city="thailand" aria-pressed="true">Thailand</button><button data-city="krabi" aria-pressed="false">Krabi</button><button data-city="pattaya" aria-pressed="false">Pattaya</button>
-    </div>
+    <div class="titlerow"><h1 id="appTitle">Thailand Wohnen</h1></div>
     <p id="stand" class="muted">Lade Inserate …</p>
   </div>
   <div class="topbtns"><button id="shareApp" class="pill icon" aria-label="App teilen" title="App teilen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M6 11H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-1"/></svg></button>
   <button id="filterBtn" class="pill" aria-haspopup="dialog" aria-controls="filters">Filter <span id="filterCount"></span></button></div>
 </header>
+<div class="placebar" id="placebar" role="group" aria-label="Meine Orte"></div>
 
+<section id="places" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="plTitle">
+  <div class="grab"></div><button class="close" id="plClose" aria-label="Schließen">✕</button>
+  <h2 id="plTitle">Meine Orte</h2>
+  <p class="muted">Orte erscheinen oben als Knopf – ein Tipp zeigt die Wohnungen dort.</p>
+  <div id="plMine" class="plmine"></div>
+  <form id="plForm" class="plform"><input id="plInput" type="search" placeholder="Ort suchen, z. B. Koh Samui" autocomplete="off" enterkeyhint="search"><button class="primary" type="submit">Suchen</button></form>
+  <div id="plHits" class="plhits"></div>
+  <h3>Beliebte Orte</h3><div id="plSugg" class="plsugg"></div>
+</section>
 <nav class="seg" role="tablist" aria-label="Ansicht">
   <button role="tab" id="tabList" aria-selected="true" data-view="list">Liste</button>
   <button role="tab" id="tabMap" aria-selected="false" data-view="map">Karte</button>
