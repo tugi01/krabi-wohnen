@@ -881,8 +881,8 @@ async function loadCity(city){
   setTimeout(() => localStorage.removeItem('krabiwohnen.booting'), 4000);
 }
 // Gegend wählen (Thailand-Modus): größte Inserats-Dichte um den Provinz-Mittelpunkt
-async function goTo(lat, lng, prov){
-  let km = 6; while(km < 60 && TH.countIn(TH.around(lat,lng,km)) < 150) km *= 1.6;
+async function goTo(lat, lng, prov, maxKm = 60){   // eigene Orte: nur der Ort selbst (max. ~12 km), nicht die halbe Provinz
+  let km = 6; while(km * 1.6 <= maxKm && TH.countIn(TH.around(lat,lng,km)) < 150) km *= 1.6;
   while(km > 2 && TH.countIn(TH.around(lat,lng,km)) > TH.LOAD_LIMIT) km /= 1.6;
   TH.bounds = TH.around(lat, lng, km);
   const z = Math.max(9, Math.min(15, Math.round(Math.log2(40000 / (km*2.2)))));
@@ -926,7 +926,7 @@ async function openPlace(p){
   if(CITY !== 'thailand') await loadCity('thailand');
   if(!TH.idx) await new Promise(r => setTimeout(r, 300));
   state.region = {key:'pl:' + p.name, name:p.name, lat:p.lat, lng:p.lng}; save();
-  await goTo(p.lat, p.lng); navPush(); renderPlaces();
+  await goTo(p.lat, p.lng, null, 12); navPush(); renderPlaces();
 }
 function renderPlaceSheet(){
   const mine = $('#plMine'); if(!mine) return;
@@ -968,7 +968,7 @@ async function navApply(n){
   if(n.c && n.c !== CITY && CITIES[n.c]){ closeSheets(); await loadCity(n.c); }
   if(DATA?.th){
     if(!n.r && TH.bounds){ TH.bounds = null; state.region = null; save(); if(map) thOverview(); }
-    else if(n.r && n.r.startsWith('pl:') && state.region?.key !== n.r){ const p = PLACES.find(x => 'pl:' + x.name === n.r); if(p){ state.region = {key:n.r, name:p.name}; save(); goTo(p.lat, p.lng); } }
+    else if(n.r && n.r.startsWith('pl:') && state.region?.key !== n.r){ const p = PLACES.find(x => 'pl:' + x.name === n.r); if(p){ state.region = {key:n.r, name:p.name}; save(); goTo(p.lat, p.lng, null, 12); } }
     else if(n.r && state.region?.key !== n.r){ const p = (TH.idx?.provinces||[]).find(x=>x.key===n.r); if(p){ state.region = {key:p.key, name:p.name, n:p.n}; save(); goTo(p.lat, p.lng, p.key); } }
   }
   if(n.v && n.v !== view) setTab(n.v); else render();

@@ -288,3 +288,18 @@ body.lbopen-body{overflow:hidden}
 @media (prefers-color-scheme:dark){.dchip{background:rgba(255,255,255,.07)}}
 .csights{flex-direction:column;gap:2px}.csights span::before{content:'⭐ '}
 .srcline{font-size:.74rem;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ---- iPhone: Tippflächen nach Apple-Richtlinie mindestens 44 × 44 pt ---- */
+.pl,.seg button,.sortbar button,.ext,.chip{min-height:44px}
+@media (max-width:600px){.chip{min-height:44px;min-width:44px}}
+.cnav,.lbclose{width:44px;height:44px}
+/* Safari ignoriert die Höhe nativer Auswahlfelder – eigenes Aussehen, gleiche Bedienung */
+select{-webkit-appearance:none;appearance:none;min-height:44px;font-size:16px;color:inherit;padding:0 34px 0 12px;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);
+  background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+/* Text-Knöpfe in Hinweiszeilen: sieht klein aus, Tippfläche trotzdem 44 pt hoch */
+.linkbtn{display:inline-flex;align-items:center;min-height:44px;margin:-11px 0;padding:0 10px;vertical-align:middle}
+.range input[type=range]{min-height:44px}
+#places .close{position:absolute;top:10px;right:14px;width:44px;height:44px;border-radius:22px;border:0;background:var(--card);font-size:1.1rem;cursor:pointer;color:inherit}
+.plchip button{width:44px;height:44px;margin:-8px -12px -8px -4px;border-radius:22px}
+.linkbtn{margin:4px 0}
