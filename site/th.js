@@ -17,13 +17,17 @@ const TH = {
   },
   inter(b, q){ return !(b[2] < q[0] || b[0] > q[2] || b[3] < q[1] || b[1] > q[3]); },
   tilesIn(q){ return (TH.idx?.tiles || []).filter(t => TH.inter(t.b, q)); },
-  countIn(q){ return TH.tilesIn(q).reduce((s,t)=>s+t.n, 0); },
+  // geschätzte Zahl im Ausschnitt: je Kachel anteilig nach überlappender Fläche (ganze Kacheln überschätzen stark)
+  countIn(q){ return Math.round(TH.tilesIn(q).reduce((s,t)=>{ const b=t.b, a=(b[2]-b[0])*(b[3]-b[1]) || 1e-9;
+    const o=Math.max(0, Math.min(b[2],q[2])-Math.max(b[0],q[0])) * Math.max(0, Math.min(b[3],q[3])-Math.max(b[1],q[1]));
+    return s + t.n * Math.min(1, o/a); }, 0)); },
 
   norm(x){   // Kachel-Format -> App-Format (wie Krabi/Pattaya)
     const l = { id:x.id, url:x.url, title:x.title || 'Mietobjekt', price:x.price, lat:x.lat, lng:x.lng, beds:x.beds,
       size:x.size ?? null, sizeh:x.sizeh ?? null, sz:x.sz || null, built:x.built || null, by:x.by || null,
       images:x.img ? [x.img] : [], source:x.src==='DotProperty' ? 'DotProperty / FazWaz' : x.src, first_seen:x.first,
-      posted:x.posted, pool:x.pool || null, approx:!!x.approx, prov:x.prov, full:!!x.full, th:true };
+      posted:x.posted, pool:x.pool || null, approx:!!x.approx, prov:x.prov, full:!!x.full, th:true,
+      kind:x.kind || null, area:x.area || null, price_max:x.price_max || null, updated:x.upd || null };
     if(x.d){ l.dist = {}; for(const [c,v] of Object.entries(x.d)) l.dist[c] = {km:v[0], min:null, name:v[1], lat:v[2], lng:v[3], road:false}; }
     if(x.dr){ l.dist = l.dist || {}; for(const [c,v] of Object.entries(x.dr)) l.dist[c] = {...(l.dist[c]||{}), km:v[0], min:v[1], name:v[2], road:true}; }
     const det = TH.detail.get(l.url); if(det) TH.merge(l, det);
@@ -34,6 +38,8 @@ const TH = {
     if(d.price && d.price >= 1000 && d.price <= 2000000 && d.price !== l.price){ l.price_list = l.price; l.price = d.price; }
     if(d.price) l.priceChecked = true;
     if(d.size) l.size = d.size; if(d.built){ l.built = d.built; l.built_src = d.built_src; }
+    if(d.beds != null && l.beds == null) l.beds = d.beds;
+    if(d.rooms?.length) l.rooms = d.rooms;
     if(d.pool !== undefined && d.pool !== null) l.pool = d.pool;
     if(d.furniture) l.furniture = d.furniture; if(d.images?.length && d.images.length >= (l.images||[]).length) l.images = d.images;
     for(const k of ['description','available','pets','updated']) if(d[k]) l[k] = d[k];
@@ -90,7 +96,7 @@ const TH = {
 
   async loadDetail(l){
     l.detailTried = true;
-    if(l.detailLoaded || l.own || !/dotproperty\.co\.th\/en\/ads\//.test(l.url||'')) return null;   // jedes DotProperty-Inserat: Preis von der Originalseite
+    if(l.detailLoaded || l.own || !DETAIL_URL.test(l.url||'')) return null;   // Preis, Fotos, Text immer von der Originalseite
     if(TH.detail.has(l.url)) return TH.merge(l, TH.detail.get(l.url));
     try {
       const r = await fetch(`https://krabi-wohnen-img.tugrulc.workers.dev/detail?u=${encodeURIComponent(l.url)}`);

@@ -1,0 +1,43 @@
+name: Weitere Portale (PropertyHub, Renthub)
+
+# Nachts alle Miet-Inserate von PropertyHub (Condo, Haus, Reihenhaus) und Renthub (Apartments) in ganz Thailand.
+# Nacheinander (gleicher Betreiber), höflich (2 s Pause), bei Sperre (403/429) sofort Schluss.
+# Ergebnis liegt im Release "th-data" (th-extra-ph.json.gz / th-extra-rh.json.gz); der Thailand-Lauf baut es in die Kacheln ein.
+on:
+  schedule:
+    - cron: "0 18 * * *"    # 01:00 Uhr Thailand
+  workflow_dispatch:
+
+concurrency:
+  group: th-extra
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 345
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        source: [ph, rh]
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: main }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Letzten Stand holen
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: gh release download th-data -p "th-extra-${{ matrix.source }}.json.gz" -D old || echo "noch kein Stand"
+      - name: Inserate laden
+        id: crawl
+        env: { TH_EXTRA_DELAY: "2", TH_EXTRA_LIST_SECONDS: "15000", TH_EXTRA_MAX_SECONDS: "19500" }
+        run: python3 scraper/th_extra.py crawl --source ${{ matrix.source }} --state old/th-extra-${{ matrix.source }}.json.gz --out th-extra-${{ matrix.source }}.json.gz
+      - name: Im Release sichern (auch nach Sperre: enthält dann den alten Stand + bis dahin Neues)
+        if: always()
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          if [ -f th-extra-${{ matrix.source }}.json.gz ]; then gh release upload th-data th-extra-${{ matrix.source }}.json.gz --clobber; ls -la th-extra-*.json.gz; else echo "nichts zu sichern"; fi

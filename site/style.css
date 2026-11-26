@@ -287,3 +287,4 @@ body.lbopen-body{overflow:hidden}
 .csights small{color:var(--muted)}
 @media (prefers-color-scheme:dark){.dchip{background:rgba(255,255,255,.07)}}
 .csights{flex-direction:column;gap:2px}.csights span::before{content:'⭐ '}
+.srcline{font-size:.74rem;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

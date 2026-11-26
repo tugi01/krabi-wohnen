@@ -91,7 +91,7 @@ const activeCount = () => { const N = DEF_OF('thailand'); return Object.keys(DEF
 // verdächtige Preise im Hintergrund an der Inseratseite prüfen (über den Detail-Dienst, höchstens 6 auf einmal)
 let verifying = 0, verifyTimer = null;
 function verifyPrices(rows){
-  const todo = rows.filter(l => pCheck(l) && !l.detailTried && /dotproperty\.co\.th\/en\/ads\//.test(l.url||'')).slice(0, 6 - verifying);
+  const todo = rows.filter(l => pCheck(l) && !l.detailTried && DETAIL_URL.test(l.url||'')).slice(0, 6 - verifying);
   for(const l of todo){ verifying++; TH.loadDetail(l).finally(() => { verifying--; clearTimeout(verifyTimer); verifyTimer = setTimeout(() => { if($('#detail').hidden) render(); }, 400); }); }
 }
 // Preis wirkt unplausibel (z. B. 290 m² Villa für 6.500 ฿): markieren, bis die Inseratseite geprüft ist
@@ -99,6 +99,10 @@ const pCheck = l => !l.own && !l.price_list && !l.detailLoaded && l.price && (l.
 // Grundstücke, Büros, Lagerhallen, Läden sind kein Wohnraum (gleiche Regel wie im Abruf; wirkt sofort auch auf ältere Daten)
 const NOT_HOME_URL = /\/ads\/(?:studio-|\d+-bedroom-)?(?:warehouse|office|retail-space|land|hotel|whole-building|restaurant|factory)-for-(?:rent|sale)/;
 const NOT_HOME_TITLE = /^(?!.*\b(?:houses?|villas?|condos?|apartments?|bedrooms?|beds?|br|homes?|townhouses?|studios?)\b).*\b(?:land|plot|rai|warehouse|factory|office|retail|showroom|restaurant)\b/i;
+// Inserate, deren Originalseite der Detail-Dienst lesen kann (Preis, Fotos, Beschreibung)
+const DETAIL_URL = /dotproperty\.co\.th\/en\/ads\/|propertyhub\.in\.th\/en\/listings\/|renthub\.in\.th\/en\//;
+const srcName = l => l.own ? 'Eigenes Inserat' : /propertyhub/.test(l.url||'') ? 'PropertyHub' : /renthub/.test(l.url||'') ? 'Renthub'
+  : /bahtsold/.test(l.url||'') ? 'BahtSold' : /meezub/.test(l.url||'') ? 'Meezub' : /dotproperty/.test(l.url||'') ? 'DotProperty / FazWaz' : (l.source||'').split(' ')[0] || 'Anbieter';
 const isHome = l => !(NOT_HOME_URL.test(l.url||'') || (!/dotproperty/.test(l.url||'') && NOT_HOME_TITLE.test(l.title||'')));
 // kompakte Entfernungen [km, min, Name, Straße?] -> {km, min, name, road}
 function unpackDist(list){
@@ -253,8 +257,9 @@ function card(l){
     <div class="badges">${l.seller==='Eigentümer'?'<span class="badge owner">Eigentümer</span>':''}${l.approx&&!l.own&&l.lat!=null?'<span class="badge approx" title="Lage nur ungefähr: der Anbieter nennt nur den Ortsteil">Lage ≈</span>':''}${l.own?`<span class="badge own">Eigenes${/facebook\.com|fb\.me/i.test(l.url||'')?' · Facebook':''}</span>`:''}${isNew(l)?'<span class="badge new" title="in den letzten 7 Tagen eingestellt">NEU eingestellt</span>':''}${l.price_before && l.price_before>l.price?'<span class="badge drop">Preis ↓</span>':''}${pCheck(l)?'<span class="badge warnb" title="Ungewöhnlich günstig für die Fläche – Preis beim Anbieter prüfen">Preis prüfen</span>':''}${l.price_list && l.price_list !== l.price ? `<span class="badge fixp" title="Die Suchliste nannte ${fmt(l.price_list)} ฿ – übernommen wurde der Preis der Inseratseite">Preis laut Inserat</span>` : ''}${l.gone ? '<span class="badge warnb">nicht mehr online</span>' : ''}</div>
     <button class="fav" data-fav="${esc(l.id)}" aria-label="Merken" aria-pressed="${isFav(l.id)}">${isFav(l.id)?'★':'☆'}</button>
     <div class="body">
-      <div class="price">${fmt(l.price)} ฿ <small>/ Monat${e?` · ≈ ${fmt(e)} €`:''}</small></div>
+      <div class="price">${l.price_max > l.price ? '<small>ab</small> ' : ''}${fmt(l.price)} ฿ <small>/ Monat${e?` · ≈ ${fmt(e)} €`:''}</small></div>
       <div class="title">${esc(l.title)}</div>
+      <div class="srcline">${esc(srcName(l))}${l.kind ? ` · ${esc(l.kind)}` : ''}</div>
       ${(o => o ? `<div class="online ${o.days<=7?'fresh':''}" title="${o.posted?'Einstelldatum beim Anbieter':'Datum, an dem die App das Inserat zuerst gefunden hat'}">🕒 ${esc(o.label)} (${esc(o.ago)})</div>` : '')(onlineInfo(l))}
       <div class="facts">
         ${l.elsewhere?`<span class="tag area">${esc(CITIES[l.city]?.name||l.city)}</span>`:''}${sizeTxt(l)?`<span class="tag">${sizeTxt(l)}</span>`:''}${l.th && l.prov && !l.full?`<span class="tag area">📍 ${esc(PROVNAME(l.prov))}</span>`:''}${l.area && !['Pattaya','Krabi'].includes(l.area)?`<span class="tag area">📍 ${esc(l.area.split(' / ')[0])}</span>`:''}
@@ -370,7 +375,7 @@ function watchPhotoCards(){
   photoObs ||= new IntersectionObserver(es => { for(const e of es){ if(!e.isIntersecting) continue; photoObs.unobserve(e.target);
     const l = getListing(e.target.dataset.id); if(!l) continue;
     if(l.hasDesc && !l.desc && !l.description) loadDesc(l).then(ok => ok && refreshCard(l));      // Beschreibung für die Liste
-    if(!l.detailTried && !l.own && /dotproperty\.co\.th\/en\/ads\//.test(l.url||'')){ photoQ.push(l); photoPump(); } } }, {rootMargin:'900px 0px'});
+    if(!l.detailTried && !l.own && DETAIL_URL.test(l.url||'')){ photoQ.push(l); photoPump(); } } }, {rootMargin:'900px 0px'});
   document.querySelectorAll('#list .card:not([data-pw])').forEach(c => { c.dataset.pw = 1; photoObs.observe(c); });
 }
 
@@ -597,7 +602,9 @@ function openDetail(id){
     ...(l.price_list && l.price_list !== l.price ? [['Preis-Hinweis', `Die Suchliste des Anbieters nannte ${fmt(l.price_list)} ฿ – auf der Inseratseite stehen ${fmt(l.price)} ฿.`]] : []),
     ...(pCheck(l) ? [['Preis-Hinweis', 'Ungewöhnlich günstig für die Fläche – bitte beim Anbieter prüfen.']] : []),
     ['Frei ab', l.available ? deDate(l.available) : 'nicht angegeben'], ['Haustiere', deTxt(l.pets)||'–'],
-    ...(l.area ? [['Gegend', l.area]] : []), ['Anbieter', l.seller||'–'], ['Online seit', l.posted ? `${onlineInfo(l).date} (${onlineInfo(l).ago}, laut Anbieter)` : 'Anbieter nennt kein Einstelldatum'], ['Aktualisiert', l.updated ? deDate(l.updated) : '–'], ['Bei uns seit', l.first_seen ? new Date(l.first_seen).toLocaleDateString('de-DE') : '–'], ['Quelle', (l.source||'–') + (l.also?.length ? ` (auch bei ${l.also.map(a=>a.source + (a.price ? ` für ${fmt(a.price)} ฿` : '')).join(', ')})` : '')],
+    ...(l.area ? [['Gegend', l.area]] : []),
+    ...(l.rooms?.length ? [['Zimmer im Haus', l.rooms.map(r => `${deTxt((r[0]||'').replace(/_/g,' ').toLowerCase())||'Zimmer'}: ${r[2] && r[2] !== r[1] ? `${r[1]}–${r[2]}` : (r[1]||'?')} m², ${fmt(r[3])}${r[4] && r[4] !== r[3] ? `–${fmt(r[4])}` : ''} ฿`).join(' · ')]] : []),
+    ['Portal', srcName(l)], ['Anbieter', l.seller||'–'], ['Online seit', l.posted ? `${onlineInfo(l).date} (${onlineInfo(l).ago}, laut Anbieter)` : 'Anbieter nennt kein Einstelldatum'], ['Aktualisiert', l.updated ? deDate(l.updated) : '–'], ['Bei uns seit', l.first_seen ? new Date(l.first_seen).toLocaleDateString('de-DE') : '–'], ['Quelle', (l.source||'–') + (l.also?.length ? ` (auch bei ${l.also.map(a=>a.source + (a.price ? ` für ${fmt(a.price)} ฿` : '')).join(', ')})` : '')],
     ...(l.approx && !l.own ? [['Lage', 'nur ungefähr (Ortsteil) – genaue Adresse beim Anbieter erfragen']] : []),
     ...(l.th && !l.full ? [['Provinz', PROVNAME(l.prov)]] : []),
     ...(l.gone ? [['Status', 'Beim Anbieter nicht mehr online – wird beim nächsten Lauf entfernt']] : []),
@@ -630,7 +637,7 @@ function openDetail(id){
     ${l.own?`<div class="sheetActions"><button class="ghost" data-ownedit="${esc(l.id)}">Bearbeiten</button><button class="ghost" data-ownpos="${esc(l.id)}">Ort auf Karte setzen</button><button class="ghost danger" data-owndel="${esc(l.id)}">Löschen</button></div>`:''}`;
   if($('#detail').hidden) openSheet('#detail', linkOf(l)); else { try { history.replaceState({sheet:1}, '', location.pathname + linkOf(l)); } catch {} }
   if(l.hasDesc && !l.description) loadDesc(l).then(ok => { if(ok && !$('#detail').hidden && $('#detail [data-fav]')?.dataset.fav === l.id) openDetail(l.id); });
-  if(!l.own && !l.detailLoaded && !l.detailTried && !l.gone && /dotproperty\.co\.th\/en\/ads\//.test(l.url||'')){
+  if(!l.own && !l.detailLoaded && !l.detailTried && !l.gone && DETAIL_URL.test(l.url||'')){
     $('#detail h2').insertAdjacentHTML('afterend', '<p class="loading">Lade Details vom Anbieter …</p>');
     TH.loadDetail(l).then(() => { if(!$('#detail').hidden && $('#detail [data-fav]')?.dataset.fav === l.id) openDetail(l.id); });
   }

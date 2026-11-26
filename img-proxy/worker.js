@@ -7,6 +7,9 @@
 const ALLOWED = /^https:\/\/(cdn|img)\.fazwaz\.com\//;
 const WIDTHS = new Set(['384', '640', '828']);
 const AD_URL = /^https:\/\/www\.dotproperty\.co\.th\/en\/ads\/[^?#]+$/;
+// PropertyHub- und Renthub-Inserate (Next.js-Seiten mit __NEXT_DATA__)
+const PH_URL = /^https:\/\/propertyhub\.in\.th\/en\/listings\/[^?#\/]+$/;
+const RH_URL = /^https:\/\/www\.renthub\.in\.th\/en\/[a-z0-9%-]+$/i;
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 ' +
   '(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
 const MONTHS = Object.fromEntries(
@@ -61,9 +64,10 @@ function withMaxAge(res, maxAge) {
 
 async function detail(url, ctx) {
   const u = url.searchParams.get('u') || '';
-  if (u.length >= 400 || !AD_URL.test(u)) return json({ ok: false, error: 'bad url' }, 400);
+  const kind = AD_URL.test(u) ? 'dp' : PH_URL.test(u) ? 'ph' : RH_URL.test(u) ? 'rh' : null;
+  if (u.length >= 600 || !kind) return json({ ok: false, error: 'bad url' }, 400);
   const cache = caches.default;
-  const key = new Request(`https://detail-cache.local/v2/${encodeURIComponent(u)}`);
+  const key = new Request(`https://detail-cache.local/${kind === 'dp' ? 'v2' : 'x1'}/${encodeURIComponent(u)}`);
   const hit = await cache.match(key);
   if (hit) return withMaxAge(hit, 86400);
   let r;
@@ -79,7 +83,13 @@ async function detail(url, ctx) {
   }
   if (!r.ok) return json({ ok: false }, 502);
   let d;
-  try { d = parseDetail(await r.text()); } catch { return json({ ok: false }, 502); }
+  try { const t = await r.text(); d = kind === 'dp' ? parseDetail(t) : kind === 'ph' ? parsePH(t) : parseRH(t); }
+  catch { return json({ ok: false }, 502); }
+  if (d === null) {                                   // Seite ohne Inserat (gelöscht/umgeleitet)
+    const out = { ok: false, gone: true };
+    ctx.waitUntil(cache.put(key, json(out, 200, 86400)));
+    return json(out);
+  }
   const out = { ok: true, ...d };
   ctx.waitUntil(cache.put(key, json(out, 200, 604800)));     // 7 Tage
   return json(out);
@@ -170,4 +180,52 @@ function parseDetail(page) {
   if (am.includes('private pool') || am.includes('privater pool')) d.pool = 'privat';
   else if (['communal pool', 'pool access', 'swimming pool', 'infinity pool'].some(k => am.includes(k))) d.pool = 'gemeinschaft';
   return d;
+}
+
+// ---------- PropertyHub / Renthub (Next.js) ----------
+function nextData(page) {
+  const m = page.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
+  return m ? JSON.parse(m[1]) : null;
+}
+const htmlText = h => unescapeHtml(String(h || '').replace(/<br\s*\/?>|<\/p>|<\/li>/gi, '\n').replace(/<li[^>]*>/gi, '• ')
+  .replace(/<[^>]+>/g, '')).replace(/\n{3,}/g, '\n\n').trim();
+function poolOf(text, facPool) {
+  const t = text.toLowerCase();
+  if (t.includes('private pool') || t.includes('pool villa')) return 'privat';
+  if (facPool || t.includes('swimming pool') || t.includes('communal pool')) return 'gemeinschaft';
+  return null;
+}
+function parsePH(page) {
+  const L = nextData(page)?.props?.pageProps?.listing;
+  if (!L || !L.id) return null;
+  const pr = L.price?.forRent?.monthly?.price;
+  const ri = L.roomInformation || {}, lh = L.landAndHouseInformation || {};
+  const desc = htmlText(L.detail);
+  const cy = parseInt(L.project?.projectInfo?.completedYear ?? L.project?.completedYear, 10);
+  const img = (L.images || []).map(i => i && (i.pictureUrl || i.thumbnailUrl)).filter(Boolean)
+    .slice(0, 8).map(x => 'https://bcdn.propertyhub.in.th' + x + '?width=828');
+  return { price: pr > 0 ? Math.round(pr) : null, size: ri.roomArea || lh.usableArea || null,
+    beds: ri.numberOfBed ?? lh.numberOfBed ?? null,
+    built: cy > 1950 && cy < 2100 ? `${cy}-01` : null, built_src: cy > 1950 ? 'Projekt' : null,
+    pool: poolOf(desc, L.project?.facilities?.pool), furniture: L.amenities?.hasFurniture ? 'Möbliert' : null,
+    images: img, description: [...desc].slice(0, 1500).join(''), available: null,
+    pets: L.project?.facilities?.allowPet ? 'erlaubt' : null, updated: (L.updatedAt || '').slice(0, 10) || null,
+    lat: L.location?.lat ?? L.project?.location?.lat ?? null, lng: L.location?.lng ?? L.project?.location?.lng ?? null };
+}
+function parseRH(page) {
+  const L = nextData(page)?.props?.pageProps?.listing;
+  if (!L || !L.id) return null;
+  const rooms = (L.rooms || []).filter(r => r && r.availability !== false);
+  const prices = rooms.map(r => r.price?.monthly?.minPrice).filter(x => x > 0);
+  const pr = prices.length ? Math.min(...prices) : L.price?.monthly?.minPrice;
+  const size = Math.max(0, ...rooms.map(r => r.maxSize || r.minSize || 0)) || null;
+  const desc = htmlText(L.description);
+  const img = (L.pictures || []).map(p => p && p.pictureUrl).filter(Boolean).slice(0, 8)
+    .map(x => 'https://bcdn.renthub.in.th' + x + '?width=828');
+  return { price: pr > 0 ? Math.round(pr) : null, size, built: null, built_src: null,
+    pool: poolOf(desc, L.amenities?.hasPool), furniture: L.amenities?.hasFurniture ? 'Möbliert' : null,
+    images: img, description: [...desc].slice(0, 1500).join(''), available: null,
+    pets: L.amenities?.allowPet ? 'erlaubt' : null, updated: (L.updatedAt || '').slice(0, 10) || null,
+    rooms: rooms.slice(0, 6).map(r => [r.roomType, r.minSize, r.maxSize, r.price?.monthly?.minPrice, r.price?.monthly?.maxPrice]),
+    lat: L.location?.lat ?? null, lng: L.location?.lng ?? null };
 }

@@ -485,6 +485,60 @@ def from_city(l, prov):
     return {k: v for k, v in r.items() if v not in (None, "", [], {})}
 
 
+EXTRA_URL = "https://github.com/tugi01/krabi-wohnen/releases/download/th-data/th-extra-{}.json.gz"
+
+
+def load_extra(a, src):
+    """Ergebnis von scraper/th_extra.py: lokale Datei (--extra) oder letzter Stand aus dem Release."""
+    p = os.path.join(a.extra or "", f"th-extra-{src}.json.gz")
+    if a.extra and os.path.exists(p):
+        return load_gz(p, None)
+    try:
+        import urllib.request
+        tmp = os.path.join(os.environ.get("RUNNER_TEMP", "/tmp"), f"th-extra-{src}.json.gz")
+        urllib.request.urlretrieve(EXTRA_URL.format(src), tmp)
+        return load_gz(tmp, None)
+    except Exception as e:  # noqa: BLE001
+        log(f"weitere Quelle {src}: noch kein Stand ({str(e)[:60]})")
+        return None
+
+
+def add_extra(items, a):
+    pc = {}
+    for it in items:
+        if it.get("lat") is not None and it.get("prov"):
+            pc.setdefault(it["prov"], []).append((it["lat"], it["lng"]))
+    cen = {k: (sorted(x[0] for x in v)[len(v) // 2], sorted(x[1] for x in v)[len(v) // 2]) for k, v in pc.items() if len(v) >= 5}
+
+    def near_prov(lat, lng):
+        return min(cen, key=lambda k: (cen[k][0] - lat) ** 2 + (cen[k][1] - lng) ** 2) if cen else "thailand"
+    seen = {(round(it["lat"], 3), round(it["lng"], 3), it.get("price"), it.get("beds")) for it in items if it.get("lat") is not None}
+    added = {}
+    for src in ("ph", "rh"):
+        st = load_extra(a, src)
+        if not st:
+            continue
+        n = dup = nogeo = 0
+        for it in st.get("items", {}).values():
+            if it.get("lat") is None or it.get("lng") is None:
+                nogeo += 1
+                continue
+            k = (round(it["lat"], 3), round(it["lng"], 3), it.get("price"), it.get("beds"))
+            if it.get("beds") is not None and k in seen:
+                dup += 1
+                continue
+            seen.add(k)
+            if not it.get("prov"):
+                it = dict(it, prov=near_prov(it["lat"], it["lng"]))
+            r = {x: it.get(x) for x in ("id", "url", "title", "price", "lat", "lng", "beds", "size", "built", "img", "src",
+                                         "prov", "pool", "posted", "first", "kind", "area", "price_max", "upd")}
+            items.append({x: v for x, v in r.items() if v not in (None, "")})
+            n += 1
+        added[st.get("source", src)] = n
+        log(f"+{n} von {src} ({dup} doppelt, {nogeo} noch ohne Lage)")
+    return added
+
+
 def cmd_build(a):
     now = datetime.now(timezone.utc)
     today = now.strftime("%Y-%m-%d")
@@ -549,6 +603,8 @@ def cmd_build(a):
             else:
                 items.append(r)
                 extra += 1
+    # Weitere Portale (PropertyHub, Renthub) – nur mit bekannter Lage; Doppelte (gleiche Lage/Preis/Zimmer) raus
+    extra_n = add_extra(items, a)
     # Plausibilität (Tagespreise, Hotels, ganze Wohnhäuser)
     n0 = len(items)
     items = [it for it in items if scrape.keep_home({"price": it.get("price"), "beds": it.get("beds"), "url": it.get("url"),
@@ -590,7 +646,7 @@ def cmd_build(a):
     idx = {
         "generated": now.strftime("%Y-%m-%dT%H:%M+00:00"), "fx": fx, "count": len(items),
         "new_since_last": new, "removed_since_last": removed,
-        "sources": {s: sum(1 for it in items if it.get("src") == s) for s in ("DotProperty", "BahtSold", "Meezub", "aonangapartments")},
+        "sources": {s: sum(1 for it in items if it.get("src") == s) for s in ("DotProperty", "BahtSold", "Meezub", "aonangapartments", "PropertyHub", "Renthub")},
         "coverage": {"sz": sum(1 for it in items if it.get("sz") or it.get("size")),
                      "by": sum(1 for it in items if it.get("by") or it.get("built"))},
         "portal_total": sum(v for k, v in counts.items() if "|" not in k and k in PROVINCES),
@@ -626,6 +682,7 @@ def main():
     b.add_argument("--shards", required=True)
     b.add_argument("--state", default="state.json.gz")
     b.add_argument("--out", default=os.path.join(ROOT, "site", "data", "th"))
+    b.add_argument("--extra", default="", help="Ordner mit th-extra-ph/rh.json.gz (sonst aus dem Release)")
     a = ap.parse_args()
     {"crawl": cmd_crawl, "build": cmd_build, "bands": cmd_bands}[a.cmd](a)
 
