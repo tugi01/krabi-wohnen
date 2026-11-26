@@ -2618,6 +2618,46 @@
   "boat": false
  },
  {
+  "cat": "Muay Thai",
+  "name": "ค่ายมวย ครูสด จิตรลดา (Kru Sod Chitralada)",
+  "lat": 13.1488,
+  "lng": 100.95523,
+  "id": "mua-web-sriracha-1",
+  "note": "Aus Web-Verzeichnis ergänzt (nicht in OpenStreetMap) – Lage, Zeiten und Preise vor Ort prüfen"
+ },
+ {
+  "cat": "Muay Thai",
+  "name": "CK Muay Thai Academy Sriracha",
+  "lat": 13.16344,
+  "lng": 100.92923,
+  "id": "mua-web-sriracha-2",
+  "note": "Aus Web-Verzeichnis ergänzt (nicht in OpenStreetMap) – Lage, Zeiten und Preise vor Ort prüfen"
+ },
+ {
+  "cat": "Muay Thai",
+  "name": "PG MuayThai Sriracha",
+  "lat": 13.12026,
+  "lng": 100.94561,
+  "id": "mua-web-sriracha-3",
+  "note": "Aus Web-Verzeichnis ergänzt (nicht in OpenStreetMap) – Lage, Zeiten und Preise vor Ort prüfen"
+ },
+ {
+  "cat": "Muay Thai",
+  "name": "BOSS Muaythai Studio Sriracha",
+  "lat": 13.14594,
+  "lng": 100.95708,
+  "id": "mua-web-sriracha-4",
+  "note": "Aus Web-Verzeichnis ergänzt (nicht in OpenStreetMap) – Lage, Zeiten und Preise vor Ort prüfen"
+ },
+ {
+  "cat": "Muay Thai",
+  "name": "Dares Muay Thai Gym Sriracha",
+  "lat": 13.13873,
+  "lng": 100.95353,
+  "id": "mua-web-sriracha-5",
+  "note": "Aus Web-Verzeichnis ergänzt (nicht in OpenStreetMap) – Lage, Zeiten und Preise vor Ort prüfen"
+ },
+ {
   "cat": "7-Eleven",
   "name": "7-Eleven",
   "lat": 12.9274103,
@@ -6272,45 +6312,5 @@
   "lng": 100.898738,
   "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
   "id": "711-w1567833437"
- },
- {
-  "cat": "Muay Thai",
-  "name": "ค่ายมวย ครูสด จิตรลดา (Kru Sod Chitralada)",
-  "lat": 13.1488,
-  "lng": 100.95523,
-  "id": "mua-web-sriracha-1",
-  "note": "Aus Web-Verzeichnis ergänzt (nicht in OpenStreetMap) – Lage, Zeiten und Preise vor Ort prüfen"
- },
- {
-  "cat": "Muay Thai",
-  "name": "CK Muay Thai Academy Sriracha",
-  "lat": 13.16344,
-  "lng": 100.92923,
-  "id": "mua-web-sriracha-2",
-  "note": "Aus Web-Verzeichnis ergänzt (nicht in OpenStreetMap) – Lage, Zeiten und Preise vor Ort prüfen"
- },
- {
-  "cat": "Muay Thai",
-  "name": "PG MuayThai Sriracha",
-  "lat": 13.12026,
-  "lng": 100.94561,
-  "id": "mua-web-sriracha-3",
-  "note": "Aus Web-Verzeichnis ergänzt (nicht in OpenStreetMap) – Lage, Zeiten und Preise vor Ort prüfen"
- },
- {
-  "cat": "Muay Thai",
-  "name": "BOSS Muaythai Studio Sriracha",
-  "lat": 13.14594,
-  "lng": 100.95708,
-  "id": "mua-web-sriracha-4",
-  "note": "Aus Web-Verzeichnis ergänzt (nicht in OpenStreetMap) – Lage, Zeiten und Preise vor Ort prüfen"
- },
- {
-  "cat": "Muay Thai",
-  "name": "Dares Muay Thai Gym Sriracha",
-  "lat": 13.13873,
-  "lng": 100.95353,
-  "id": "mua-web-sriracha-5",
-  "note": "Aus Web-Verzeichnis ergänzt (nicht in OpenStreetMap) – Lage, Zeiten und Preise vor Ort prüfen"
  }
 ]
