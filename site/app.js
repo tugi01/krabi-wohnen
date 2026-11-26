@@ -571,7 +571,10 @@ function settingsPanel(){
   const red = matchMedia('(prefers-reduced-motion: reduce)').matches;
   return `<section class="panel"><h2>Bedienung</h2>
     <label class="row toggle"><span><b>Vibration zur Bestätigung</b><small>kurzes Klick-Gefühl beim Merken, Filtern, Sortieren und Speichern${/iPhone|iPad/.test(navigator.userAgent) ? ' (iPhone: ab iOS 18)' : ''}</small></span><input type="checkbox" id="setHaptic" ${hap ? 'checked' : ''}><i></i></label>
-    <p class="muted">Wellen und schimmernder Rand beim Antippen ${red ? 'sind aus, weil am Gerät „Bewegung reduzieren“ eingeschaltet ist' : 'folgen der Geräte-Einstellung „Bewegung reduzieren“'}.</p></section>`;
+    <p class="muted">Wellen und schimmernder Rand beim Antippen ${red ? 'sind aus, weil am Gerät „Bewegung reduzieren“ eingeschaltet ist' : 'folgen der Geräte-Einstellung „Bewegung reduzieren“'}.</p></section>
+    <section class="panel"><h2>Über die App</h2>
+    <p>Ein privates Projekt von Tugrul Cinkaya – ohne Konto, ohne Cookies, ohne Werbung und ohne Webanalyse. Merkliste, Filter, eigene Orte und eigene Inserate bleiben nur in diesem Browser.</p>
+    <p class="legal"><a href="https://www.tugrulcinkaya.com/impressum.html" rel="noopener">Impressum</a> · <a href="https://www.tugrulcinkaya.com/datenschutz.html#thailand-wohnen-title" rel="noopener">Datenschutz</a> · <a href="https://www.tugrulcinkaya.com/projekte/thailand-wohnen.html" rel="noopener">Über das Projekt</a></p></section>`;
 }
 document.addEventListener('change', e => { if(e.target.id === 'setHaptic' && typeof TAP !== 'undefined'){ TAP.set(e.target.checked); if(e.target.checked) TAP.haptic(); } });
 
