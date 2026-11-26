@@ -31,10 +31,11 @@ const TH = {
   },
   merge(l, d){
     if(!d || !d.ok) return l;
-    if(d.price && d.price >= 3000 && d.price <= 300000 && d.price !== l.price){ l.price_list = l.price; l.price = d.price; }
+    if(d.price && d.price >= 1000 && d.price <= 2000000 && d.price !== l.price){ l.price_list = l.price; l.price = d.price; }
+    if(d.price) l.priceChecked = true;
     if(d.size) l.size = d.size; if(d.built){ l.built = d.built; l.built_src = d.built_src; }
     if(d.pool !== undefined && d.pool !== null) l.pool = d.pool;
-    if(d.furniture) l.furniture = d.furniture; if(d.images?.length) l.images = d.images;
+    if(d.furniture) l.furniture = d.furniture; if(d.images?.length && d.images.length >= (l.images||[]).length) l.images = d.images;
     for(const k of ['description','available','pets','updated']) if(d[k]) l[k] = d[k];
     l.detailLoaded = true; return l;
   },
@@ -89,7 +90,7 @@ const TH = {
 
   async loadDetail(l){
     l.detailTried = true;
-    if((l.full && !pCheck(l)) || l.detailLoaded || !/dotproperty\.co\.th\/en\/ads\//.test(l.url||'')) return null;
+    if(l.detailLoaded || l.own || !/dotproperty\.co\.th\/en\/ads\//.test(l.url||'')) return null;   // jedes DotProperty-Inserat: Preis von der Originalseite
     if(TH.detail.has(l.url)) return TH.merge(l, TH.detail.get(l.url));
     try {
       const r = await fetch(`https://krabi-wohnen-img.tugrulc.workers.dev/detail?u=${encodeURIComponent(l.url)}`);

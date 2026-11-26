@@ -276,3 +276,4 @@ body.lbopen-body{overflow:hidden}
 .lbload{font-size:.8rem;opacity:.75}
 .lbopen{margin-left:auto;min-height:44px;padding:0 18px;border-radius:999px;border:0;background:var(--accent,#0e7a69);color:#fff;font:inherit;font-weight:700;cursor:pointer}
 .card [data-gal] img,#detail .gallery img{cursor:zoom-in}
+.badge.fixp{background:#e6f4ef;color:#0e6b5b}@media (prefers-color-scheme:dark){.badge.fixp{background:#173a32;color:#8fe0c8}}

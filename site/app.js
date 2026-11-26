@@ -203,7 +203,7 @@ function card(l){
   const distTxt = cats.filter(k=>d[k]).map(k=>`${TXTICON(k)} ${l.approx?'ca. ':''}${String(d[k].km).replace('.',',')} km${d[k].min!=null && !l.approx?` · ${d[k].min} min`:''}`).join('   ');
   return `<article class="card" data-id="${esc(l.id)}" tabindex="0" aria-label="${esc(l.title)}">
     ${img}
-    <div class="badges">${l.seller==='Eigentümer'?'<span class="badge owner">Eigentümer</span>':''}${l.approx&&!l.own&&l.lat!=null?'<span class="badge approx" title="Lage nur ungefähr: der Anbieter nennt nur den Ortsteil">Lage ≈</span>':''}${l.own?`<span class="badge own">Eigenes${/facebook\.com|fb\.me/i.test(l.url||'')?' · Facebook':''}</span>`:''}${isNew(l)?'<span class="badge new" title="in den letzten 7 Tagen eingestellt">NEU eingestellt</span>':''}${l.price_before && l.price_before>l.price?'<span class="badge drop">Preis ↓</span>':''}${pCheck(l)?'<span class="badge warnb" title="Ungewöhnlich günstig für die Fläche – Preis beim Anbieter prüfen">Preis prüfen</span>':''}</div>
+    <div class="badges">${l.seller==='Eigentümer'?'<span class="badge owner">Eigentümer</span>':''}${l.approx&&!l.own&&l.lat!=null?'<span class="badge approx" title="Lage nur ungefähr: der Anbieter nennt nur den Ortsteil">Lage ≈</span>':''}${l.own?`<span class="badge own">Eigenes${/facebook\.com|fb\.me/i.test(l.url||'')?' · Facebook':''}</span>`:''}${isNew(l)?'<span class="badge new" title="in den letzten 7 Tagen eingestellt">NEU eingestellt</span>':''}${l.price_before && l.price_before>l.price?'<span class="badge drop">Preis ↓</span>':''}${pCheck(l)?'<span class="badge warnb" title="Ungewöhnlich günstig für die Fläche – Preis beim Anbieter prüfen">Preis prüfen</span>':''}${l.price_list && l.price_list !== l.price ? `<span class="badge fixp" title="Die Suchliste nannte ${fmt(l.price_list)} ฿ – übernommen wurde der Preis der Inseratseite">Preis laut Inserat</span>` : ''}${l.gone ? '<span class="badge warnb">nicht mehr online</span>' : ''}</div>
     <button class="fav" data-fav="${esc(l.id)}" aria-label="Merken" aria-pressed="${isFav(l.id)}">${isFav(l.id)?'★':'☆'}</button>
     <div class="body">
       <div class="price">${fmt(l.price)} ฿ <small>/ Monat${e?` · ≈ ${fmt(e)} €`:''}</small></div>
@@ -309,13 +309,14 @@ function photoPump(){
   }
 }
 function refreshCard(l){
-  const el = document.querySelector(`.card[data-id="${CSS.escape(l.id)}"]`); if(!el || (l.images||[]).length < 2) return;
+  const el = document.querySelector(`.card[data-id="${CSS.escape(l.id)}"]`); if(!el) return;
+  if(!l.price_list && !l.gone && (l.images||[]).length === el.querySelectorAll('[data-gal] img').length) return;   // nichts geändert
   const x = document.createElement('div'); x.innerHTML = card(l); el.replaceWith(x.firstElementChild); bindGalleries();
 }
 function watchPhotoCards(){
-  if(!DATA?.th || !('IntersectionObserver' in window)) return;
+  if(!DATA || !('IntersectionObserver' in window)) return;
   photoObs ||= new IntersectionObserver(es => { for(const e of es){ if(!e.isIntersecting) continue; photoObs.unobserve(e.target);
-    const l = getListing(e.target.dataset.id); if(l && !l.detailTried && (l.images||[]).length < 2){ photoQ.push(l); photoPump(); } } }, {rootMargin:'300px 0px'});
+    const l = getListing(e.target.dataset.id); if(l && !l.detailTried && !l.own && /dotproperty\.co\.th\/en\/ads\//.test(l.url||'')){ photoQ.push(l); photoPump(); } } }, {rootMargin:'300px 0px'});
   document.querySelectorAll('#list .card:not([data-pw])').forEach(c => { c.dataset.pw = 1; photoObs.observe(c); });
 }
 
@@ -572,7 +573,7 @@ function openDetail(id){
     </div>
     ${l.own?`<div class="sheetActions"><button class="ghost" data-ownedit="${esc(l.id)}">Bearbeiten</button><button class="ghost" data-ownpos="${esc(l.id)}">Ort auf Karte setzen</button><button class="ghost danger" data-owndel="${esc(l.id)}">Löschen</button></div>`:''}`;
   if($('#detail').hidden) openSheet('#detail', linkOf(l)); else { try { history.replaceState({sheet:1}, '', location.pathname + linkOf(l)); } catch {} }
-  if(l.th && !l.full && !l.detailLoaded && !l.detailTried && !l.gone){
+  if(!l.own && !l.detailLoaded && !l.detailTried && !l.gone && /dotproperty\.co\.th\/en\/ads\//.test(l.url||'')){
     $('#detail h2').insertAdjacentHTML('afterend', '<p class="loading">Lade Details vom Anbieter …</p>');
     TH.loadDetail(l).then(() => { if(!$('#detail').hidden && $('#detail [data-fav]')?.dataset.fav === l.id) openDetail(l.id); });
   }
