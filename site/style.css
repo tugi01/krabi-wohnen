@@ -255,3 +255,24 @@ input.bad{outline:2px solid #c0392b;outline-offset:1px}
 .placebar{position:static;padding-top:10px;padding-bottom:2px}
 .provs button em{font-style:normal;font-weight:500;color:var(--muted);font-size:.8em}
 #plSugg{display:block}#plSugg h4{margin:12px 0 6px;font-size:.82rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}.plrow{display:flex;flex-wrap:wrap;gap:8px}
+
+/* Vollbild-Fotos */
+.lightbox{position:fixed;inset:0;z-index:3000;background:#000;color:#fff;display:flex;flex-direction:column;animation:lbin .22s ease-out}
+.lightbox[hidden]{display:none}
+@keyframes lbin{from{opacity:0;filter:blur(8px)}to{opacity:1;filter:none}}
+body.lbopen-body{overflow:hidden}
+.lbtop{display:flex;align-items:center;gap:10px;padding:calc(10px + var(--safe-t,0px)) 12px 8px;background:linear-gradient(#000c,#0000)}
+.lbcnt{font-weight:700;font-variant-numeric:tabular-nums;min-width:52px}
+.lbtitle{flex:1;min-width:0;font-size:.85rem;font-weight:600;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lbclose{width:40px;height:40px;border-radius:50%;border:0;background:#ffffff26;color:#fff;font-size:1.1rem;cursor:pointer;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.lbtrack{flex:1;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.lbtrack::-webkit-scrollbar{display:none}
+.lbslide{flex:0 0 100%;scroll-snap-align:center;display:grid;place-items:center;min-width:0}
+.lbslide img{max-width:100%;max-height:100%;object-fit:contain;user-select:none;-webkit-user-select:none}
+.lbnav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:0;background:#ffffff26;color:#fff;font-size:1.6rem;cursor:pointer;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.lbnav.prev{left:10px}.lbnav.next{right:10px}
+@media (hover:none){.lbnav{display:none}}
+.lbbottom{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px calc(14px + var(--safe-b,0px))}
+.lbload{font-size:.8rem;opacity:.75}
+.lbopen{margin-left:auto;min-height:44px;padding:0 18px;border-radius:999px;border:0;background:var(--accent,#0e7a69);color:#fff;font:inherit;font-weight:700;cursor:pointer}
+.card [data-gal] img,#detail .gallery img{cursor:zoom-in}
