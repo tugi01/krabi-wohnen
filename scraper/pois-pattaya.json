@@ -6312,5 +6312,13 @@
   "lng": 100.898738,
   "note": "meist 24 Stunden geöffnet (Öffnungszeit nicht in OSM)",
   "id": "711-w1567833437"
+ },
+ {
+  "cat": "Markt",
+  "name": "Bangsaray Walking Street",
+  "lat": 12.7675299,
+  "lng": 100.8953574,
+  "note": "Nachtmarkt · Öffnungszeiten vor Ort erfragen",
+  "id": "mkt-n10177767484"
  }
 ]
