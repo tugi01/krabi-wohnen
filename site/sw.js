@@ -1,7 +1,7 @@
 // Thailand Wohnen – Service Worker: immer zuerst aus dem Netz (damit Neuerungen sofort ankommen),
 // offline aus dem Zwischenspeicher.
-const CACHE = 'krabiwohnen-v32';
-const SHELL = ['./', 'index.html', 'style.css', 'app.js', 'th.js', 'touch.js', 'manifest.webmanifest',
+const CACHE = 'krabiwohnen-v33';
+const SHELL = ['./', 'index.html', 'style.css', 'app.js', 'th.js', 'touch.js', 'manifest.webmanifest', 'datenschutz.html',
   'vendor/leaflet/leaflet.js', 'vendor/leaflet/leaflet.css', 'icons/icon-192.png', 'icons/icon-180.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL.map(u => new Request(u, {cache: 'reload'}))))); self.skipWaiting(); });
 self.addEventListener('activate', e => {
