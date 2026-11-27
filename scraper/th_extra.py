@@ -127,7 +127,8 @@ def ph_items(pp, kind):
     arr, pag = pp.get("resultListings") or [], pp.get("pagination") or {}
     out = []
     for x in arr:
-        if x.get("postType") not in (None, "FOR_RENT"):
+        # FOR_RENT_TRIAL = Miet-Inserat eines Probe-Kontos (ebenfalls echte Miete); alles andere (Verkauf) überspringen
+        if not str(x.get("postType") or "FOR_RENT").startswith("FOR_RENT"):
             continue
         pr = money((((x.get("price") or {}).get("forRent") or {}).get("monthly") or {}).get("price"))
         ri = x.get("roomInformation") or {}
@@ -232,6 +233,8 @@ def ph_apply(out):
 def rh_items(pp, prov):
     out = []
     for x in pp.get("listings") or []:
+        if x.get("apartmentIsHotel"):          # Renthub kennzeichnet Hotels selbst
+            continue
         pm = ((x.get("price") or {}).get("monthly") or {})
         pr = money(pm.get("minPrice"))
         am = x.get("amenities") or {}
