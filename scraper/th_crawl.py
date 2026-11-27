@@ -512,7 +512,19 @@ def add_extra(items, a):
 
     def near_prov(lat, lng):
         return min(cen, key=lambda k: (cen[k][0] - lat) ** 2 + (cen[k][1] - lng) ** 2) if cen else "thailand"
-    seen = {(round(it["lat"], 3), round(it["lng"], 3), it.get("price"), it.get("beds")) for it in items if it.get("lat") is not None}
+    def num(v, cast=float):
+        """Portale liefern Zahlen teils als Text ('4', '35.5') – sonst scheitern spätere Vergleiche."""
+        try:
+            x = float(str(v).replace(",", "."))
+            return cast(x) if x > 0 else None
+        except (TypeError, ValueError):
+            return None
+
+    # Doppelte: gleiches Gebäude (Lage auf ~100 m), gleicher Preis, gleiche Zimmerzahl UND gleiche Fläche.
+    # (Ohne die Fläche fielen in großen Condo-Anlagen auch verschiedene Wohnungen zusammen.)
+    def key(it):
+        return (round(it["lat"], 3), round(it["lng"], 3), it.get("price"), num(it.get("beds"), int), num(it.get("size")))
+    seen = {key(it) for it in items if it.get("lat") is not None}
     added = {}
     for src in ("ph", "rh"):
         st = load_extra(a, src)
@@ -523,8 +535,9 @@ def add_extra(items, a):
             if it.get("lat") is None or it.get("lng") is None:
                 nogeo += 1
                 continue
-            k = (round(it["lat"], 3), round(it["lng"], 3), it.get("price"), it.get("beds"))
-            if it.get("beds") is not None and k in seen:
+            it = dict(it, beds=num(it.get("beds"), int), size=num(it.get("size")), price=num(it.get("price"), int))
+            k = key(it)
+            if it.get("beds") is not None and it.get("size") is not None and k in seen:
                 dup += 1
                 continue
             seen.add(k)

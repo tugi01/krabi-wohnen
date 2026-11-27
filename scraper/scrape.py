@@ -392,7 +392,11 @@ def keep_home(l):
     p = l.get("price")
     if p and not (3000 <= p <= 300000):
         return False
-    if (l.get("beds") or 0) > 10 and (not l.get("size") or l["size"] >= 300):
+    try:
+        beds, size = float(l.get("beds") or 0), float(l.get("size") or 0)
+    except (TypeError, ValueError):
+        beds, size = 0, 0
+    if beds > 10 and (not size or size >= 300):
         return False   # ganzes Wohnhaus/Betrieb (bei kleiner Fläche ist die SZ-Zahl nur falsch gelesen)
     return not HOTEL.search(l.get("title") or "")
 

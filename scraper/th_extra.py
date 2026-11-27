@@ -87,6 +87,14 @@ def get(url):
         return None
 
 
+def numf(x):
+    try:
+        v = float(str(x).replace(",", "."))
+        return (int(v) if v == int(v) else v) if v > 0 else None
+    except (TypeError, ValueError):
+        return None
+
+
 def money(x):
     try:
         v = int(float(x))
@@ -129,8 +137,8 @@ def ph_items(pp, kind):
         addr = x.get("address") or proj.get("address")
         prov = prov_of(addr)
         r = {"id": "ph-" + str(x["id"]), "url": f"{PH}listings/{x.get('slug')}---{x['id']}", "title": x.get("title"),
-             "price": pr, "prov": prov, "beds": ri.get("numberOfBed") or lh.get("numberOfBed"),
-             "size": ri.get("roomArea") or lh.get("usableArea"), "src": "PropertyHub", "area": addr,
+             "price": pr, "prov": prov, "beds": numf(ri.get("numberOfBed") or lh.get("numberOfBed")),
+             "size": numf(ri.get("roomArea") or lh.get("usableArea")), "src": "PropertyHub", "area": addr,
              "img": PH_IMG + x["coverPicture"] + "?width=640" if x.get("coverPicture") else None,
              "posted": (x.get("createdAt") or "")[:10] or None, "upd": (x.get("refreshedAt") or x.get("updatedAt") or "")[:10] or None,
              "kind": {"condo": "Condo", "home": "Haus", "townhome": "Reihenhaus"}[kind], "ck": f"all|{kind}"}
