@@ -330,3 +330,4 @@ select{-webkit-appearance:none;appearance:none;min-height:44px;font-size:16px;co
 .tapfx-hidden{position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
 .tapfx-box.out{opacity:0;transition:opacity .12s linear}
 .panel .legal a{display:inline-flex;align-items:center;min-height:44px}
+.thpick .provsub{margin:14px 0 6px}

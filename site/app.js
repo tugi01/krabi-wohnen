@@ -278,10 +278,14 @@ function card(l){
 
 const PROV_HINT = {'surat-thani':'Koh Samui, Koh Phangan', chonburi:'Pattaya, Si Racha', 'prachuap-khiri-khan':'Hua Hin', 'phang-nga':'Khao Lak',
   trat:'Koh Chang', songkhla:'Hat Yai', krabi:'Ao Nang, Koh Lanta', phetchaburi:'Cha-am', rayong:'Ban Chang, Koh Samet', phuket:'Patong, Rawai'};
+// Großraum Bangkok am Ende der Gegend-Liste: er hat drei Viertel aller Inserate und würde sonst alles andere verdrängen
+const METRO = new Set(['bangkok','nonthaburi','samut-prakan','pathum-thani']);
+const provOrder = list => [...list].sort((a, b) => METRO.has(a.key) - METRO.has(b.key));
 function thPicker(){
-  const provs = TH.idx?.provinces || [];
+  const all = provOrder(TH.idx?.provinces || []), provs = all.filter(p => !METRO.has(p.key)), metro = all.filter(p => METRO.has(p.key));
+  const btn = p => `<button type="button" data-prov="${esc(p.key)}">${esc(p.name)}${PROV_HINT[p.key]?` <em>${PROV_HINT[p.key]}</em>`:''} <small>${fmt(p.n)}</small></button>`;
   return `<div class="thpick"><p class="intro"><b>Mietwohnungen und -häuser in Thailand</b> – mit Preis in Euro und dem Weg zu Strand, Moschee, Muay Thai, 7-Eleven und Markt.</p><div class="quick"><button type="button" class="primary" data-city="krabi">Krabi / Ao Nang ›</button><button type="button" class="primary" data-city="pattaya">Pattaya & Umgebung ›</button></div><p class="muted small">Diese zwei Gegenden sind am ausführlichsten (Straßen-km, Fahrzeit, mehr Fotos).</p><p class="empty">Oder wähle eine Gegend – oder zoome auf der <b>Karte</b> hinein. Die Zahl nennt alle Inserate der Provinz (vor deinen Filtern).</p>
-    <div class="provs">${provs.map(p=>`<button type="button" data-prov="${esc(p.key)}">${esc(p.name)}${PROV_HINT[p.key]?` <em>${PROV_HINT[p.key]}</em>`:''} <small>${fmt(p.n)}</small></button>`).join('')}</div></div>`;
+    <div class="provs">${provs.map(btn).join('')}</div>${metro.length ? `<p class="muted provsub">Großraum Bangkok</p><div class="provs">${metro.map(btn).join('')}</div>` : ''}</div>`;
 }
 function regionBar(){   // über der Liste: welche Gegend gezeigt wird + zurück zur Übersicht
   if(!DATA?.th || !TH.bounds) return '';
@@ -530,7 +534,7 @@ function renderInfo(){
   const box = $('#info'); if(!KLIMA){ box.innerHTML = '<p class="empty">Infos werden geladen …</p>'; return; }
   if(DATA?.th){
     const i = TH.idx || {}, cov = i.coverage || {};
-    const pr = (i.provinces||[]).map(p=>`<tr><td><button class="linkbtn" data-prov="${esc(p.key)}">${esc(p.name)}</button></td><td>${fmt(p.n)}</td></tr>`).join('');
+    const pr = provOrder(i.provinces||[]).map(p=>`<tr><td><button class="linkbtn" data-prov="${esc(p.key)}">${esc(p.name)}</button></td><td>${fmt(p.n)}</td></tr>`).join('');
     const src = Object.entries(i.sources||{}).filter(([,v])=>v).map(([k,v])=>`${esc(k)} ${fmt(v)}`).join(' · ');
     const pc = TH.poiIdx?.counts || {};
     box.innerHTML = `<section class="panel"><h2>Thailand – was in der App steckt</h2>
