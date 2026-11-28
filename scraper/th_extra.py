@@ -194,6 +194,47 @@ def crawl_ph(state, out, budget_end):
         log(f"PH {key}: {len(got)} von {total} {'' if ok else '(unvollständig)'}")
 
 
+# Condo-Zonen außerhalb des Großraums Bangkok noch einmal einzeln durchgehen: In der landesweiten Liste sind je Seite
+# 60 Plätze für bezahlte Inserate reserviert, die zufällig wechseln – ein Teil davon taucht so nie auf, und die
+# übrigen verschieben sich, weil Anbieter ihre Inserate ständig „auffrischen“. Kleine Zonen (Pattaya ~80 Seiten)
+# sind schnell und vollständig. Lage kommt über das Projekt (ph_geo), Provinz ist die Zone.
+PH_ZONES = ["chonburi", "phuket", "chiang-mai", "rayong", "songkhla", "khon-kaen", "nakhon-pathom", "nakhon-ratchasima",
+            "chiang-rai", "saraburi", "samut-sakhon", "ubon-ratchathani", "udon-thani", "surat-thani", "nakhon-sawan",
+            "prachinburi", "chachoengsao", "trang", "chanthaburi", "krabi", "phitsanulok", "pattani", "prachuap-khiri-khan",
+            "phang-nga", "phetchaburi", "hua-hin"]
+
+
+def crawl_ph_zones(state, out, budget_end):
+    added = 0
+    for zone in PH_ZONES:
+        p, got, total = 1, 0, None
+        while time.time() < budget_end:
+            d = get(f"{PH}condo-for-rent/{zone}" + (f"?page={p}" if p > 1 else ""))
+            pp = ((d or {}).get("props") or {}).get("pageProps") or {}
+            L = pp.get("listings") or {}
+            if not isinstance(L, dict) or not L.get("listings"):
+                break
+            pag = L.get("pagination") or {}
+            if pag.get("page") not in (None, p):
+                break
+            total = pag.get("totalCount", total)
+            prov = zone if zone in PROVINCES else (prov_of((pp.get("zone") or {}).get("name")) or None)
+            items, _ = ph_items({"resultListings": L["listings"], "pagination": pag}, "condo")
+            for it in items:
+                if prov and not it.get("prov"):
+                    it["prov"] = prov
+                if it["id"] not in out["items"]:
+                    out["items"][it["id"]] = it
+                    added += 1
+                    got += 1
+            if p >= (pag.get("totalPages") or 0):
+                break
+            p += 1
+        if total:
+            log(f"PH Zone {zone}: {total} laut Portal, {got} neu dazu")
+    log(f"PH Zonen: {added} Condos zusätzlich")
+
+
 def ph_geo(state, out, budget_end):
     """Fertigstellungsjahr (+ Lage) je Condo-Projekt – einmal je Projekt, gemerkt."""
     geo = out["geo"]
@@ -318,6 +359,8 @@ def cmd_crawl(a):
     blocked = False
     try:
         (crawl_ph if a.source == "ph" else crawl_rh)(state, out, list_end)
+        if a.source == "ph":
+            crawl_ph_zones(state, out, list_end + 1800)
         (ph_geo if a.source == "ph" else rh_geo)(state, out, geo_end)
     except Blocked as e:
         blocked = True
